@@ -1,0 +1,17 @@
+add_library(ClusteredRendererLib)
+
+target_sources(ClusteredRendererLib PUBLIC 
+	"Core.hpp" "Core.cpp" "App.hpp" "App.cpp" 
+	"Scene.hpp" "Scene.cpp" "Window.hpp" "Window.cpp")
+
+set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
+
+find_package(spdlog)
+find_package(glfw3)
+find_package(assimp)
+find_package(EnTT)
+find_package(glm)
+
+target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm)
+
+target_include_directories(ClusteredRendererLib PUBLIC ${CMAKE_CURRENT_LIST_DIR})

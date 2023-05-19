@@ -1,0 +1,12 @@
+C:/dev/ClusteredRenderer/build/CMakeFiles/edit_cache.dir
+C:/dev/ClusteredRenderer/build/CMakeFiles/rebuild_cache.dir
+C:/dev/ClusteredRenderer/build/vendor/CMakeFiles/gladLib.dir
+C:/dev/ClusteredRenderer/build/vendor/CMakeFiles/imguiLib.dir
+C:/dev/ClusteredRenderer/build/vendor/CMakeFiles/edit_cache.dir
+C:/dev/ClusteredRenderer/build/vendor/CMakeFiles/rebuild_cache.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/CMakeFiles/ClusteredRenderer.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/CMakeFiles/edit_cache.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/CMakeFiles/rebuild_cache.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/src/CMakeFiles/ClusteredRendererLib.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/src/CMakeFiles/edit_cache.dir
+C:/dev/ClusteredRenderer/build/ClusteredRenderer/src/CMakeFiles/rebuild_cache.dir

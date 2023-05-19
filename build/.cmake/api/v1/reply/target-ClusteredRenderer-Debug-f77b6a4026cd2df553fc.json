@@ -1,0 +1,1109 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "ClusteredRenderer/ClusteredRenderer.exe"
+		},
+		{
+			"path" : "ClusteredRenderer/ClusteredRenderer.pdb"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"target_link_libraries",
+			"set_property",
+			"include",
+			"find_package",
+			"find_dependency",
+			"target_sources"
+		],
+		"files" : 
+		[
+			"ClusteredRenderer/CMakeLists.txt",
+			"ClusteredRenderer/src/CMakeLists.txt",
+			"build/glfw3-Target-debug.cmake",
+			"build/glfw3Targets.cmake",
+			"build/glfw3-config.cmake",
+			"vendor/CMakeLists.txt",
+			"build/spdlog-Target-debug.cmake",
+			"build/spdlogTargets.cmake",
+			"build/spdlog-config.cmake",
+			"build/fmt-Target-debug.cmake",
+			"build/fmtTargets.cmake",
+			"build/fmt-config.cmake",
+			"C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.25/Modules/CMakeFindDependencyMacro.cmake",
+			"build/opengl_system-Target-debug.cmake",
+			"build/opengl_systemTargets.cmake",
+			"build/opengl_system-config.cmake",
+			"build/assimp-Target-debug.cmake",
+			"build/assimpTargets.cmake",
+			"build/assimp-config.cmake",
+			"build/minizip-Target-debug.cmake",
+			"build/minizipTargets.cmake",
+			"build/minizip-config.cmake",
+			"build/BZip2-Target-debug.cmake",
+			"build/BZip2Targets.cmake",
+			"build/BZip2Config.cmake",
+			"build/pugixml-Target-debug.cmake",
+			"build/pugixmlTargets.cmake",
+			"build/pugixml-config.cmake",
+			"build/zip-Target-debug.cmake",
+			"build/zipTargets.cmake",
+			"build/zip-config.cmake",
+			"build/poly2tri-Target-debug.cmake",
+			"build/poly2triTargets.cmake",
+			"build/poly2tri-config.cmake",
+			"build/ZLIB-Target-debug.cmake",
+			"build/ZLIBTargets.cmake",
+			"build/ZLIBConfig.cmake",
+			"build/draco-Target-debug.cmake",
+			"build/dracoTargets.cmake",
+			"build/draco-config.cmake",
+			"build/clipper-Target-debug.cmake",
+			"build/clipperTargets.cmake",
+			"build/clipper-config.cmake",
+			"build/openddlparser-Target-debug.cmake",
+			"build/openddlparserTargets.cmake",
+			"build/openddlparser-config.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 6,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 3
+			},
+			{
+				"file" : 5
+			},
+			{
+				"command" : 4,
+				"file" : 5,
+				"line" : 14,
+				"parent" : 5
+			},
+			{
+				"file" : 4,
+				"parent" : 6
+			},
+			{
+				"command" : 3,
+				"file" : 4,
+				"line" : 16,
+				"parent" : 7
+			},
+			{
+				"file" : 3,
+				"parent" : 8
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 26,
+				"parent" : 9
+			},
+			{
+				"file" : 2,
+				"parent" : 10
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 39,
+				"parent" : 11
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 9,
+				"parent" : 3
+			},
+			{
+				"file" : 8,
+				"parent" : 13
+			},
+			{
+				"command" : 3,
+				"file" : 8,
+				"line" : 16,
+				"parent" : 14
+			},
+			{
+				"file" : 7,
+				"parent" : 15
+			},
+			{
+				"command" : 3,
+				"file" : 7,
+				"line" : 26,
+				"parent" : 16
+			},
+			{
+				"file" : 6,
+				"parent" : 17
+			},
+			{
+				"command" : 2,
+				"file" : 6,
+				"line" : 74,
+				"parent" : 18
+			},
+			{
+				"command" : 5,
+				"file" : 8,
+				"line" : 24,
+				"parent" : 14
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 20
+			},
+			{
+				"file" : 11,
+				"parent" : 21
+			},
+			{
+				"command" : 3,
+				"file" : 11,
+				"line" : 16,
+				"parent" : 22
+			},
+			{
+				"file" : 10,
+				"parent" : 23
+			},
+			{
+				"command" : 3,
+				"file" : 10,
+				"line" : 26,
+				"parent" : 24
+			},
+			{
+				"file" : 9,
+				"parent" : 25
+			},
+			{
+				"command" : 2,
+				"file" : 9,
+				"line" : 74,
+				"parent" : 26
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 10,
+				"parent" : 3
+			},
+			{
+				"file" : 4,
+				"parent" : 28
+			},
+			{
+				"command" : 3,
+				"file" : 4,
+				"line" : 16,
+				"parent" : 29
+			},
+			{
+				"file" : 3,
+				"parent" : 30
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 26,
+				"parent" : 31
+			},
+			{
+				"file" : 2,
+				"parent" : 32
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 39,
+				"parent" : 33
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 15,
+				"parent" : 33
+			},
+			{
+				"command" : 5,
+				"file" : 4,
+				"line" : 24,
+				"parent" : 29
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 36
+			},
+			{
+				"file" : 15,
+				"parent" : 37
+			},
+			{
+				"command" : 3,
+				"file" : 15,
+				"line" : 16,
+				"parent" : 38
+			},
+			{
+				"file" : 14,
+				"parent" : 39
+			},
+			{
+				"command" : 3,
+				"file" : 14,
+				"line" : 26,
+				"parent" : 40
+			},
+			{
+				"file" : 13,
+				"parent" : 41
+			},
+			{
+				"command" : 2,
+				"file" : 13,
+				"line" : 15,
+				"parent" : 42
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 11,
+				"parent" : 3
+			},
+			{
+				"file" : 18,
+				"parent" : 44
+			},
+			{
+				"command" : 3,
+				"file" : 18,
+				"line" : 16,
+				"parent" : 45
+			},
+			{
+				"file" : 17,
+				"parent" : 46
+			},
+			{
+				"command" : 3,
+				"file" : 17,
+				"line" : 26,
+				"parent" : 47
+			},
+			{
+				"file" : 16,
+				"parent" : 48
+			},
+			{
+				"command" : 2,
+				"file" : 16,
+				"line" : 39,
+				"parent" : 49
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 51
+			},
+			{
+				"file" : 21,
+				"parent" : 52
+			},
+			{
+				"command" : 3,
+				"file" : 21,
+				"line" : 16,
+				"parent" : 53
+			},
+			{
+				"file" : 20,
+				"parent" : 54
+			},
+			{
+				"command" : 3,
+				"file" : 20,
+				"line" : 26,
+				"parent" : 55
+			},
+			{
+				"file" : 19,
+				"parent" : 56
+			},
+			{
+				"command" : 2,
+				"file" : 19,
+				"line" : 39,
+				"parent" : 57
+			},
+			{
+				"command" : 5,
+				"file" : 21,
+				"line" : 24,
+				"parent" : 53
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 59
+			},
+			{
+				"file" : 24,
+				"parent" : 60
+			},
+			{
+				"command" : 3,
+				"file" : 24,
+				"line" : 16,
+				"parent" : 61
+			},
+			{
+				"file" : 23,
+				"parent" : 62
+			},
+			{
+				"command" : 3,
+				"file" : 23,
+				"line" : 26,
+				"parent" : 63
+			},
+			{
+				"file" : 22,
+				"parent" : 64
+			},
+			{
+				"command" : 2,
+				"file" : 22,
+				"line" : 39,
+				"parent" : 65
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 67
+			},
+			{
+				"file" : 27,
+				"parent" : 68
+			},
+			{
+				"command" : 3,
+				"file" : 27,
+				"line" : 16,
+				"parent" : 69
+			},
+			{
+				"file" : 26,
+				"parent" : 70
+			},
+			{
+				"command" : 3,
+				"file" : 26,
+				"line" : 32,
+				"parent" : 71
+			},
+			{
+				"file" : 25,
+				"parent" : 72
+			},
+			{
+				"command" : 2,
+				"file" : 25,
+				"line" : 39,
+				"parent" : 73
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 75
+			},
+			{
+				"file" : 30,
+				"parent" : 76
+			},
+			{
+				"command" : 3,
+				"file" : 30,
+				"line" : 16,
+				"parent" : 77
+			},
+			{
+				"file" : 29,
+				"parent" : 78
+			},
+			{
+				"command" : 3,
+				"file" : 29,
+				"line" : 26,
+				"parent" : 79
+			},
+			{
+				"file" : 28,
+				"parent" : 80
+			},
+			{
+				"command" : 2,
+				"file" : 28,
+				"line" : 39,
+				"parent" : 81
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 83
+			},
+			{
+				"file" : 33,
+				"parent" : 84
+			},
+			{
+				"command" : 3,
+				"file" : 33,
+				"line" : 16,
+				"parent" : 85
+			},
+			{
+				"file" : 32,
+				"parent" : 86
+			},
+			{
+				"command" : 3,
+				"file" : 32,
+				"line" : 26,
+				"parent" : 87
+			},
+			{
+				"file" : 31,
+				"parent" : 88
+			},
+			{
+				"command" : 2,
+				"file" : 31,
+				"line" : 39,
+				"parent" : 89
+			},
+			{
+				"command" : 5,
+				"file" : 21,
+				"line" : 24,
+				"parent" : 53
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 91
+			},
+			{
+				"file" : 36,
+				"parent" : 92
+			},
+			{
+				"command" : 3,
+				"file" : 36,
+				"line" : 16,
+				"parent" : 93
+			},
+			{
+				"file" : 35,
+				"parent" : 94
+			},
+			{
+				"command" : 3,
+				"file" : 35,
+				"line" : 26,
+				"parent" : 95
+			},
+			{
+				"file" : 34,
+				"parent" : 96
+			},
+			{
+				"command" : 2,
+				"file" : 34,
+				"line" : 39,
+				"parent" : 97
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 99
+			},
+			{
+				"file" : 39,
+				"parent" : 100
+			},
+			{
+				"command" : 3,
+				"file" : 39,
+				"line" : 16,
+				"parent" : 101
+			},
+			{
+				"file" : 38,
+				"parent" : 102
+			},
+			{
+				"command" : 3,
+				"file" : 38,
+				"line" : 26,
+				"parent" : 103
+			},
+			{
+				"file" : 37,
+				"parent" : 104
+			},
+			{
+				"command" : 2,
+				"file" : 37,
+				"line" : 39,
+				"parent" : 105
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 107
+			},
+			{
+				"file" : 42,
+				"parent" : 108
+			},
+			{
+				"command" : 3,
+				"file" : 42,
+				"line" : 16,
+				"parent" : 109
+			},
+			{
+				"file" : 41,
+				"parent" : 110
+			},
+			{
+				"command" : 3,
+				"file" : 41,
+				"line" : 26,
+				"parent" : 111
+			},
+			{
+				"file" : 40,
+				"parent" : 112
+			},
+			{
+				"command" : 2,
+				"file" : 40,
+				"line" : 39,
+				"parent" : 113
+			},
+			{
+				"command" : 5,
+				"file" : 18,
+				"line" : 24,
+				"parent" : 45
+			},
+			{
+				"command" : 4,
+				"file" : 12,
+				"line" : 47,
+				"parent" : 115
+			},
+			{
+				"file" : 45,
+				"parent" : 116
+			},
+			{
+				"command" : 3,
+				"file" : 45,
+				"line" : 16,
+				"parent" : 117
+			},
+			{
+				"file" : 44,
+				"parent" : 118
+			},
+			{
+				"command" : 3,
+				"file" : 44,
+				"line" : 26,
+				"parent" : 119
+			},
+			{
+				"file" : 43,
+				"parent" : 120
+			},
+			{
+				"command" : 2,
+				"file" : 43,
+				"line" : 39,
+				"parent" : 121
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 3,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI"
+				},
+				{
+					"fragment" : "-std:c++20"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "HAVE_BZIP2"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "OPENDDL_STATIC_LIBARY"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SPDLOG_COMPILED_LIB"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SPDLOG_FMT_EXTERNAL"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "STB_TEXTEDIT_KEYTYPE=unsigned"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"path" : "C:/dev/ClusteredRenderer/ClusteredRenderer/src"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/dev/ClusteredRenderer/vendor/."
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/spdloc85815db9798e/p/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/fmt26f902364af87/p/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/glfw754621de0fdd2/p/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/assimc328af72455d4/p/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/entt4626e134c934c/p/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "C:/Users/Krzysztof/.conan2/p/glmb8583f8d3b716/p/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				3,
+				5,
+				7,
+				9
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "gladLib::@af9395fb4c239a7adf53"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "ClusteredRendererLib::@2bb440ae4ed33941e8ea"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "imguiLib::@af9395fb4c239a7adf53"
+		}
+	],
+	"id" : "ClusteredRenderer::@9b9c6bcb4961b2cea246",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\glfw754621de0fdd2\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\spdloc85815db9798e\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\fmt26f902364af87\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\assimc328af72455d4\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\miniz9a355f7ac94b1\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\bzip25e3167db905ff\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\zlib68724b092caa7\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\pugixac09b49913775\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\kuba-25a98d53b5a73\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\poly2fc55060a23099\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\rapid4cabb31a09329\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\draco0c5b46e22d95e\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\clippa07d3219b0876\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-LIBPATH:C:\\Users\\Krzysztof\\.conan2\\p\\opend0564534e1b3fe\\p\\lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "ClusteredRenderer\\src\\ClusteredRendererLib.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "vendor\\imguiLib.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 12,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\glfw754621de0fdd2\\p\\lib\\glfw3.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "vendor\\gladLib.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 19,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\spdloc85815db9798e\\p\\lib\\spdlogd.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 27,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\fmt26f902364af87\\p\\lib\\fmtd.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 34,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\glfw754621de0fdd2\\p\\lib\\glfw3.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 35,
+				"fragment" : "gdi32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 43,
+				"fragment" : "opengl32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 50,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\assimc328af72455d4\\p\\lib\\assimp-vc143-mtd.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 58,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\miniz9a355f7ac94b1\\p\\lib\\minizip.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 66,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\bzip25e3167db905ff\\p\\lib\\bz2.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 74,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\pugixac09b49913775\\p\\lib\\pugixml.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 82,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\kuba-25a98d53b5a73\\p\\lib\\zip.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 90,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\poly2fc55060a23099\\p\\lib\\poly2tri.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 98,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\zlib68724b092caa7\\p\\lib\\zlib.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 106,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\draco0c5b46e22d95e\\p\\lib\\draco.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 114,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\clippa07d3219b0876\\p\\lib\\polyclipping.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 122,
+				"fragment" : "C:\\Users\\Krzysztof\\.conan2\\p\\opend0564534e1b3fe\\p\\lib\\openddlparser.lib",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "ClusteredRenderer",
+	"nameOnDisk" : "ClusteredRenderer.exe",
+	"paths" : 
+	{
+		"build" : "ClusteredRenderer",
+		"source" : "ClusteredRenderer"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				3,
+				5,
+				7,
+				9
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				4,
+				6,
+				8
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 123,
+			"compileGroupIndex" : 0,
+			"path" : "ClusteredRenderer/ClusteredRenderer.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 123,
+			"path" : "ClusteredRenderer/ClusteredRenderer.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "ClusteredRenderer/src/Core.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "ClusteredRenderer/src/Core.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "ClusteredRenderer/src/App.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "ClusteredRenderer/src/App.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "ClusteredRenderer/src/Scene.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "ClusteredRenderer/src/Scene.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "ClusteredRenderer/src/Window.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "ClusteredRenderer/src/Window.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

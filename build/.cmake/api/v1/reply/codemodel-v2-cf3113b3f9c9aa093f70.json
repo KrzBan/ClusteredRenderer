@@ -1,0 +1,138 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "vendor",
+					"jsonFile" : "directory-vendor-Debug-fbf6dc3f88f70c22a47e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "vendor",
+					"targetIndexes" : 
+					[
+						2,
+						3
+					]
+				},
+				{
+					"build" : "ClusteredRenderer",
+					"childIndexes" : 
+					[
+						3
+					],
+					"jsonFile" : "directory-ClusteredRenderer-Debug-8d0e9378d8466dbb5c00.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "ClusteredRenderer",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "ClusteredRenderer/src",
+					"jsonFile" : "directory-ClusteredRenderer.src-Debug-e752ce84f66e994da07d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "ClusteredRenderer/src",
+					"targetIndexes" : 
+					[
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					],
+					"name" : "ClusteredRenderer",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "ClusteredRenderer::@9b9c6bcb4961b2cea246",
+					"jsonFile" : "target-ClusteredRenderer-Debug-f77b6a4026cd2df553fc.json",
+					"name" : "ClusteredRenderer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ClusteredRendererLib::@2bb440ae4ed33941e8ea",
+					"jsonFile" : "target-ClusteredRendererLib-Debug-f66144048c1b16c7b2dd.json",
+					"name" : "ClusteredRendererLib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "gladLib::@af9395fb4c239a7adf53",
+					"jsonFile" : "target-gladLib-Debug-0b6cdc674ca3120a31c1.json",
+					"name" : "gladLib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "imguiLib::@af9395fb4c239a7adf53",
+					"jsonFile" : "target-imguiLib-Debug-1a55cde0858ffdd098f7.json",
+					"name" : "imguiLib",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/dev/ClusteredRenderer/build",
+		"source" : "C:/dev/ClusteredRenderer"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
