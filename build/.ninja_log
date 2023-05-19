@@ -46,3 +46,9 @@
 18	2142	7062298781287703	ClusteredRenderer/src/CMakeFiles/ClusteredRendererLib.dir/Window.cpp.obj	f3670fc5043d857e
 2142	2236	7062298782122587	ClusteredRenderer/src/ClusteredRendererLib.lib	74c8270746358b24
 2236	2883	7062298787745430	ClusteredRenderer/ClusteredRenderer.exe	e5100dfb66700cc5
+14	2330	7062323180171558	ClusteredRenderer/CMakeFiles/ClusteredRenderer.dir/src/App.cpp.obj	62738da1bb44fc56
+17	2762	7062323184465159	ClusteredRenderer/CMakeFiles/ClusteredRenderer.dir/src/Window.cpp.obj	88e2fccda2fda1ac
+26	2792	7062323184774342	ClusteredRenderer/src/CMakeFiles/ClusteredRendererLib.dir/Window.cpp.obj	f3670fc5043d857e
+22	3611	7062323192986932	ClusteredRenderer/src/CMakeFiles/ClusteredRendererLib.dir/App.cpp.obj	c27654bb19ee2c21
+3611	3672	7062323193455682	ClusteredRenderer/src/ClusteredRendererLib.lib	74c8270746358b24
+3672	3870	7062323195230940	ClusteredRenderer/ClusteredRenderer.exe	e5100dfb66700cc5
