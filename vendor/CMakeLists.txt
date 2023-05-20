@@ -2,7 +2,7 @@ add_library(gladLib
 	glad/glad.h
 	glad/glad.c
 	KHR/khrplatform.h)
-target_include_directories(gladLib PUBLIC ./)
+target_include_directories(gladLib SYSTEM PUBLIC ./)
 
 add_library(imguiLib STATIC 
 	"imgui/imgui_impl_glfw.h" "imgui/imgui_impl_glfw.cpp" 
@@ -14,5 +14,4 @@ add_library(imguiLib STATIC
 find_package(glfw3)
 target_link_libraries(imguiLib PRIVATE gladLib glfw)
 
-target_include_directories(imguiLib SYSTEM PUBLIC ./)
-target_compile_options(imguiLib PUBLIC "")
+target_include_directories(imguiLib PUBLIC SYSTEM ./)

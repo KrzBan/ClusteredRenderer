@@ -10,5 +10,5 @@ public:
 	int Run();
 
 private:
-	Weak<Scene> scene;
+	Scene scene;
 };

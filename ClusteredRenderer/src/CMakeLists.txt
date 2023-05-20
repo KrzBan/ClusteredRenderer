@@ -2,7 +2,8 @@ add_library(ClusteredRendererLib)
 
 target_sources(ClusteredRendererLib PUBLIC 
 	"Core.hpp" "Core.cpp" "App.hpp" "App.cpp" 
-	"Scene.hpp" "Scene.cpp" "Window.hpp" "Window.cpp")
+	"Gui.hpp" "Gui.cpp"
+	"Scene.hpp" "Scene.cpp" "Window.hpp" "Window.cpp" )
 
 set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
 

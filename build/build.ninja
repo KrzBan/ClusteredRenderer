@@ -79,7 +79,7 @@ build cmake_object_order_depends_target_gladLib: phony || vendor\CMakeFiles\glad
 
 build vendor\CMakeFiles\gladLib.dir\glad\glad.c.obj: C_COMPILER__gladLib_Debug C$:\dev\ClusteredRenderer\vendor\glad\glad.c || cmake_object_order_depends_target_gladLib
   FLAGS = /DWIN32 /D_WINDOWS /Ob0 /Od /RTC1 -MDd -ZI
-  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\.
+  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:W0
   OBJECT_DIR = vendor\CMakeFiles\gladLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\gladLib.dir\glad
   TARGET_COMPILE_PDB = vendor\CMakeFiles\gladLib.dir\gladLib.pdb
@@ -114,7 +114,7 @@ build cmake_object_order_depends_target_imguiLib: phony || cmake_object_order_de
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_glfw.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_impl_glfw.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -122,7 +122,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_glfw.cpp.obj: CXX_COMPILER
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_opengl3.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_impl_opengl3.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -130,7 +130,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_opengl3.cpp.obj: CXX_COMPI
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_win32.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_impl_win32.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -138,7 +138,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_impl_win32.cpp.obj: CXX_COMPILE
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -146,7 +146,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui.cpp.obj: CXX_COMPILER__imguiLib
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_draw.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_draw.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -154,7 +154,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_draw.cpp.obj: CXX_COMPILER__img
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_tables.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_tables.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -162,7 +162,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_tables.cpp.obj: CXX_COMPILER__i
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_widgets.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -170,7 +170,7 @@ build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__
 
 build vendor\CMakeFiles\imguiLib.dir\imgui\imgui_demo.cpp.obj: CXX_COMPILER__imguiLib_Debug C$:\dev\ClusteredRenderer\vendor\imgui\imgui_demo.cpp || cmake_object_order_depends_target_imguiLib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:W0
   OBJECT_DIR = vendor\CMakeFiles\imguiLib.dir
   OBJECT_FILE_DIR = vendor\CMakeFiles\imguiLib.dir\imgui
   TARGET_COMPILE_PDB = vendor\CMakeFiles\imguiLib.dir\imguiLib.pdb
@@ -234,7 +234,7 @@ build cmake_object_order_depends_target_ClusteredRenderer: phony || cmake_object
 build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\ClusteredRenderer.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\ClusteredRenderer.cpp || cmake_object_order_depends_target_ClusteredRenderer
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
@@ -243,7 +243,7 @@ build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\ClusteredRenderer.cpp.o
 build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Core.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Core.cpp || cmake_object_order_depends_target_ClusteredRenderer
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src
   TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
@@ -252,7 +252,16 @@ build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Core.cpp.obj: CXX_C
 build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\App.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\App.cpp || cmake_object_order_depends_target_ClusteredRenderer
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
+  OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src
+  TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
+  TARGET_PDB = ClusteredRenderer\ClusteredRenderer.pdb
+
+build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Gui.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Gui.cpp || cmake_object_order_depends_target_ClusteredRenderer
+  DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src
   TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
@@ -261,7 +270,7 @@ build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\App.cpp.obj: CXX_CO
 build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Scene.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Scene.cpp || cmake_object_order_depends_target_ClusteredRenderer
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src
   TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
@@ -270,7 +279,7 @@ build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Scene.cpp.obj: CXX_
 build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Window.cpp.obj: CXX_COMPILER__ClusteredRenderer_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Window.cpp || cmake_object_order_depends_target_ClusteredRenderer
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir
   OBJECT_FILE_DIR = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src
   TARGET_COMPILE_PDB = ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\
@@ -284,7 +293,7 @@ build ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Window.cpp.obj: CXX
 #############################################
 # Link the executable ClusteredRenderer\ClusteredRenderer.exe
 
-build ClusteredRenderer\ClusteredRenderer.exe: CXX_EXECUTABLE_LINKER__ClusteredRenderer_Debug ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\ClusteredRenderer.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Core.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\App.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Scene.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Window.cpp.obj | ClusteredRenderer\src\ClusteredRendererLib.lib vendor\imguiLib.lib C$:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib vendor\gladLib.lib C$:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\lib\spdlogd.lib C$:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\lib\fmtd.lib C$:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib C$:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\lib\assimp-vc143-mtd.lib C$:\Users\Krzysztof\.conan2\p\miniz9a355f7ac94b1\p\lib\minizip.lib C$:\Users\Krzysztof\.conan2\p\bzip25e3167db905ff\p\lib\bz2.lib C$:\Users\Krzysztof\.conan2\p\pugixac09b49913775\p\lib\pugixml.lib C$:\Users\Krzysztof\.conan2\p\kuba-25a98d53b5a73\p\lib\zip.lib C$:\Users\Krzysztof\.conan2\p\poly2fc55060a23099\p\lib\poly2tri.lib C$:\Users\Krzysztof\.conan2\p\zlib68724b092caa7\p\lib\zlib.lib C$:\Users\Krzysztof\.conan2\p\draco0c5b46e22d95e\p\lib\draco.lib C$:\Users\Krzysztof\.conan2\p\clippa07d3219b0876\p\lib\polyclipping.lib C$:\Users\Krzysztof\.conan2\p\opend0564534e1b3fe\p\lib\openddlparser.lib || ClusteredRenderer\src\ClusteredRendererLib.lib vendor\gladLib.lib vendor\imguiLib.lib
+build ClusteredRenderer\ClusteredRenderer.exe: CXX_EXECUTABLE_LINKER__ClusteredRenderer_Debug ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\ClusteredRenderer.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Core.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\App.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Gui.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Scene.cpp.obj ClusteredRenderer\CMakeFiles\ClusteredRenderer.dir\src\Window.cpp.obj | ClusteredRenderer\src\ClusteredRendererLib.lib vendor\imguiLib.lib C$:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib vendor\gladLib.lib C$:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\lib\spdlogd.lib C$:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\lib\fmtd.lib C$:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib C$:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\lib\assimp-vc143-mtd.lib C$:\Users\Krzysztof\.conan2\p\miniz9a355f7ac94b1\p\lib\minizip.lib C$:\Users\Krzysztof\.conan2\p\bzip25e3167db905ff\p\lib\bz2.lib C$:\Users\Krzysztof\.conan2\p\pugixac09b49913775\p\lib\pugixml.lib C$:\Users\Krzysztof\.conan2\p\kuba-25a98d53b5a73\p\lib\zip.lib C$:\Users\Krzysztof\.conan2\p\poly2fc55060a23099\p\lib\poly2tri.lib C$:\Users\Krzysztof\.conan2\p\zlib68724b092caa7\p\lib\zlib.lib C$:\Users\Krzysztof\.conan2\p\draco0c5b46e22d95e\p\lib\draco.lib C$:\Users\Krzysztof\.conan2\p\clippa07d3219b0876\p\lib\polyclipping.lib C$:\Users\Krzysztof\.conan2\p\opend0564534e1b3fe\p\lib\openddlparser.lib || ClusteredRenderer\src\ClusteredRendererLib.lib vendor\gladLib.lib vendor\imguiLib.lib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = ClusteredRenderer\src\ClusteredRendererLib.lib  vendor\imguiLib.lib  C:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib  vendor\gladLib.lib  C:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\lib\spdlogd.lib  C:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\lib\fmtd.lib  C:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\lib\glfw3.lib  gdi32.lib  opengl32.lib  C:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\lib\assimp-vc143-mtd.lib  C:\Users\Krzysztof\.conan2\p\miniz9a355f7ac94b1\p\lib\minizip.lib  C:\Users\Krzysztof\.conan2\p\bzip25e3167db905ff\p\lib\bz2.lib  C:\Users\Krzysztof\.conan2\p\pugixac09b49913775\p\lib\pugixml.lib  C:\Users\Krzysztof\.conan2\p\kuba-25a98d53b5a73\p\lib\zip.lib  C:\Users\Krzysztof\.conan2\p\poly2fc55060a23099\p\lib\poly2tri.lib  C:\Users\Krzysztof\.conan2\p\zlib68724b092caa7\p\lib\zlib.lib  C:\Users\Krzysztof\.conan2\p\draco0c5b46e22d95e\p\lib\draco.lib  C:\Users\Krzysztof\.conan2\p\clippa07d3219b0876\p\lib\polyclipping.lib  C:\Users\Krzysztof\.conan2\p\opend0564534e1b3fe\p\lib\openddlparser.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -337,7 +346,7 @@ build cmake_object_order_depends_target_ClusteredRendererLib: phony || cmake_obj
 build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Core.cpp.obj: CXX_COMPILER__ClusteredRendererLib_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Core.cpp || cmake_object_order_depends_target_ClusteredRendererLib
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   OBJECT_FILE_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   TARGET_COMPILE_PDB = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\ClusteredRendererLib.pdb
@@ -346,7 +355,16 @@ build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Core.cpp.obj: CX
 build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\App.cpp.obj: CXX_COMPILER__ClusteredRendererLib_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\App.cpp || cmake_object_order_depends_target_ClusteredRendererLib
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
+  OBJECT_FILE_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
+  TARGET_COMPILE_PDB = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\ClusteredRendererLib.pdb
+  TARGET_PDB = ClusteredRenderer\src\ClusteredRendererLib.pdb
+
+build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Gui.cpp.obj: CXX_COMPILER__ClusteredRendererLib_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Gui.cpp || cmake_object_order_depends_target_ClusteredRendererLib
+  DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   OBJECT_FILE_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   TARGET_COMPILE_PDB = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\ClusteredRendererLib.pdb
@@ -355,7 +373,7 @@ build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\App.cpp.obj: CXX
 build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Scene.cpp.obj: CXX_COMPILER__ClusteredRendererLib_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Scene.cpp || cmake_object_order_depends_target_ClusteredRendererLib
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   OBJECT_FILE_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   TARGET_COMPILE_PDB = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\ClusteredRendererLib.pdb
@@ -364,7 +382,7 @@ build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Scene.cpp.obj: C
 build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Window.cpp.obj: CXX_COMPILER__ClusteredRendererLib_Debug C$:\dev\ClusteredRenderer\ClusteredRenderer\src\Window.cpp || cmake_object_order_depends_target_ClusteredRendererLib
   DEFINES = -DHAVE_BZIP2 -DOPENDDL_STATIC_LIBARY -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSTB_TEXTEDIT_KEYTYPE=unsigned
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI -std:c++20
-  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
+  INCLUDES = -IC:\dev\ClusteredRenderer\ClusteredRenderer\src -IC:\dev\ClusteredRenderer\vendor\SYSTEM -external:IC:\dev\ClusteredRenderer\vendor\. -external:IC:\Users\Krzysztof\.conan2\p\spdloc85815db9798e\p\include -external:IC:\Users\Krzysztof\.conan2\p\fmt26f902364af87\p\include -external:IC:\Users\Krzysztof\.conan2\p\glfw754621de0fdd2\p\include -external:IC:\Users\Krzysztof\.conan2\p\assimc328af72455d4\p\include -external:IC:\Users\Krzysztof\.conan2\p\entt4626e134c934c\p\include -external:IC:\Users\Krzysztof\.conan2\p\glmb8583f8d3b716\p\include -external:W0
   OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   OBJECT_FILE_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
   TARGET_COMPILE_PDB = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\ClusteredRendererLib.pdb
@@ -378,7 +396,7 @@ build ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Window.cpp.obj: 
 #############################################
 # Link the static library ClusteredRenderer\src\ClusteredRendererLib.lib
 
-build ClusteredRenderer\src\ClusteredRendererLib.lib: CXX_STATIC_LIBRARY_LINKER__ClusteredRendererLib_Debug ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Core.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\App.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Scene.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Window.cpp.obj || vendor\gladLib.lib vendor\imguiLib.lib
+build ClusteredRenderer\src\ClusteredRendererLib.lib: CXX_STATIC_LIBRARY_LINKER__ClusteredRendererLib_Debug ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Core.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\App.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Gui.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Scene.cpp.obj ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir\Window.cpp.obj || vendor\gladLib.lib vendor\imguiLib.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -ZI
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = ClusteredRenderer\src\CMakeFiles\ClusteredRendererLib.dir
