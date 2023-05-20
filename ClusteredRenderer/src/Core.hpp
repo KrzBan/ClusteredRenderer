@@ -1,7 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
+#include <array>
+#include <numeric>
+#include <ranges>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #include <spdlog/spdlog.h>
 
@@ -12,6 +18,9 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+
+#include <Core/Input.hpp>
+#include <Core/Time.hpp>
 
 struct OpenGLVersion {
 	int major = 0;

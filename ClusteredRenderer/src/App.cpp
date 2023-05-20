@@ -7,6 +7,8 @@ int App::Run() {
 	
 	Window window(640, 480, config::windowTitle, config::openGLVersion);
 
+	Input::Init(window.glfwWindow());
+
 	Gui gui(window);
 
 	// Demo State
@@ -16,8 +18,18 @@ int App::Run() {
 	WindowTest2 windowTest2{};
 
 	while (window.ShouldClose() == false) {
+		Time::UpdateTime(glfwGetTime());
+
 		// Get Inputs
+		Input::ClearKeys();
 		glfwPollEvents();
+
+		if (Input::GetKeyDown(KB_G)) {
+			spdlog::info("Current time: {}", Time::DeltaTime());
+		}
+		if (Input::GetKeyUp(KB_G)) {
+			spdlog::info("Current FPS: {}", Time::FramesPerSecond());
+		}
 
 		// Prepare GUI
 		gui.NewFrame();

@@ -2,8 +2,10 @@ add_library(ClusteredRendererLib)
 
 target_sources(ClusteredRendererLib PUBLIC 
 	"Core.hpp" "Core.cpp" "App.hpp" "App.cpp" 
+	"Core/Time.hpp" "Core/Time.cpp" "Core/Input.hpp" "Core/Input.cpp" 
+	"Core/KeyCodes.hpp"  "Core/KeyCodes.cpp"
 	"Gui.hpp" "Gui.cpp"
-	"Scene.hpp" "Scene.cpp" "Window.hpp" "Window.cpp" )
+	"Scene.hpp" "Scene.cpp" "Window.hpp" "Window.cpp"  )
 
 set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
 
