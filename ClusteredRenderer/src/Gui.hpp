@@ -2,7 +2,7 @@
 
 #include <Core.hpp>
 
-#include "Window.hpp"
+#include "Renderer/Window.hpp"
 
 #include "Gui/WindowTest1.hpp"
 #include "Gui/WindowTest2.hpp"

@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-#include "Window.hpp"
+#include "Renderer/Window.hpp"
 #include "Gui.hpp"
 
 int App::Run() {

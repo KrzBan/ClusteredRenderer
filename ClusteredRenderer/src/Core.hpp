@@ -1,8 +1,10 @@
 #pragma once
 
-#include <iostream>
 #include <algorithm>
 #include <array>
+#include <format>
+#include <fstream>
+#include <iostream>
 #include <numeric>
 #include <ranges>
 #include <string>
@@ -18,6 +20,11 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <stb_image.h>
 
 #include <Core/Input.hpp>
 #include <Core/Time.hpp>
@@ -41,3 +48,5 @@ using Unique = std::unique_ptr<T>;
 
 template<typename T>
 using Shared = std::unique_ptr<T>;
+
+using uint32 = uint32_t;
