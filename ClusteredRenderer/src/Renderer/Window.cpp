@@ -66,10 +66,10 @@ void Window::ErrorCallback(int error, const char* description) {
 }
 
 void PrintVersionInfo() {
-    const auto vendor = glGetString(GL_VENDOR);
-    const auto renderer = glGetString(GL_RENDERER);
-    const auto version = glGetString(GL_VERSION);
-    const auto glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    const auto vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    const auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    const auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    const auto glslVersion = reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     spdlog::info("GL Vendor: {}", vendor);
     spdlog::info("GL Renderer: {}", renderer);
@@ -80,7 +80,8 @@ void PrintVersionInfo() {
     glGetIntegerv(GL_NUM_EXTENSIONS, &nExtensions);
     spdlog::info("Available extensions:");
     for (int i = 0; i < nExtensions; i++) {
-        spdlog::info("{}", glGetStringi(GL_EXTENSIONS, i));
+        const auto extStr = reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i));
+        spdlog::info("{}", extStr);
     }
 
     int maxTessGenLevel = 0;
