@@ -23,7 +23,7 @@ Shader::Shader(ShaderType shaderType, std::string_view source, ShaderCreateInfo 
 
 	glGetShaderiv(m_Handle, GL_COMPILE_STATUS, &success);
 	if (success != GL_TRUE) {
-		glGetShaderInfoLog(m_Handle, logBuffer.size(), nullptr, logBuffer.data());
+		glGetShaderInfoLog(m_Handle, static_cast<GLsizei>(logBuffer.size()), nullptr, logBuffer.data());
 		spdlog::error("Shader compilation failed: {}", logBuffer.data());
 	};
 }
@@ -67,8 +67,8 @@ std::string Shader::PreprocessShader(const std::string& input) {
 		auto searchStrPos = source.find(searchStr);
 		if (searchStrPos != source.npos) {//vec4 p00 = gl_in[0].gl_Position;
 			std::string newStr{};
-			for (int y = 0; y < tesY; ++y) {
-				for (int x = 0; x < tesX; ++x) {
+			for (size_t y = 0; y < tesY; ++y) {
+				for (size_t x = 0; x < tesX; ++x) {
 					if (x + y * tesX >= maxPoints) break;
 
 					newStr.append(std::format("vec4 p{}{} = gl_in[{}].gl_Position;\n", y, x, x + y * tesX));
@@ -102,8 +102,8 @@ std::string Shader::PreprocessShader(const std::string& input) {
 			//p30*bu[3]*bv[0] + p31*bu[3]*bv[1] + p32*bu[3]*bv[2] + p33*bu[3]*bv[3];
 
 			newStr.append("vec4 pos = \n");
-			for (int y = 0; y < tesY; ++y) {
-				for (int x = 0; x < tesX; ++x) {
+			for (size_t y = 0; y < tesY; ++y) {
+				for (size_t x = 0; x < tesX; ++x) {
 					if (x + y * tesX >= maxPoints) break;
 
 					if (x != 0 || y != 0) newStr.append(" + ");
@@ -121,8 +121,8 @@ std::string Shader::PreprocessShader(const std::string& input) {
 			//p30*dbu[3]*bv[0] + p31*dbu[3]*bv[1] + p32*dbu[3]*bv[2] + p33*dbu[3]*bv[3];
 
 			newStr.append("vec4 du = \n");
-			for (int x = 0; x < tesX; ++x) {
-				for (int y = 0; y < tesY; ++y) {
+			for (size_t x = 0; x < tesX; ++x) {
+				for (size_t y = 0; y < tesY; ++y) {
 					if (x + y * tesX >= maxPoints) break;
 
 					if (x != 0 || y != 0) newStr.append(" + ");
@@ -139,8 +139,8 @@ std::string Shader::PreprocessShader(const std::string& input) {
 			//p30*bu[3]*dbv[0] + p31*bu[3]*dbv[1] + p32*bu[3]*dbv[2] + p33*bu[3]*dbv[3];
 
 			newStr.append("vec4 dv = \n");
-			for (int y = 0; y < tesY; ++y) {
-				for (int x = 0; x < tesX; ++x) {
+			for (size_t y = 0; y < tesY; ++y) {
+				for (size_t x = 0; x < tesX; ++x) {
 					if (x + y * tesX >= maxPoints) break;
 
 					if (x != 0 || y != 0) newStr.append(" + ");

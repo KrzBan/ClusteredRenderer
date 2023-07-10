@@ -20,7 +20,7 @@ void ShaderProgram::CompileProgram() const {
 	glGetProgramiv(m_Handle, GL_LINK_STATUS, &success);
 	if (success != GL_TRUE)
 	{
-		glGetProgramInfoLog(m_Handle, logBuffer.size(), nullptr, logBuffer.data());
+		glGetProgramInfoLog(m_Handle, static_cast<GLsizei>(logBuffer.size()), nullptr, logBuffer.data());
 		spdlog::error("ShaderProgram link failed: {}", logBuffer.data());
 	}
 }

@@ -10,8 +10,8 @@ Window::Window(int width, int height, const char* title, OpenGLVersion openGLVer
 		throw std::runtime_error("Couldn't init glfw");
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config::openGLVersion.major);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config::openGLVersion.minor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersion.major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGLVersion.minor);
 
 	m_Window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 	if (m_Window == nullptr) {
@@ -61,7 +61,7 @@ void Window::SetTitle(const std::string& title) {
     glfwSetWindowTitle(m_Window, title.c_str());
 }
 
-void Window::ErrorCallback(int error, const char* description) {
+void Window::ErrorCallback( [[maybe_unused]] int error, const char* description) {
 	spdlog::error("Error: {}", description);
 }
 

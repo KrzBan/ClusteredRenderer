@@ -9,7 +9,7 @@ struct KeyState {
 
 struct InputData {
 	std::array<KeyState, GLFW_KEY_LAST> keyStates{};
-	std::vector<uint16_t> releasedKeys;
+	std::vector<int> releasedKeys;
 
 	double MousePosX = 0.0, MousePosY = 0.0;
 	double MouseDeltaX = 0.0, MouseDeltaY = 0.0;
@@ -48,7 +48,7 @@ void Input::ClearKeys() {
 	inputData.releasedKeys.clear();
 }
 
-void Input::InputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void Input::InputCallback([[maybe_unused]] GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
 
 	switch (action) {
 	case GLFW_PRESS:
@@ -70,7 +70,7 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 	InputCallback(window, button, 0, action, mods);
 }
 
-void Input::MousePosCallback(GLFWwindow* window, double xpos, double ypos) {
+void Input::MousePosCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
 	inputData.MousePosX = xpos;
 	inputData.MousePosY = ypos;
 }
