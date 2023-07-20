@@ -31,18 +31,21 @@ int App::Run() {
 			spdlog::info("Current FPS: {}", Time::FramesPerSecond());
 		}
 
+		// Scripts
+
 		// Prepare GUI
 		gui.NewFrame();
 
-		windowTest1.Draw(show_demo_window, windowTest2.GetDrawHandle());
+		auto windowTest1Output = windowTest1.Draw(show_demo_window, windowTest2.GetDrawHandle());
+
+		if (windowTest1Output.clearColor.has_value()) {
+			auto clearColor = windowTest1Output.clearColor.value();
+			window.SetClearColor(clearColor);
+		}
+
 		windowTest2.Draw();
 
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
-
-		// Clear Screen
-		auto clearColor = windowTest1.GetClearColor();
-		glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
+		// Clear Screen	
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Render

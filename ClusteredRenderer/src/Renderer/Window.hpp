@@ -22,6 +22,7 @@ public:
 	static void ErrorCallback(int error, const char* description);
 
 	void SetTitle(const std::string& title);
+	void SetClearColor(const glm::vec4& clearColor);
 
 private:
 	GLFWwindow* m_Window = nullptr;

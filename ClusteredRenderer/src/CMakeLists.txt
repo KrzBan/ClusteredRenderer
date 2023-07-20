@@ -4,21 +4,29 @@ set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
 
 target_sources(ClusteredRendererLib PUBLIC 
 	"App.hpp" "App.cpp" 
+	"Components.hpp"
 
 	"Core.hpp" "Core.cpp" 
 	"Core/Input.hpp" "Core/Input.cpp" 
 	"Core/KeyCodes.hpp"  "Core/KeyCodes.cpp"
 	"Core/Time.hpp" "Core/Time.cpp"
-	
+
+	"Entity.hpp" "Entity.cpp"
 	"Gui.hpp" "Gui.cpp"
 	"Scene.hpp" "Scene.cpp" 
+	"SceneCamera.hpp" "SceneCamera.cpp"
+	"Scriptable.hpp"
 	"Stb.cpp"
 
+	"Renderer/Camera.hpp"
+	"Renderer/EditorCamera.hpp" "Renderer/EditorCamera.cpp"
 	"Renderer/Framebuffer.hpp" "Renderer/Framebuffer.cpp" 
 	"Renderer/Shader.hpp" "Renderer/Shader.cpp" 
 	"Renderer/ShaderProgram.hpp" "Renderer/ShaderProgram.cpp" 
 	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
-	"Renderer/Window.hpp" "Renderer/Window.cpp"   )
+	"Renderer/Window.hpp" "Renderer/Window.cpp"    
+	
+	"UUID.hpp" "UUID.cpp"   )
 
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)

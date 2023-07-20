@@ -2,6 +2,10 @@
 
 #include <Core.hpp>
 
+struct WindowTest1Output {
+	std::optional<ImVec4> clearColor;
+};
+
 class WindowTest1 {
 private:
 	bool m_DrawThis = true;
@@ -13,8 +17,10 @@ public:
 	ImVec4 GetClearColor() const { return m_ClearColor; }
 	bool& GetDrawHandle() { return m_DrawThis; }
 
-	void Draw(bool& showDemoWindow, bool& showWindowTest2) {
-		if (m_DrawThis == false) return;
+	WindowTest1Output Draw(bool& showDemoWindow, bool& showWindowTest2) {
+		WindowTest1Output output{};
+
+		if (m_DrawThis == false) return output;
 
 		if (ImGui::Begin("Hello, world!")) {
 			static float f = 0.0f;
@@ -24,8 +30,10 @@ public:
 			ImGui::Checkbox("Demo Window", &showDemoWindow);		// Edit bools storing our window open/close state
 			ImGui::Checkbox("Another Window", &showWindowTest2);
 
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);				// Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&m_ClearColor);	// Edit 3 floats representing a color
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);				
+			if (ImGui::ColorEdit3("clear color", (float*)&m_ClearColor)) {
+				output.clearColor = m_ClearColor;
+			}
 
 			if (ImGui::Button("Button"))								// Buttons return true when clicked (most widgets return true when edited/activated)
 				counter++;
@@ -36,5 +44,7 @@ public:
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		}
 		ImGui::End();
+
+		return output;
 	}
 };

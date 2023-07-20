@@ -61,6 +61,11 @@ void Window::SetTitle(const std::string& title) {
     glfwSetWindowTitle(m_Window, title.c_str());
 }
 
+void Window::SetClearColor(const glm::vec4& clearColor) {
+    glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
+}
+
+
 void Window::ErrorCallback( [[maybe_unused]] int error, const char* description) {
 	spdlog::error("Error: {}", description);
 }
