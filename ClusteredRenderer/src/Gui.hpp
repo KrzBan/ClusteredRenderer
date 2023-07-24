@@ -4,8 +4,7 @@
 
 #include "Renderer/Window.hpp"
 
-#include "Gui/WindowTest1.hpp"
-#include "Gui/WindowTest2.hpp"
+#include "Gui/ViewportWindow.hpp"
 
 class Gui {
 public:

@@ -10,12 +10,7 @@ int App::Run() {
 	Input::Init(window.glfwWindow());
 
 	Gui gui(window);
-
-	// Demo State
-	bool show_demo_window = true;
-
-	WindowTest1 windowTest1{ ImVec4(0.45f, 0.55f, 0.60f, 1.00f) };
-	WindowTest2 windowTest2{};
+	ViewportWindow viewport{};
 
 	while (window.ShouldClose() == false) {
 		Time::UpdateTime(glfwGetTime());
@@ -24,27 +19,17 @@ int App::Run() {
 		Input::ClearKeys();
 		glfwPollEvents();
 
-		if (Input::GetKeyDown(KB_G)) {
-			spdlog::info("Current time: {}", Time::DeltaTime());
-		}
-		if (Input::GetKeyUp(KB_G)) {
-			spdlog::info("Current FPS: {}", Time::FramesPerSecond());
-		}
-
 		// Scripts
-
+		//scene.OnUpdate(Input::DeltaTime());
+		
 		// Prepare GUI
 		gui.NewFrame();
 
-		auto windowTest1Output = windowTest1.Draw(show_demo_window, windowTest2.GetDrawHandle());
-
-		if (windowTest1Output.clearColor.has_value()) {
-			auto clearColor = windowTest1Output.clearColor.value();
-			window.SetClearColor(clearColor);
-		}
-
-		windowTest2.Draw();
-
+		// Draw Editor Windows
+		auto viewportOutput = viewport.Draw(0);
+		// update Cameras
+		// update Viewport
+		
 		// Clear Screen	
 		glClear(GL_COLOR_BUFFER_BIT);
 
