@@ -5,7 +5,7 @@
 class Framebuffer {
 public:
 	Framebuffer(uint32 width, uint32 height, uint32 samples);
-	~Framebuffer();
+	~Framebuffer() noexcept;
 
 	void Resize(uint32 width, uint32 height);
 

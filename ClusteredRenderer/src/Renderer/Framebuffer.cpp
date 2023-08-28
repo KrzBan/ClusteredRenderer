@@ -72,15 +72,7 @@ void Framebuffer::Destroy() {
 	m_ColTexID = 0;
 }
 
-bool Framebuffer::Bind() const {
-	if (m_FboID == 0) return false;
-	glBindFramebuffer(GL_FRAMEBUFFER, m_FboID);
-	glViewport(0, 0, m_Width, m_Height);
-
-	return true;
-}
-
-bool Framebuffer::Bind(uint32 target) const {
+bool Framebuffer::Bind(uint32 target = GL_FRAMEBUFFER) const {
 	if (m_FboID == 0) return false;
 	glBindFramebuffer(target, m_FboID);
 	glViewport(0, 0, m_Width, m_Height);
