@@ -20,14 +20,14 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin("Viewport")) {
+		if (ImGui::Begin("Viewport", &m_DrawThis)) {
 			ImGui::BeginChild("ViewportRender");
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
 			output.windowWidth = windowSize.x;
 			output.windowHeight = windowSize.y;
 
-			//ImGui::Image((ImTextureID)textureId, windowSize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((ImTextureID)textureId, windowSize, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::EndChild();
 		}
 		ImGui::End();

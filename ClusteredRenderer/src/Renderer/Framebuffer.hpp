@@ -9,8 +9,7 @@ public:
 
 	void Resize(uint32 width, uint32 height);
 
-	bool Bind() const;
-	bool Bind(uint32 target) const;
+	bool Bind(uint32 target = GL_FRAMEBUFFER) const;
 	void Unbind() const;
 
 	uint32 GetWidth() const;

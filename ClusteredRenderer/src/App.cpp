@@ -3,6 +3,9 @@
 #include "Renderer/Window.hpp"
 #include "Gui.hpp"
 
+#include "Renderer/Framebuffer.hpp"
+#include "Renderer/EditorCamera.hpp"
+
 int App::Run() {
 	
 	Window window(640, 480, config::windowTitle, config::openGLVersion);
@@ -10,7 +13,13 @@ int App::Run() {
 	Input::Init(window.glfwWindow());
 
 	Gui gui(window);
-	ViewportWindow viewport{};
+	ViewportWindow viewportWindow{};
+	SceneWindow sceneWindow{};
+
+	Framebuffer viewportFB{ 1, 1, 0 };
+	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
+
+	bool runtime = false;
 
 	while (window.ShouldClose() == false) {
 		Time::UpdateTime(glfwGetTime());
@@ -18,24 +27,35 @@ int App::Run() {
 		// Get Inputs
 		Input::ClearKeys();
 		glfwPollEvents();
-
-		// Scripts
-		//scene.OnUpdate(Input::DeltaTime());
 		
+		// Clear Screen	
+		viewportFB.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		// Scripts & Render
+		if (runtime) {
+			scene.OnUpdateRuntime(Time::DeltaTime());
+		} else {
+			scene.OnUpdateEditor(Time::DeltaTime(), editorCamera);
+		}
+
+		viewportFB.Unbind();
+
 		// Prepare GUI
 		gui.NewFrame();
 
 		// Draw Editor Windows
-		auto viewportOutput = viewport.Draw(0);
-		// update Cameras
-		// update Viewport
-		
-		// Clear Screen	
-		glClear(GL_COLOR_BUFFER_BIT);
+		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
+		auto sceneWindowOut = sceneWindow.Draw(scene);
 
-		// Render
-		// Scene.Render or Scene.Logic ...
 		gui.Render(window);
+
+		// Update cameras based on viewport dimensions
+		viewportFB.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+		editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+		if (runtime) {
+			scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+		}
 
 		// Show frame
 		window.SwapBuffers();
