@@ -8,16 +8,19 @@
 
 int App::Run() {
 	
-	Window window(640, 480, config::windowTitle, config::openGLVersion);
+	Window window(1920, 1080, config::windowTitle, config::openGLVersion);
 
 	Input::Init(window.glfwWindow());
 
+	Scene scene{};
+	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
+
 	Gui gui(window);
-	ViewportWindow viewportWindow{};
+	InspectorWindow inspectorWindow{};
 	SceneWindow sceneWindow{};
+	ViewportWindow viewportWindow{};
 
 	Framebuffer viewportFB{ 1, 1, 0 };
-	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
 
 	bool runtime = false;
 
@@ -45,8 +48,9 @@ int App::Run() {
 		gui.NewFrame();
 
 		// Draw Editor Windows
+		auto inspectorWindowOutput = inspectorWindow.Draw();
+		auto sceneWindowOutput = sceneWindow.Draw(scene);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
-		auto sceneWindowOut = sceneWindow.Draw(scene);
 
 		gui.Render(window);
 

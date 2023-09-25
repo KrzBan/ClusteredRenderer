@@ -8,11 +8,16 @@ target_sources(ClusteredRendererLib PUBLIC
 
 	"Core.hpp" "Core.cpp" 
 	"Core/Input.hpp" "Core/Input.cpp" 
-	"Core/KeyCodes.hpp"  "Core/KeyCodes.cpp"
+	"Core/KeyCodes.hpp" "Core/KeyCodes.cpp"
 	"Core/Time.hpp" "Core/Time.cpp"
 
 	"Entity.hpp" "Entity.cpp"
+
 	"Gui.hpp" "Gui.cpp"
+	"Gui/InspectorWindow.hpp"
+	"Gui/SceneWindow.hpp"
+	"Gui/ViewportWindow.hpp"
+
 	"Scene.hpp" "Scene.cpp" 
 	"SceneCamera.hpp" "SceneCamera.cpp"
 	"Scriptable.hpp"

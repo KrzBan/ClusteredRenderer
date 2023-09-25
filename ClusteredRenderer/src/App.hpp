@@ -10,5 +10,5 @@ public:
 	int Run();
 
 private:
-	Scene scene;
+	
 };
