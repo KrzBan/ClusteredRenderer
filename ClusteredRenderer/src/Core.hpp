@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -50,10 +51,15 @@ struct OpenGLVersion {
 	int minor = 0;
 };
 
+#define ASSETS_DIR "assets"
+#define RES_DIR "resources"
+
 namespace config {
 	constexpr char const* windowTitle = "Program";
 	constexpr char const* glslVersion = "#version 400";
 	constexpr OpenGLVersion openGLVersion{ 4, 0 };
+
+	constexpr char const* assetDirectory = "assets";
 }
 
 template<typename T>

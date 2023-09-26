@@ -16,6 +16,7 @@ int App::Run() {
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
 
 	Gui gui(window);
+	ContentBrowserWindow contentBrowserWindow{};
 	InspectorWindow inspectorWindow{};
 	SceneWindow sceneWindow{};
 	ViewportWindow viewportWindow{};
@@ -48,6 +49,7 @@ int App::Run() {
 		gui.NewFrame();
 
 		// Draw Editor Windows
+		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
 		auto inspectorWindowOutput = inspectorWindow.Draw();
 		auto sceneWindowOutput = sceneWindow.Draw(scene);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());

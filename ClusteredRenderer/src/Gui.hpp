@@ -4,6 +4,7 @@
 
 #include "Renderer/Window.hpp"
 
+#include "Gui/ContentBrowserWindow.hpp"
 #include "Gui/InspectorWindow.hpp"
 #include "Gui/SceneWindow.hpp"
 #include "Gui/ViewportWindow.hpp"

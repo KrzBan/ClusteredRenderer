@@ -14,6 +14,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Entity.hpp" "Entity.cpp"
 
 	"Gui.hpp" "Gui.cpp"
+	"Gui/ContentBrowserWindow.hpp"
 	"Gui/InspectorWindow.hpp"
 	"Gui/SceneWindow.hpp"
 	"Gui/ViewportWindow.hpp"
