@@ -20,7 +20,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin("Viewport", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_GAMEPAD " Viewport", &m_DrawThis)) {
 			ImGui::BeginChild("ViewportRender");
 
 			ImVec2 windowSize = ImGui::GetWindowSize();

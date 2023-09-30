@@ -20,7 +20,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin("Inspector", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_NEWSPAPER " Inspector", &m_DrawThis)) {
 			
 		}
 		ImGui::End();

@@ -21,7 +21,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin("Scene", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_SITEMAP " Scene", &m_DrawThis)) {
 			
 		}
 		ImGui::End();

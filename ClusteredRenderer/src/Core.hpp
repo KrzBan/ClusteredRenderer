@@ -46,6 +46,9 @@
 #include <Core/Input.hpp>
 #include <Core/Time.hpp>
 
+// Icons
+#include <Gui/IconsFontAwesome6.h>
+
 struct OpenGLVersion {
 	int major = 0;
 	int minor = 0;

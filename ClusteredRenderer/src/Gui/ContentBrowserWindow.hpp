@@ -29,7 +29,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin("ContentBrowser", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_FOLDER_OPEN " ContentBrowser", &m_DrawThis)) {
 			if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory)) {
 				if (ImGui::Button("<-")) {
 					m_CurrentDirectory = m_CurrentDirectory.parent_path();
