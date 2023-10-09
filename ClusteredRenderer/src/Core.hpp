@@ -43,9 +43,6 @@
 
 #include <stb_image.h>
 
-#include <Core/Input.hpp>
-#include <Core/Time.hpp>
-
 // Icons
 #include <Gui/IconsFontAwesome6.h>
 
@@ -54,8 +51,8 @@ struct OpenGLVersion {
 	int minor = 0;
 };
 
-#define ASSETS_DIR "assets"
-#define RES_DIR "resources"
+#define ASSETS_DIR "assets/"
+#define RESOURCES_DIR "resources/"
 
 namespace config {
 	constexpr char const* windowTitle = "Program";
@@ -76,4 +73,4 @@ using Shared = std::shared_ptr<T>;
 
 using uint32 = uint32_t;
 
-using Timestep = float;
+#define ColorFromInt(r,g,b,a) r/255.0f, g/255.0f, b/255.0f, a/255.0f 

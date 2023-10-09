@@ -15,8 +15,8 @@ private:
 	std::filesystem::path m_BaseDirectory;
 	std::filesystem::path m_CurrentDirectory;
 
-	Shared<Texture> m_DirectoryIcon = std::make_shared<Texture>("resources/icons/contentBrowser/DirectoryIcon.png");
-	Shared<Texture> m_FileIcon = std::make_shared<Texture>("resources/icons/contentBrowser/FileIcon.png");
+	Shared<Texture> m_DirectoryIcon = std::make_shared<Texture>(RESOURCES_DIR "icons/contentBrowser/DirectoryIcon.png");
+	Shared<Texture> m_FileIcon = std::make_shared<Texture>(RESOURCES_DIR "icons/contentBrowser/FileIcon.png");
 
 public:
 	ContentBrowserWindow()
@@ -54,8 +54,8 @@ public:
 
 				ImGui::PushID(filenameString.c_str());
 				Shared<Texture> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-				ImGui::ImageButton((ImTextureID)icon->GetHandle(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(109, 108, 112, 255)));
+				ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<size_t>(icon->GetHandle())), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
 				if (ImGui::BeginDragDropSource()) {
 					std::filesystem::path relativePath(path);

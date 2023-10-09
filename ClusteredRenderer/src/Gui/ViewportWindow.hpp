@@ -24,10 +24,10 @@ public:
 			ImGui::BeginChild("ViewportRender");
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			output.windowWidth = windowSize.x;
-			output.windowHeight = windowSize.y;
+			output.windowWidth = static_cast<uint32>(windowSize.x);
+			output.windowHeight = static_cast<uint32>(windowSize.y);
 
-			ImGui::Image((ImTextureID)textureId, windowSize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<size_t>(textureId)), windowSize, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::EndChild();
 		}
 		ImGui::End();

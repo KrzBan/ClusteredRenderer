@@ -2,8 +2,6 @@
 
 #include "Core.hpp"
 
-#include "Scene.hpp"
-
 class App {
 
 public:

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core.hpp"
+#include <Core.hpp>
+#include <Core/Time.hpp>
 
 #include "Camera.hpp"
 

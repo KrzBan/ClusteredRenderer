@@ -1,5 +1,7 @@
 #include "EditorCamera.hpp"
 
+#include <Core/Input.hpp>
+
 EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
 	: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 {
@@ -49,18 +51,20 @@ float EditorCamera::ZoomSpeed() const
 
 void EditorCamera::OnUpdate(Timestep ts)
 {
-	if (Input::GetKey(KB_LEFT_ALT))
-	{
+	if (Input::GetKey(KB_LEFT_ALT)) {
 		const glm::vec2& mouse{ Input::GetMousePosX(), Input::GetMousePosY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
 
-		if (Input::GetKey(MOUSE_BUTTON_MIDDLE))
+		if (Input::GetKey(MOUSE_BUTTON_MIDDLE)) {
 			MousePan(delta);
-		else if (Input::GetKey(MOUSE_BUTTON_LEFT))
+		}
+		else if (Input::GetKey(MOUSE_BUTTON_LEFT)) {
 			MouseRotate(delta);
-		else if (Input::GetKey(MOUSE_BUTTON_RIGHT))
+		}
+		else if (Input::GetKey(MOUSE_BUTTON_RIGHT)) {
 			MouseZoom(delta.y);
+		}
 	}
 
 	UpdateView();

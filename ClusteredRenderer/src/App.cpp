@@ -1,5 +1,10 @@
 #include "App.hpp"
 
+#include <Core/Input.hpp>
+#include <Core/Time.hpp>
+
+#include "Scene.hpp"
+
 #include "Renderer/Window.hpp"
 #include "Gui.hpp"
 

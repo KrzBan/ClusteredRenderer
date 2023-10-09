@@ -2,15 +2,14 @@
 
 #include <Core.hpp>
 
+using Timestep = float;
+
 struct Time {
-	static double DeltaTime();
-	static double RealTime();
+	static Timestep DeltaTime();
+	static Timestep RealTime();
 
-	static float DeltaTimeF();
-	static float RealTimeF();
+	static uint32 FramesPerSecond();
+	static Timestep FrameTimeAvg();
 
-	static uint32_t FramesPerSecond();
-	static double FrameTimeAvg();
-
-	static void UpdateTime(double time);
+	static void UpdateTime(Timestep time);
 };

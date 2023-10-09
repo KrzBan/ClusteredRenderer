@@ -1,5 +1,49 @@
 #include "Gui.hpp"
 
+static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+static float baseFontSize = 26.0f;						 // 13.0f is the size of the default font. Change to the font size you use.
+static float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
+
+void InitStyle(float scale) {
+	static float oldScale = 1.0f;
+	if (oldScale == scale)
+		return;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style = ImGuiStyle{};
+
+	ImGui::StyleColorsDark();
+	// ImGui::StyleColorsLight();
+
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+	style.WindowMenuButtonPosition = ImGuiDir_None;
+
+	style.ScaleAllSizes(scale);
+}
+
+ImFontAtlas* CreateFontAtlas(float scale) {
+	ImFontAtlas* fontAtlas = new ImFontAtlas{};
+
+	auto fontCfg = ImFontConfig();
+	fontCfg.SizePixels = std::roundf(baseFontSize);
+
+	fontAtlas->AddFontDefault(&fontCfg);
+	// merge in icons from Font Awesome
+	static ImFontConfig icons_config{};
+	icons_config.MergeMode = true;
+	icons_config.PixelSnapH = true;
+	icons_config.GlyphMinAdvanceX = scale * iconFontSize;
+	fontAtlas->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, std::roundf( scale * iconFontSize ), &icons_config, icons_ranges);
+	// use FONT_ICON_FILE_NAME_FAR if you want regular instead of solid
+	fontAtlas->Build();
+
+	return fontAtlas;
+}
+
 Gui::Gui(const Window& window) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -9,29 +53,10 @@ Gui::Gui(const Window& window) {
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
-	io.Fonts->AddFontDefault();
-	float baseFontSize = 13.0f; // 13.0f is the size of the default font. Change to the font size you use.
-	float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
+	InitStyle(1.0f);
 
-	// merge in icons from Font Awesome
-	static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-	ImFontConfig icons_config;
-	icons_config.MergeMode = true;
-	icons_config.PixelSnapH = true;
-	icons_config.GlyphMinAdvanceX = iconFontSize;
-	io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, iconFontSize, &icons_config, icons_ranges);
-	// use FONT_ICON_FILE_NAME_FAR if you want regular instead of solid
-
-	ImGui::StyleColorsDark();
-	//ImGui::StyleColorsLight();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
-	style.WindowMenuButtonPosition = ImGuiDir_None;
+	auto* fontAtlas = CreateFontAtlas(1.0f);
+	io.Fonts = fontAtlas;
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window.glfwWindow(), true);
@@ -45,6 +70,7 @@ Gui::~Gui() {
 }
 
 void Gui::NewFrame() const {
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
