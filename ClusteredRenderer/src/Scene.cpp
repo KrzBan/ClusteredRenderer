@@ -4,6 +4,9 @@
 #include "Entity.hpp"
 #include "Scriptable.hpp"
 
+#include "SceneCamera.hpp"
+#include "Renderer/EditorCamera.hpp"
+
 Scene::Scene()
 {
 }
@@ -145,70 +148,10 @@ void Scene::OnUpdateRuntime(Timestep ts)
 					nsc.Instance->OnUpdate(ts);
 				});
 		}
-
-		// Physics
-		{
-			// const int32_t velocityIterations = 6;
-			// const int32_t positionIterations = 2;
-			// m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-			// Retrieve transform from Box2D
-			// auto view = m_Registry.view<Rigidbody2DComponent>();
-			// for (auto e : view)
-			// {
-			// 	Entity entity = { e, this };
-			// 	auto& transform = entity.GetComponent<TransformComponent>();
-			// 	auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-			// 
-			// 	b2Body* body = (b2Body*)rb2d.RuntimeBody;
-			// 
-			// 	const auto& position = body->GetPosition();
-			// 	transform.Translation.x = position.x;
-			// 	transform.Translation.y = position.y;
-			// 	transform.Rotation.z = body->GetAngle();
-			// }
-		}
 	}
-
-	// Render 2D
-	Camera* mainCamera = nullptr;
-	glm::mat4 cameraTransform;
-	{
-		auto view = m_Registry.view<TransformComponent, CameraComponent>();
-		for (auto entity : view)
-		{
-			auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-
-			if (camera.Primary)
-			{
-				mainCamera = &camera.Camera;
-				cameraTransform = transform.GetTransform();
-				break;
-			}
-		}
-	}
-
-	if (mainCamera)
-	{
-		// Renderer::BeginScene(*mainCamera, cameraTransform);
-
-		// Draw meshes
-		{
-			auto group = m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-			for (auto entity : group)
-			{
-				auto [transform, sprite] = group.get<TransformComponent, MeshRendererComponent>(entity);
-
-				// Renderer::DrawMesh(transform.GetTransform(), sprite, (int)entity);
-			}
-		}
-
-		// Renderer::EndScene();
-	}
-
 }
 
-void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
+void Scene::OnUpdateSimulation(Timestep ts)
 {
 	if (!m_IsPaused || m_StepFrames-- > 0)
 	{
@@ -236,15 +179,11 @@ void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
 		}
 		*/
 	}
-
-	// Render
-	RenderScene(camera);
 }
 
-void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+void Scene::OnUpdateEditor(Timestep ts)
 {
-	// Render
-	RenderScene(camera);
+	// 
 }
 
 void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -374,8 +313,18 @@ void Scene::OnPhysics2DStop()
 	// m_PhysicsWorld = nullptr;
 }
 
-void Scene::RenderScene(EditorCamera& camera)
-{
+void Scene::RenderSceneEditor(const EditorCamera& camera) {
+	RenderScene(camera, glm::vec3{});
+}
+void Scene::RenderSceneRuntime() {
+	auto mainCameraEntity = GetPrimaryCameraEntity();
+	auto mainCameraTransform = mainCameraEntity.GetComponent<TransformComponent>();
+	auto mainCamera = mainCameraEntity.GetComponent<CameraComponent>();
+
+	RenderScene(mainCamera.Camera, mainCameraTransform.Translation);
+}
+
+void Scene::RenderScene(const Camera& camera, const glm::vec3& position) {
 	// Renderer::BeginScene(camera);
 
 	// Draw sprites

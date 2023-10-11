@@ -29,6 +29,7 @@ int App::Run() {
 	Framebuffer viewportFB{ 1, 1, 0 };
 
 	bool runtime = false;
+	Timestep physicsAccumulator{ 0.0 };
 
 	while (window.ShouldClose() == false) {
 		Time::UpdateTime(glfwGetTime());
@@ -37,15 +38,29 @@ int App::Run() {
 		Input::ClearKeys();
 		glfwPollEvents();
 		
-		// Clear Screen	
-		viewportFB.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		// Scripts & Render
+		physicsAccumulator += Time::DeltaTime();
+		while (physicsAccumulator >= Time::FixedDeltaTime()) {
+			scene.OnUpdateSimulation(Time::FixedDeltaTime());
+			physicsAccumulator -= Time::FixedDeltaTime();
+		}
+
+		// Update Logic
 		if (runtime) {
 			scene.OnUpdateRuntime(Time::DeltaTime());
 		} else {
-			scene.OnUpdateEditor(Time::DeltaTime(), editorCamera);
+			scene.OnUpdateEditor(Time::DeltaTime());
+		}
+
+		// Clear Screen
+		viewportFB.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Render
+		if (runtime) {
+			scene.RenderSceneRuntime();
+		}
+		else {
+			scene.RenderSceneEditor(editorCamera);
 		}
 
 		viewportFB.Unbind();

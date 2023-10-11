@@ -6,6 +6,7 @@
 
 class Entity;
 class EditorCamera;
+class Camera;
 
 using Timestep = float;
 
@@ -27,9 +28,12 @@ public:
 	void OnSimulationStop();
 
 	void OnUpdateRuntime(Timestep ts);
-	void OnUpdateSimulation(Timestep ts, EditorCamera& camera);
-	void OnUpdateEditor(Timestep ts, EditorCamera& camera);
+	void OnUpdateSimulation(Timestep ts);
+	void OnUpdateEditor(Timestep ts);
 	void OnViewportResize(uint32_t width, uint32_t height);
+
+	void RenderSceneEditor(const EditorCamera& camera);
+	void RenderSceneRuntime();
 
 	Entity DuplicateEntity(Entity entity);
 
@@ -57,7 +61,7 @@ private:
 	void OnPhysics2DStart();
 	void OnPhysics2DStop();
 
-	void RenderScene(EditorCamera& camera);
+	void RenderScene(const Camera& camera, const glm::vec3& position);
 
 private:
 	entt::registry m_Registry;

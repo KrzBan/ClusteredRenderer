@@ -5,8 +5,7 @@
 
 #include "Camera.hpp"
 
-class EditorCamera : public Camera
-{
+class EditorCamera : public Camera {
 public:
 	EditorCamera() = default;
 	EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);

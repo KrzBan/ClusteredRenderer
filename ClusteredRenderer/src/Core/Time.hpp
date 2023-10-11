@@ -7,6 +7,8 @@ using Timestep = float;
 struct Time {
 	static Timestep DeltaTime();
 	static Timestep RealTime();
+	static Timestep FixedDeltaTime();
+
 
 	static uint32 FramesPerSecond();
 	static Timestep FrameTimeAvg();

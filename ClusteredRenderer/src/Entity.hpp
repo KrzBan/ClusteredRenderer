@@ -33,7 +33,7 @@ public:
 	template<typename T>
 	T& GetComponent()
 	{
-		// assert(HasComponent<T>() && "Entity does not have component!");
+		assert(HasComponent<T>() && "Entity does not have component!");
 		return m_Scene->m_Registry.get<T>(m_EntityHandle);
 	}
 

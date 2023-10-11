@@ -5,6 +5,8 @@ struct TimeData {
 	Timestep deltaTime = 0.0;
 	Timestep currentTime = 0.0;
 
+	Timestep fixedDeltaTime = 0.02;
+
 	uint32_t avgCount = 1;
 
 	uint32_t currentDeltaIndex = 0;
@@ -19,6 +21,10 @@ Timestep Time::DeltaTime() {
 
 Timestep Time::RealTime() {
 	return s_TimeData.currentTime;
+}
+
+Timestep Time::FixedDeltaTime() {
+	return s_TimeData.fixedDeltaTime;
 }
 
 void Time::UpdateTime(Timestep time) {
