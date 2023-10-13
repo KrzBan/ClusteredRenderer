@@ -1,5 +1,7 @@
 #include "Gui.hpp"
 
+#define FONT_TEXT_REGULAR RESOURCES_DIR "fonts/Roboto-Light.ttf"
+
 static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
 static float baseFontSize = 26.0f;						 // 13.0f is the size of the default font. Change to the font size you use.
 static float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
@@ -30,12 +32,15 @@ ImFontAtlas* CreateFontAtlas(float scale) {
 
 	auto fontCfg = ImFontConfig();
 	fontCfg.SizePixels = std::roundf(baseFontSize);
+	fontCfg.PixelSnapH = true;
+	//fontAtlas->AddFontDefault(&fontCfg);
+	
+	fontAtlas->AddFontFromFileTTF(FONT_TEXT_REGULAR, std::roundf(scale * baseFontSize), &fontCfg);
 
-	fontAtlas->AddFontDefault(&fontCfg);
 	// merge in icons from Font Awesome
 	static ImFontConfig icons_config{};
-	icons_config.MergeMode = true;
 	icons_config.PixelSnapH = true;
+	icons_config.MergeMode = true;
 	icons_config.GlyphMinAdvanceX = scale * iconFontSize;
 	fontAtlas->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, std::roundf( scale * iconFontSize ), &icons_config, icons_ranges);
 	// use FONT_ICON_FILE_NAME_FAR if you want regular instead of solid
