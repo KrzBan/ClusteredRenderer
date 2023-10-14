@@ -1,19 +1,56 @@
 #include "Shader.hpp"
 
+// ShaderType
+std::string ShaderTypeToString(ShaderType shaderType) {
+	switch (shaderType) {
+	case ShaderType::VERTEX:
+		return "VERTEX";
+	case ShaderType::FRAGMENT:
+		return "FRAGMENT";
+	case ShaderType::GEOMETRY:
+		return "GEOMRTRY";
+	case ShaderType::TESS_CONTROL:
+		return "TESS_CONTROL";
+	case ShaderType::TESS_EVALUATION:
+		return "TESS_EVALUATION";
+	case ShaderType::UNKNOWN:
+		return "UNKNOWN";
+	}
 
-Shader::Shader(ShaderCreateInfo info)
-	: Shader(Shader::NameToShaderType(info.filepath), Shader::ReadShaderFile(info.filepath), info)
-{
+	throw "ShaderTypeToString, Unknown shader type.";
 }
 
-Shader::Shader(ShaderType shaderType, std::string_view source, ShaderCreateInfo info)
-	: m_ShaderType{ shaderType },
-	m_Handle{ glCreateShader(ShaderTypeToShaderType(shaderType)) },
-	m_Info{ info }
-{
-	auto str = std::string{ source };
-	str = PreprocessShader(str);
-	auto cStr = str.c_str();
+uint32 ShaderTypeToGlShaderType(ShaderType shaderType) {
+	switch (shaderType) {
+	case ShaderType::VERTEX:
+		return GL_VERTEX_SHADER;
+	case ShaderType::FRAGMENT:
+		return GL_FRAGMENT_SHADER;
+	case ShaderType::GEOMETRY:
+		return GL_GEOMETRY_SHADER;
+	case ShaderType::TESS_EVALUATION:
+		return GL_TESS_EVALUATION_SHADER;
+	case ShaderType::TESS_CONTROL:
+		return GL_TESS_CONTROL_SHADER;
+		// case ShaderType::COMPUTE: return GL_COMPUTE_SHADER;
+	}
+
+	throw std::invalid_argument("ShaderType not supported");
+}
+// ShaderType End
+
+
+Shader::Shader(ShaderCreateInfo info)
+	: Shader(info, Shader::NameToShaderType(info.filepath), Shader::ReadShaderFile(info.filepath)) {
+}
+
+Shader::Shader(ShaderCreateInfo info, ShaderType shaderType, std::string_view source)
+	: m_Info{ info },
+	  m_ShaderType{ shaderType },
+	  m_Handle{ glCreateShader(ShaderTypeToGlShaderType(shaderType)) },
+	  m_Source{ PreprocessShader(source) } 
+{	
+	auto cStr = m_Source.c_str();
 
 	glShaderSource(m_Handle, 1, &cStr, nullptr);
 	glCompileShader(m_Handle);
@@ -28,33 +65,54 @@ Shader::Shader(ShaderType shaderType, std::string_view source, ShaderCreateInfo 
 	};
 }
 
-Shader::~Shader() noexcept {
-	glDeleteShader(m_Handle);
+Shader::Shader(Shader&& other) noexcept 
+	: Shader() 
+{
+	other.Swap(*this);
+	other.m_Handle = 0;
 }
 
-uint32_t Shader::GetHandle() const {
+Shader& Shader::operator=(Shader&& other) noexcept {
+	other.Swap(*this);
+	other.m_Handle = 0;
+
+	return *this;
+}
+
+void Shader::Swap(Shader& other) noexcept {
+	std::swap(m_Handle, other.m_Handle);
+	std::swap(m_ShaderType, other.m_ShaderType);
+	std::swap(m_Info, other.m_Info);
+	std::swap(m_Source, other.m_Source);
+}
+
+
+Shader::~Shader() noexcept {
+	Destroy();
+}
+
+void Shader::Destroy() {
+	if (m_Handle != 0) {
+		glDeleteShader(m_Handle);
+		m_Handle = 0;
+	}
+}
+
+uint32 Shader::GetHandle() const {
 	return m_Handle;
 }
 
-uint32_t Shader::ShaderTypeToShaderType(ShaderType shaderType) {
-	switch (shaderType) {
-	case ShaderType::VERTEX: return GL_VERTEX_SHADER;
-	case ShaderType::FRAGMENT: return GL_FRAGMENT_SHADER;
-	case ShaderType::GEOMETRY: return GL_GEOMETRY_SHADER;
-	case ShaderType::TESS_EVALUATION: return GL_TESS_EVALUATION_SHADER;
-	case ShaderType::TESS_CONTROL: return GL_TESS_CONTROL_SHADER;
-		//case ShaderType::COMPUTE: return GL_COMPUTE_SHADER;
-	}
-
-	throw std::invalid_argument("ShaderType not supported");
+ShaderType Shader::GetShaderType() const {
+	return m_ShaderType;
 }
 
-std::string Shader::PreprocessShader(const std::string& input) {
-	auto source = input;
+std::string Shader::PreprocessShader(std::string_view input) {
+	auto source = std::string{ input };
 	auto tesX = m_Info.tesCpCountX;
 	auto tesY = m_Info.tesCpCountY;
 	const size_t maxPoints = 32;
-	{
+
+	{	// Tesselation: Number of Control Points
 		auto searchStr = std::string{ "CP_COUNT" };
 		auto cpCountPos = source.find(searchStr);
 		if (cpCountPos != source.npos) {
@@ -62,7 +120,7 @@ std::string Shader::PreprocessShader(const std::string& input) {
 		}
 	}
 
-	{
+	{	// Tesselation: List of Control Points
 		auto searchStr = std::string{ "CP_LIST" };
 		auto searchStrPos = source.find(searchStr);
 		if (searchStrPos != source.npos) {//vec4 p00 = gl_in[0].gl_Position;
@@ -79,27 +137,16 @@ std::string Shader::PreprocessShader(const std::string& input) {
 
 	}
 
-	{
+	{	// Tesselation: Bezier, point calculation
 		auto searchStr = std::string{ "CP_CALC" };
 		auto searchStrPos = source.find(searchStr);
 		if (searchStrPos != source.npos) {
 			std::string newStr{};
 
-			//float bu[4], bv[4]; // Basis functions for u and v
-			//float dbu[4], dbv[4]; // Derivitives for u and v
-			//bernstein4(bu, dbu, u);
-			//bernstein4(bv, dbv, v);
-
 			newStr.append(std::format("float bu[{}], bv[{}];\n", tesX, tesY));
 			newStr.append(std::format("float dbu[{}], dbv[{}];\n", tesX, tesY));
 			newStr.append(std::format("bernstein{}(bu, dbu, u);\n", tesX));
 			newStr.append(std::format("bernstein{}(bv, dbv, v);\n", tesY));
-
-			//vec4 pos =
-			//p00*bu[0]*bv[0] + p01*bu[0]*bv[1] + p02*bu[0]*bv[2] + p03*bu[0]*bv[3] +
-			//p10*bu[1]*bv[0] + p11*bu[1]*bv[1] + p12*bu[1]*bv[2] + p13*bu[1]*bv[3] +
-			//p20*bu[2]*bv[0] + p21*bu[2]*bv[1] + p22*bu[2]*bv[2] + p23*bu[2]*bv[3] +
-			//p30*bu[3]*bv[0] + p31*bu[3]*bv[1] + p32*bu[3]*bv[2] + p33*bu[3]*bv[3];
 
 			newStr.append("vec4 pos = \n");
 			for (size_t y = 0; y < tesY; ++y) {
@@ -113,13 +160,6 @@ std::string Shader::PreprocessShader(const std::string& input) {
 			}
 			newStr.append(";\n");
 
-			// The partial derivatives
-			//vec4 du =
-			//p00*dbu[0]*bv[0] + p01*dbu[0]*bv[1] + p02*dbu[0]*bv[2] + p03*dbu[0]*bv[3] +
-			//p10*dbu[1]*bv[0] + p11*dbu[1]*bv[1] + p12*dbu[1]*bv[2] + p13*dbu[1]*bv[3] +
-			//p20*dbu[2]*bv[0] + p21*dbu[2]*bv[1] + p22*dbu[2]*bv[2] + p23*dbu[2]*bv[3] + 
-			//p30*dbu[3]*bv[0] + p31*dbu[3]*bv[1] + p32*dbu[3]*bv[2] + p33*dbu[3]*bv[3];
-
 			newStr.append("vec4 du = \n");
 			for (size_t x = 0; x < tesX; ++x) {
 				for (size_t y = 0; y < tesY; ++y) {
@@ -131,12 +171,6 @@ std::string Shader::PreprocessShader(const std::string& input) {
 				}
 			}
 			newStr.append(";\n");
-
-			//vec4 dv =
-			//p00*bu[0]*dbv[0] + p01*bu[0]*dbv[1] + p02*bu[0]*dbv[2] + p03*bu[0]*dbv[3] +
-			//p10*bu[1]*dbv[0] + p11*bu[1]*dbv[1] + p12*bu[1]*dbv[2] + p13*bu[1]*dbv[3] +
-			//p20*bu[2]*dbv[0] + p21*bu[2]*dbv[1] + p22*bu[2]*dbv[2] + p23*bu[2]*dbv[3] +
-			//p30*bu[3]*dbv[0] + p31*bu[3]*dbv[1] + p32*bu[3]*dbv[2] + p33*bu[3]*dbv[3];
 
 			newStr.append("vec4 dv = \n");
 			for (size_t y = 0; y < tesY; ++y) {
@@ -155,7 +189,6 @@ std::string Shader::PreprocessShader(const std::string& input) {
 	}
 
 	return source;
-
 }
 
 std::string Shader::ReadShaderFile(std::string_view filepath) {
@@ -170,6 +203,7 @@ std::string Shader::ReadShaderFile(std::string_view filepath) {
 	std::string textSource;
 	textSource = stringStream.str();
 
+	// Resolve #includes
 	auto pos = textSource.find("#include ");
 	while (pos != textSource.npos) {
 		const auto p1 = textSource.find('"', pos);

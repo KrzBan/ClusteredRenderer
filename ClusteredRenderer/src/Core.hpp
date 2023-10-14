@@ -14,6 +14,7 @@
 #include <unordered_set>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 #include <spdlog/spdlog.h>

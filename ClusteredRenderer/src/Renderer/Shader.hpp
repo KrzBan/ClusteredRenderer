@@ -3,14 +3,18 @@
 #include <Core.hpp>
 
 enum class ShaderType {
+	UNKNOWN,
 	VERTEX, FRAGMENT,
 	GEOMETRY, TESS_CONTROL,
 	TESS_EVALUATION
 	//, COMPUTE
 };
 
+uint32 ShaderTypeToGlShaderType(ShaderType shaderType);
+std::string ShaderTypeToString(ShaderType shaderType);
+
 struct ShaderCreateInfo {
-	std::string_view filepath = "";
+	std::string_view filepath;
 	uint32_t tesCpCountX = 4;
 	uint32_t tesCpCountY = 4;
 	ShaderCreateInfo() = default;
@@ -20,20 +24,30 @@ struct ShaderCreateInfo {
 
 class Shader {
 public:
+	Shader() = default;
 	Shader(ShaderCreateInfo info);
-	Shader(ShaderType shaderType, std::string_view source, ShaderCreateInfo info);
+	Shader(ShaderCreateInfo info, ShaderType shaderType, std::string_view source);
+	Shader(Shader&& other) noexcept;
 	~Shader() noexcept;
+
+	Shader& operator=(Shader&& other) noexcept;
+
+	void Swap(Shader& other) noexcept;
+
 	uint32 GetHandle() const;
+	ShaderType GetShaderType() const;
 
 private:
 	uint32 m_Handle = 0;
-	ShaderType m_ShaderType;
+	ShaderType m_ShaderType = ShaderType::UNKNOWN;
 	ShaderCreateInfo m_Info;
+	std::string m_Source;
 
 private:
-	std::string PreprocessShader(const std::string& input);
+	void Destroy();
+
+	std::string PreprocessShader(std::string_view input);
 
 	std::string ReadShaderFile(std::string_view filepath);
 	ShaderType NameToShaderType(std::string_view filename);
-	uint32 ShaderTypeToShaderType(ShaderType shaderType);
 };
