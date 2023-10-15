@@ -34,7 +34,7 @@ public:
 				m_SelectedEntity = {};
 
 			// Right-click on blank space
-			if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight)) {
+			if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
 				if (ImGui::MenuItem("Create Empty Entity"))
 					scene.CreateEntity("Empty Entity");
 
@@ -55,6 +55,7 @@ private:
 		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0);
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 		flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+		flags |= ImGuiTreeNodeFlags_Leaf;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 		if (ImGui::IsItemClicked()) {
@@ -68,14 +69,15 @@ private:
 
 			ImGui::EndPopup();
 		}
+		ImGui::TreePop();
 
-		if (opened) {
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
-			ImGui::TreePop();
-		}
+		//if (opened) {
+		//	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		//	bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
+		//	if (opened)
+		//		ImGui::TreePop();
+		//	ImGui::TreePop();
+		//}
 
 		if (entityDeleted) {
 			scene.DestroyEntity(entity);

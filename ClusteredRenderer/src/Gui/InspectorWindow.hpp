@@ -151,9 +151,11 @@ private:
 
 			bool removeComponent = false;
 			if (ImGui::BeginPopup("ComponentSettings")) {
-				if (ImGui::MenuItem("Remove component"))
-					removeComponent = true;
-
+				if constexpr (not std::is_same_v<TransformComponent, T>) {
+					if (ImGui::MenuItem("Remove component"))
+						removeComponent = true;
+				}
+				
 				ImGui::EndPopup();
 			}
 
