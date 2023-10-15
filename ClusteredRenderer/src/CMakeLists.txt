@@ -15,6 +15,7 @@ target_sources(ClusteredRendererLib PUBLIC
 
 	"Gui.hpp" "Gui.cpp"
 	"Gui/ContentBrowserWindow.hpp"
+	"Gui/ControlUtils.hpp" "Gui/ControlUtils.cpp"
 	"Gui/InspectorWindow.hpp"
 	"Gui/SceneWindow.hpp"
 	"Gui/ViewportWindow.hpp"
@@ -32,7 +33,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
 	"Renderer/Window.hpp" "Renderer/Window.cpp"    
 	
-	"UUID.hpp" "UUID.cpp"   )
+	"UUID.hpp" "UUID.cpp"    "Gui/ControlUtils.cpp")
 
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)

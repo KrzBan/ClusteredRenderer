@@ -46,7 +46,7 @@ public:
 	template<typename T>
 	void RemoveComponent()
 	{
-		HZ_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+		assert(HasComponent<T>() && "Entity does not have component!");
 		m_Scene->m_Registry.remove<T>(m_EntityHandle);
 	}
 

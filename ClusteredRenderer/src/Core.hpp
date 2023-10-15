@@ -39,6 +39,7 @@
         operator glm::vec4() const { return glm::vec4(x,y,z,w); }
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 

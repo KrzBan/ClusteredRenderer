@@ -70,8 +70,8 @@ int App::Run() {
 
 		// Draw Editor Windows
 		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
-		auto inspectorWindowOutput = inspectorWindow.Draw();
 		auto sceneWindowOutput = sceneWindow.Draw(scene);
+		auto inspectorWindowOutput = inspectorWindow.Draw(sceneWindowOutput.selectedEntity);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
 
 		gui.Render(window);
