@@ -6,6 +6,7 @@
 
 struct SceneWindowOutput {
 	Entity selectedEntity;
+	bool selectionChanged = false;
 };
 
 class SceneWindow {
@@ -17,6 +18,9 @@ public:
 	SceneWindow() {}
 
 	bool& GetDrawHandle() { return m_DrawThis; }
+	void ResetSelection() {
+		m_SelectedEntity = {}; 
+	}
 
 	SceneWindowOutput Draw(Scene& scene) {
 		SceneWindowOutput output{};
@@ -27,7 +31,9 @@ public:
 			
 			scene.m_Registry.each([&](auto entityID) {
 				Entity entity{ entityID, &scene };
-				DrawEntity(entity, scene);
+				if (DrawEntity(entity, scene)) {
+					output.selectionChanged = true;
+				}
 			});
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -49,7 +55,8 @@ public:
 	}
 
 private:
-	void DrawEntity(Entity entity, Scene& scene) {
+	bool DrawEntity(Entity entity, Scene& scene) {
+		bool selectionChanged = false;
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0);
@@ -60,6 +67,7 @@ private:
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 		if (ImGui::IsItemClicked()) {
 			m_SelectedEntity = entity;
+			selectionChanged = true;
 		}
 
 		bool entityDeleted = false;
@@ -84,5 +92,7 @@ private:
 			if (m_SelectedEntity == entity)
 				m_SelectedEntity = {};
 		}
+
+		return selectionChanged;
 	}
 };

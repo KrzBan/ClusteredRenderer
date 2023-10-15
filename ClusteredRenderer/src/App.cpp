@@ -70,8 +70,21 @@ int App::Run() {
 
 		// Draw Editor Windows
 		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
+		if (contentBrowserWindowOutput.selectionChanged)
+			sceneWindow.ResetSelection();
 		auto sceneWindowOutput = sceneWindow.Draw(scene);
-		auto inspectorWindowOutput = inspectorWindow.Draw(sceneWindowOutput.selectedEntity);
+		if (sceneWindowOutput.selectionChanged)
+			contentBrowserWindow.ResetSelection();
+
+		std::variant<std::monostate, Entity, std::string> selection;
+		if (contentBrowserWindowOutput.selectedFile != "") {
+			selection = contentBrowserWindowOutput.selectedFile;
+		}
+		if (sceneWindowOutput.selectedEntity) {
+			selection = sceneWindowOutput.selectedEntity;
+		}
+
+		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
 
 		gui.Render(window);

@@ -5,12 +5,15 @@
 #include <Renderer/Texture.hpp>
 
 struct ContentBrowserWindowOutput {
-	
+	std::string selectedFile;
+	bool selectionChanged = false;
 };
 
 class ContentBrowserWindow {
 private:
 	bool m_DrawThis = true;
+
+	std::string m_SelectedFile;
 
 	std::filesystem::path m_BaseDirectory;
 	std::filesystem::path m_CurrentDirectory;
@@ -23,6 +26,9 @@ public:
 		: m_BaseDirectory{config::assetDirectory}, m_CurrentDirectory{ m_BaseDirectory } {}
 
 	bool& GetDrawHandle() { return m_DrawThis; }
+	void ResetSelection() {
+		m_SelectedFile = {};
+	}
 
 	ContentBrowserWindowOutput Draw() {
 		ContentBrowserWindowOutput output{};
@@ -52,10 +58,21 @@ public:
 				const auto& path = directoryEntry.path();
 				std::string filenameString = path.filename().string();
 
-				ImGui::PushID(filenameString.c_str());
+				const auto filenameCStr = filenameString.c_str();
+				//ImGui::PushID(filenameCStr);
+
 				Shared<Texture> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(109, 108, 112, 255)));
-				ImGui::ImageButton(reinterpret_cast<ImTextureID>(static_cast<size_t>(icon->GetHandle())), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+				if (m_SelectedFile != filenameString) {
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(109, 108, 112, 255)));
+				}
+				else {
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(64, 64, 240, 255)));
+				}
+
+				if (ImGui::ImageButton(filenameCStr, reinterpret_cast<ImTextureID>(static_cast<size_t>(icon->GetHandle())), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 })) {
+					m_SelectedFile = filenameString;
+					output.selectionChanged = true;
+				}
 
 				if (ImGui::BeginDragDropSource()) {
 					std::filesystem::path relativePath(path);
@@ -70,20 +87,24 @@ public:
 						m_CurrentDirectory /= path.filename();
 
 				}
-				ImGui::TextWrapped(filenameString.c_str());
+				ImGui::TextWrapped(filenameCStr);
 
 				ImGui::NextColumn();
 
-				ImGui::PopID();
+				//ImGui::PopID();
 			}
 
 			ImGui::Columns(1);
 
 			ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
 			ImGui::SliderFloat("Padding", &padding, 0, 32);
+
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+				m_SelectedFile = {};
 		}
 		ImGui::End();
 
+		output.selectedFile = m_SelectedFile;
 		return output;
 	}
 };

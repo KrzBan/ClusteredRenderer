@@ -14,21 +14,24 @@ private:
 	bool m_DrawThis = true;
 
 public:
-	InspectorWindow() {}
+	InspectorWindow() = default;
 
 	bool& GetDrawHandle() { return m_DrawThis; }
 
-	InspectorWindowOutput Draw(Entity selectedEntity) {
+	InspectorWindowOutput Draw(std::variant<std::monostate, Entity, std::string> selection) {
 		InspectorWindowOutput output{};
 
 		if (m_DrawThis == false) return output;
 
 		if (ImGui::Begin(ICON_FA_NEWSPAPER " Inspector", &m_DrawThis)) {
 			
-			if (selectedEntity) {
-				DrawComponents(selectedEntity);
-			}
-
+			std::visit(
+				overload(
+					[](std::monostate monostate) { /* Nothing selected */ },
+					[&](Entity entity) { DrawComponents(entity); },
+					[&](const std::string& filename) { DrawFile(filename); }
+				),
+				selection);
 		}
 		ImGui::End();
 
@@ -36,6 +39,10 @@ public:
 	}
 
 private:
+	void DrawFile(std::string filename) {
+		ImGui::Text(filename.c_str());
+	}
+
 	void DrawComponents(Entity entity) {
 		if (entity.HasComponent<TagComponent>()) {
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
