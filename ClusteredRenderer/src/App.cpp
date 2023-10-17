@@ -3,6 +3,8 @@
 #include <Core/Input.hpp>
 #include <Core/Time.hpp>
 
+#include "Assets/AssetManager.hpp"
+
 #include "Scene.hpp"
 
 #include "Renderer/Window.hpp"
@@ -10,6 +12,8 @@
 
 #include "Renderer/Framebuffer.hpp"
 #include "Renderer/EditorCamera.hpp"
+
+#include <FileWatch.hpp>
 
 int App::Run() {
 	
@@ -19,6 +23,8 @@ int App::Run() {
 
 	Scene scene{};
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
+
+	AssetManager::Init(ASSETS_DIR);
 
 	Gui gui(window);
 	ContentBrowserWindow contentBrowserWindow{};
@@ -30,6 +36,29 @@ int App::Run() {
 
 	bool runtime = false;
 	Timestep physicsAccumulator{ 0.0 };
+
+	filewatch::FileWatch<std::string> watch(
+		"./assets",
+		[](const std::string& path, const filewatch::Event change_type) {
+			std::cout << path << " : ";
+			switch (change_type) {
+			case filewatch::Event::added:
+				std::cout << "The file was added to the directory." << '\n';
+				break;
+			case filewatch::Event::removed:
+				std::cout << "The file was removed from the directory." << '\n';
+				break;
+			case filewatch::Event::modified:
+				std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
+				break;
+			case filewatch::Event::renamed_old:
+				std::cout << "The file was renamed and this is the old name." << '\n';
+				break;
+			case filewatch::Event::renamed_new:
+				std::cout << "The file was renamed and this is the new name." << '\n';
+				break;
+			};
+		});
 
 	while (window.ShouldClose() == false) {
 		Time::UpdateTime(glfwGetTime());
@@ -82,7 +111,7 @@ int App::Run() {
 		}
 		if (sceneWindowOutput.selectedEntity) {
 			selection = sceneWindowOutput.selectedEntity;
-		}
+		} 
 
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());

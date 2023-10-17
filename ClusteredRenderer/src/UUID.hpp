@@ -2,28 +2,29 @@
 
 #include "Core.hpp"
 
-class UUID {
-public:
-	UUID();
-	UUID(uint64_t uuid);
-	UUID(const UUID&) = default;
+namespace kb {
 
-	operator uint64_t() const { return m_UUID; }
-private:
-	uint64_t m_UUID;
-};
+	class UUID {
+	public:
+		UUID();
+		UUID(uint64_t uuid);
+		UUID(const UUID&) = default;
 
+		operator uint64_t() const { return m_UUID; }
+
+	private:
+		uint64_t m_UUID;
+	};
+}
 
 namespace std {
-	template <typename T> struct hash;
+	template <typename T>
+	struct hash;
 
-	template<>
-	struct hash<UUID>
-	{
-		std::size_t operator()(const UUID& uuid) const
-		{
+	template <>
+	struct hash<kb::UUID> {
+		::std::size_t operator()(const kb::UUID& uuid) const {
 			return (uint64_t)uuid;
 		}
 	};
-
 }

@@ -17,7 +17,7 @@ Scene::~Scene()
 }
 
 template<typename... Component>
-static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
 {
 	([&]()
 		{
@@ -33,7 +33,7 @@ static void CopyComponent(entt::registry& dst, entt::registry& src, const std::u
 }
 
 template<typename... Component>
-static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
 {
 	CopyComponent<Component...>(dst, src, enttMap);
 }
@@ -63,13 +63,13 @@ Shared<Scene> Scene::Copy(Shared<Scene> other)
 	
 	auto& srcSceneRegistry = other->m_Registry;
 	auto& dstSceneRegistry = newScene->m_Registry;
-	std::unordered_map<UUID, entt::entity> enttMap;
+	std::unordered_map<kb::UUID, entt::entity> enttMap;
 
 	// Create entities in new scene
 	auto idView = srcSceneRegistry.view<IDComponent>();
 	for (auto e : idView)
 	{
-		UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+		kb::UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
 		const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
 		Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
 		enttMap[uuid] = (entt::entity)newEntity;
@@ -83,11 +83,10 @@ Shared<Scene> Scene::Copy(Shared<Scene> other)
 
 Entity Scene::CreateEntity(const std::string& name)
 {
-	return CreateEntityWithUUID(UUID(), name);
+	return CreateEntityWithUUID(kb::UUID(), name);
 }
 
-Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
-{
+Entity Scene::CreateEntityWithUUID(kb::UUID uuid, const std::string& name) {
 	Entity entity = { m_Registry.create(), this };
 	entity.AddComponent<IDComponent>(uuid);
 	entity.AddComponent<TransformComponent>();
@@ -241,8 +240,7 @@ Entity Scene::FindEntityByName(std::string_view name)
 	return {};
 }
 
-Entity Scene::GetEntityByUUID(UUID uuid)
-{
+Entity Scene::GetEntityByUUID(kb::UUID uuid) {
 	// TODO(Yan): Maybe should be assert
 	if (m_EntityMap.find(uuid) != m_EntityMap.end())
 		return { m_EntityMap.at(uuid), this };

@@ -53,8 +53,8 @@ struct OpenGLVersion {
 	int minor = 0;
 };
 
-#define ASSETS_DIR "assets/"
-#define RESOURCES_DIR "resources/"
+#define ASSETS_DIR "./assets/"
+#define RESOURCES_DIR "./resources/"
 
 namespace config {
 	constexpr char const* windowTitle = "Program";

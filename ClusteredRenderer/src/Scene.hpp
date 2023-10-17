@@ -18,7 +18,7 @@ public:
 	static Shared<Scene> Copy(Shared<Scene> other);
 
 	Entity CreateEntity(const std::string& name = std::string());
-	Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
+	Entity CreateEntityWithUUID(kb::UUID uuid, const std::string& name = std::string());
 	void DestroyEntity(Entity entity);
 
 	void OnRuntimeStart();
@@ -38,7 +38,7 @@ public:
 	Entity DuplicateEntity(Entity entity);
 
 	Entity FindEntityByName(std::string_view name);
-	Entity GetEntityByUUID(UUID uuid);
+	Entity GetEntityByUUID(kb::UUID uuid);
 
 	Entity GetPrimaryCameraEntity();
 
@@ -72,7 +72,7 @@ private:
 
 	// b2World* m_PhysicsWorld = nullptr;
 
-	std::unordered_map<UUID, entt::entity> m_EntityMap;
+	std::unordered_map<kb::UUID, entt::entity> m_EntityMap;
 
 	friend class Entity;
 	friend class SceneWindow;

@@ -4,6 +4,12 @@ set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
 
 target_sources(ClusteredRendererLib PUBLIC 
 	"App.hpp" "App.cpp" 
+
+	"Assets/AssetManager.hpp" "Assets/AssetManager.cpp"
+	"Assets/FileUtils.hpp"
+	"Assets/MaterialAsset.hpp"
+	"Assets/TextAsset.hpp"
+
 	"Components.hpp"
 
 	"Core.hpp" "Core.cpp" 
@@ -33,7 +39,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
 	"Renderer/Window.hpp" "Renderer/Window.cpp"    
 	
-	"UUID.hpp" "UUID.cpp"    "Gui/ControlUtils.cpp")
+	"UUID.hpp" "UUID.cpp"    "Gui/ControlUtils.cpp" "Assets/AssetManager.cpp")
 
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -41,8 +47,10 @@ find_package(assimp REQUIRED)
 find_package(EnTT REQUIRED)
 find_package(glm REQUIRED)
 find_package(Stb REQUIRED)
-    
-target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm)
+find_package(cereal CONFIG REQUIRED)
+
+target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib FileWatchLib 
+	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal)
 
 # Supress warnings - Spdlog does not set it's includes as SYSTEM
 get_target_property(_inc spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)

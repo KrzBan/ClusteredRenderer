@@ -6,10 +6,10 @@
 #include "SceneCamera.hpp"
 
 struct IDComponent {
-	UUID ID;
+	kb::UUID ID;
 
 	IDComponent() = default;
-	IDComponent(UUID ID) : ID{ ID } {}
+	IDComponent(kb::UUID ID) : ID{ ID } {}
 	IDComponent(const IDComponent&) = default;
 };
 
