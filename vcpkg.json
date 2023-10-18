@@ -6,6 +6,7 @@
     "assimp",
     "entt",
     "stb",
-    "cereal"
+    "cereal",
+    "efsw"
   ]
 }

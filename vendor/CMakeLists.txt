@@ -4,9 +4,6 @@ add_library(gladLib
 	KHR/khrplatform.h)
 target_include_directories(gladLib SYSTEM PUBLIC ./)
 
-add_library(FileWatchLib INTERFACE)
-target_include_directories(FileWatchLib INTERFACE ./FileWatch)
-
 add_library(imguiLib STATIC 
 	"imgui/imgui_impl_glfw.h" "imgui/imgui_impl_glfw.cpp" 
 	"imgui/imgui_impl_opengl3.h" "imgui/imgui_impl_opengl3.cpp" "imgui/imgui_impl_win32.h" "imgui/imgui_impl_win32.cpp"

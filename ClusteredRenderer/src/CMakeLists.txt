@@ -48,9 +48,10 @@ find_package(EnTT REQUIRED)
 find_package(glm REQUIRED)
 find_package(Stb REQUIRED)
 find_package(cereal CONFIG REQUIRED)
+find_package(efsw CONFIG REQUIRED)
 
-target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib FileWatchLib 
-	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal)
+target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib 
+	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal efsw::efsw)
 
 # Supress warnings - Spdlog does not set it's includes as SYSTEM
 get_target_property(_inc spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
