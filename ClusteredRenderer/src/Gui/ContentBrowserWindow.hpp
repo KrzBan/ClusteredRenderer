@@ -1,17 +1,19 @@
 #pragma once
 
 #include <Core.hpp>
-
 #include <Renderer/Texture.hpp>
+
+#include "GuiWindow.hpp"
 
 struct ContentBrowserWindowOutput {
 	std::string selectedFile;
 	bool selectionChanged = false;
 };
 
-class ContentBrowserWindow {
+class ContentBrowserWindow : public GuiWindow {
+
+#define CONTENT_BROWSER_NAME "Content Browser"
 private:
-	bool m_DrawThis = true;
 
 	std::string m_SelectedFile;
 
@@ -25,7 +27,10 @@ public:
 	ContentBrowserWindow()
 		: m_BaseDirectory{config::assetDirectory}, m_CurrentDirectory{ m_BaseDirectory } {}
 
-	bool& GetDrawHandle() { return m_DrawThis; }
+	virtual const char* GetName() const override{
+		return CONTENT_BROWSER_NAME;
+	};
+
 	void ResetSelection() {
 		m_SelectedFile = {};
 	}
@@ -35,7 +40,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin(ICON_FA_FOLDER_OPEN " ContentBrowser", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_FOLDER_OPEN " " CONTENT_BROWSER_NAME, &m_DrawThis)) {
 			if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory)) {
 				if (ImGui::Button("<-")) {
 					m_CurrentDirectory = m_CurrentDirectory.parent_path();

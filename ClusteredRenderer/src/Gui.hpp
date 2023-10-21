@@ -9,6 +9,8 @@
 #include "Gui/SceneWindow.hpp"
 #include "Gui/ViewportWindow.hpp"
 
+#include "Gui/MenuBar.hpp"
+
 class Gui {
 public:
 	Gui(const Window& window);

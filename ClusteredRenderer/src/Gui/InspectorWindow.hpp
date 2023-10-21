@@ -3,27 +3,29 @@
 #include <Core.hpp>
 #include <Entity.hpp>
 
+#include "GuiWindow.hpp"
 #include "ControlUtils.hpp"
 
 struct InspectorWindowOutput {
 	
 };
 
-class InspectorWindow {
-private:
-	bool m_DrawThis = true;
+class InspectorWindow : public GuiWindow {
 
+#define INSPECTOR_NAME "Inspector"
 public:
 	InspectorWindow() = default;
 
-	bool& GetDrawHandle() { return m_DrawThis; }
+	virtual const char* GetName() const override {
+		return INSPECTOR_NAME;
+	};
 
 	InspectorWindowOutput Draw(std::variant<std::monostate, Entity, std::string> selection) {
 		InspectorWindowOutput output{};
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin(ICON_FA_NEWSPAPER " Inspector", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_NEWSPAPER " " INSPECTOR_NAME, &m_DrawThis)) {
 			
 			std::visit(
 				overload(

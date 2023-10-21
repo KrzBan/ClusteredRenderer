@@ -29,6 +29,9 @@ int App::Run() {
 	InspectorWindow inspectorWindow{};
 	SceneWindow sceneWindow{};
 	ViewportWindow viewportWindow{};
+	const std::vector<GuiWindow*> pWindows = { &contentBrowserWindow, &inspectorWindow, &sceneWindow, &viewportWindow };
+
+	MenuBar menuBar;
 
 	Framebuffer viewportFB{ 1, 1, 0 };
 
@@ -73,6 +76,7 @@ int App::Run() {
 		gui.NewFrame();
 
 		// Draw Editor Windows
+		menuBar.Draw(pWindows);
 		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
 		if (contentBrowserWindowOutput.selectionChanged)
 			sceneWindow.ResetSelection();
@@ -94,10 +98,12 @@ int App::Run() {
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
-		viewportFB.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
-		editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
-		if (runtime) {
-			scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+		if (viewportWindowOutput.windowWidth != 0 && viewportWindowOutput.windowHeight != 0) {
+			viewportFB.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			if (runtime) {
+				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			}
 		}
 
 		// Show frame

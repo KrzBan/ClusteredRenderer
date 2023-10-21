@@ -22,7 +22,9 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Gui.hpp" "Gui.cpp"
 	"Gui/ContentBrowserWindow.hpp"
 	"Gui/ControlUtils.hpp" "Gui/ControlUtils.cpp"
+	"Gui/GuiWindow.hpp"
 	"Gui/InspectorWindow.hpp"
+	"Gui/MenuBar.hpp"
 	"Gui/SceneWindow.hpp"
 	"Gui/ViewportWindow.hpp"
 

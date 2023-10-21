@@ -4,20 +4,26 @@
 #include <Scene.hpp>
 #include <Entity.hpp>
 
+#include "GuiWindow.hpp"
+
 struct SceneWindowOutput {
 	Entity selectedEntity;
 	bool selectionChanged = false;
 };
 
-class SceneWindow {
+class SceneWindow : public GuiWindow {
+
+#define SCENE_NAME "Scene"
 private:
-	bool m_DrawThis = true;
 	Entity m_SelectedEntity = {};
 
 public:
 	SceneWindow() {}
 
-	bool& GetDrawHandle() { return m_DrawThis; }
+	virtual const char* GetName() const override {
+		return SCENE_NAME;
+	};
+
 	void ResetSelection() {
 		m_SelectedEntity = {}; 
 	}
@@ -27,7 +33,7 @@ public:
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin(ICON_FA_SITEMAP " Scene", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_SITEMAP " " SCENE_NAME, &m_DrawThis)) {
 			
 			scene.m_Registry.each([&](auto entityID) {
 				Entity entity{ entityID, &scene };

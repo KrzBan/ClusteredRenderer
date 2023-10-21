@@ -2,25 +2,27 @@
 
 #include <Core.hpp>
 
+#include "GuiWindow.hpp"
+
 struct ViewportWindowOutput {
 	uint32 windowWidth{}, windowHeight{};
 };
 
-class ViewportWindow {
-private:
-	bool m_DrawThis = true;
-
+class ViewportWindow : public GuiWindow {
+#define VIEWPORT_NAME "Viewport"
 public:
 	ViewportWindow() {}
 
-	bool& GetDrawHandle() { return m_DrawThis; }
+	virtual const char* GetName() const override {
+		return VIEWPORT_NAME;
+	};
 
 	ViewportWindowOutput Draw(uint32 textureId) {
 		ViewportWindowOutput output{};
 
 		if (m_DrawThis == false) return output;
 
-		if (ImGui::Begin(ICON_FA_GAMEPAD " Viewport", &m_DrawThis)) {
+		if (ImGui::Begin(ICON_FA_GAMEPAD " " VIEWPORT_NAME, &m_DrawThis)) {
 			ImGui::BeginChild("ViewportRender");
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
