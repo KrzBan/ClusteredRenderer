@@ -46,7 +46,7 @@
 #include <stb_image.h>
 
 // Icons
-#include <Gui/IconsFontAwesome6.h>
+#include <Gui/Definitions/IconsFontAwesome6.h>
 
 struct OpenGLVersion {
 	int major = 0;

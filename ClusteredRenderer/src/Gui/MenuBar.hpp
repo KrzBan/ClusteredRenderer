@@ -2,7 +2,7 @@
 
 #include <Core.hpp>
 
-#include "GuiWindow.hpp"
+#include "Windows/GuiWindow.hpp"
 
 class MenuBar {
 	

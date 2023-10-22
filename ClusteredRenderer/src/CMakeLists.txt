@@ -20,13 +20,18 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Entity.hpp" "Entity.cpp"
 
 	"Gui.hpp" "Gui.cpp"
-	"Gui/ContentBrowserWindow.hpp"
 	"Gui/ControlUtils.hpp" "Gui/ControlUtils.cpp"
-	"Gui/GuiWindow.hpp"
-	"Gui/InspectorWindow.hpp"
+
+	"Gui/Definitions/IconsFontAwesome6.h"
+
 	"Gui/MenuBar.hpp"
-	"Gui/SceneWindow.hpp"
-	"Gui/ViewportWindow.hpp"
+
+	"Gui/Windows/AssetManagerWindow.hpp"
+	"Gui/Windows/ContentBrowserWindow.hpp"
+	"Gui/Windows/GuiWindow.hpp"
+	"Gui/Windows/InspectorWindow.hpp"
+	"Gui/Windows/SceneWindow.hpp"
+	"Gui/Windows/ViewportWindow.hpp"
 
 	"Scene.hpp" "Scene.cpp" 
 	"SceneCamera.hpp" "SceneCamera.cpp"

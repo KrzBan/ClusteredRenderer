@@ -4,7 +4,7 @@
 #include <Entity.hpp>
 
 #include "GuiWindow.hpp"
-#include "ControlUtils.hpp"
+#include <Gui/ControlUtils.hpp>
 
 struct InspectorWindowOutput {
 	

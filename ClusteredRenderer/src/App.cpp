@@ -25,11 +25,13 @@ int App::Run() {
 	AssetManager::Init(ASSETS_DIR);
 
 	Gui gui(window);
+	AssetManagerWindow assetManagerWindow{};
 	ContentBrowserWindow contentBrowserWindow{};
 	InspectorWindow inspectorWindow{};
 	SceneWindow sceneWindow{};
 	ViewportWindow viewportWindow{};
-	const std::vector<GuiWindow*> pWindows = { &contentBrowserWindow, &inspectorWindow, &sceneWindow, &viewportWindow };
+	const std::vector<GuiWindow*> pWindows = { &assetManagerWindow, &contentBrowserWindow,
+		&inspectorWindow, &sceneWindow, &viewportWindow };
 
 	MenuBar menuBar;
 
@@ -73,7 +75,7 @@ int App::Run() {
 		viewportFB.Unbind();
 
 		// Prepare GUI
-		gui.NewFrame();
+		gui.NewFrame(); 
 
 		// Draw Editor Windows
 		menuBar.Draw(pWindows);
@@ -94,7 +96,7 @@ int App::Run() {
 
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
-
+		auto assetManagerWindowOutput = assetManagerWindow.Draw();
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions

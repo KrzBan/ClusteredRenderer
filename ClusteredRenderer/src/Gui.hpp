@@ -4,10 +4,11 @@
 
 #include "Renderer/Window.hpp"
 
-#include "Gui/ContentBrowserWindow.hpp"
-#include "Gui/InspectorWindow.hpp"
-#include "Gui/SceneWindow.hpp"
-#include "Gui/ViewportWindow.hpp"
+#include "Gui/Windows/AssetManagerWindow.hpp"
+#include "Gui/Windows/ContentBrowserWindow.hpp"
+#include "Gui/Windows/InspectorWindow.hpp"
+#include "Gui/Windows/SceneWindow.hpp"
+#include "Gui/Windows/ViewportWindow.hpp"
 
 #include "Gui/MenuBar.hpp"
 
