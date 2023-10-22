@@ -14,6 +14,8 @@ namespace kb {
 
 	private:
 		uint64_t m_UUID;
+
+		friend struct std::formatter<UUID>;
 	};
 }
 
@@ -25,6 +27,14 @@ namespace std {
 	struct hash<kb::UUID> {
 		::std::size_t operator()(const kb::UUID& uuid) const {
 			return (uint64_t)uuid;
+		}
+	};
+
+	template <>
+	struct std::formatter<kb::UUID> : std::formatter<std::string> {
+		auto format(kb::UUID uuid, format_context& ctx) const {
+			return formatter<string>::format(
+				std::format("{}", uuid.m_UUID), ctx);
 		}
 	};
 }

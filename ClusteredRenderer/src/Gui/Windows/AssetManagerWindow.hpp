@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core.hpp>
+#include <Assets/AssetManager.hpp>
 
 #include "GuiWindow.hpp"
 
@@ -24,6 +25,33 @@ public:
 
 		if (ImGui::Begin(ICON_FA_CITY " " ASSET_MANAGER_NAME, &m_DrawThis)) {
 			
+			const auto& managedAssets = AssetManager::GetManagedAssets();
+			const auto& unmanagedAssets = AssetManager::GetUnmanagedAssets();
+
+			if (ImGui::TreeNode("Assets")) {
+				
+				for (const auto& [uuid, info] : managedAssets) {
+					const auto uuidStr = std::format("{}", uuid);
+					if (ImGui::TreeNode(uuidStr.c_str())) {
+						ImGui::Text(std::format("ID: {}", uuidStr).c_str());
+						ImGui::Text(std::format("Path: {}", info.path.string()).c_str());
+						ImGui::Text(std::format("Type: {}", AssetTypeToString(info.assetType)).c_str());
+
+						ImGui::TreePop();
+					}
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Other")) {
+
+				for (const auto& path : unmanagedAssets) {
+					ImGui::BulletText(std::format("{}", path.string()).c_str());
+				}
+
+				ImGui::TreePop();
+			}
 		}
 		ImGui::End();
 
