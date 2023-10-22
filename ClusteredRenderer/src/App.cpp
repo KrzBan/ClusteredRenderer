@@ -112,5 +112,7 @@ int App::Run() {
 		window.SwapBuffers();
 	}
 
+	AssetManager::Clear();
+
 	return EXIT_SUCCESS;
 }

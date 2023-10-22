@@ -15,6 +15,9 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	if (ext == ".txt") {
 		return AssetType::TEXT;
 	}
+	if (ext == ".png") {
+		return AssetType::TEXTURE_2D;
+	}
 	return AssetType::UNKNOWN;
 }
 
@@ -28,9 +31,6 @@ constexpr std::string AssetToString(const Asset& asset) {
 }
 
 struct AssetManagerData {
-	std::unordered_map<std::string, MaterialAsset> materialAsset;
-	std::unordered_map<std::string, TextAsset> textAssets;
-
 	std::unordered_map<kb::UUID, AssetInfo> managedAssets;
 	std::unordered_set<std::filesystem::path> unmanagedAssets;
 };
@@ -42,6 +42,11 @@ const std::unordered_map<kb::UUID, AssetInfo>& AssetManager::GetManagedAssets() 
 }
 const std::unordered_set<std::filesystem::path>& AssetManager::GetUnmanagedAssets() {
 	return s_AssetManagerData.unmanagedAssets;
+}
+
+void AssetManager::Clear() {
+	s_AssetManagerData.managedAssets.clear();
+	s_AssetManagerData.unmanagedAssets.clear();
 }
 
 void AssetManager::Init(const std::string& basePath) {
@@ -56,31 +61,41 @@ void AssetManager::DiscoverAssets(const std::string& basePath) {
 			continue;
 
 		auto path = dirEntry.path();
-		auto pathStr = path.string();
-		auto extension = path.extension().string();
+		auto extensionStr = path.extension().string();
 
-		auto assetType = ExtensionToAssetType(extension);
+		if (extensionStr == ".meta")
+			continue;
 
-		if (assetType != AssetType::UNKNOWN) {
+		auto assetType = ExtensionToAssetType(extensionStr);
 
-			std::ifstream f(path, std::ios::in);
-
-			try {
-				cereal::JSONInputArchive iarchive(f);
-
-				uint64_t uuid{ 0 };
-				iarchive(uuid);
-
-				AssetInfo info{ path, assetType };
-				kb::UUID fileId{ uuid };
-				s_AssetManagerData.managedAssets[fileId] = info;
-				continue;
-			}
-			catch (...) {
-				// Can't decode, not JSON
-			}
+		if (assetType == AssetType::UNKNOWN) {
+			s_AssetManagerData.unmanagedAssets.insert(path);
+			continue;
 		}
 
-		s_AssetManagerData.unmanagedAssets.insert(path);
+		auto metaPath = path;
+		metaPath += std::filesystem::path{ ".meta" };
+
+		uint64_t uuid{};
+
+		if (std::filesystem::exists(metaPath)) {
+			std::ifstream f(metaPath, std::ios::in);
+			cereal::JSONInputArchive iarchive(f);
+
+			iarchive(uuid);
+		}
+		else {
+			kb::UUID newUuid{};
+			uuid = newUuid;
+
+			std::ofstream f(metaPath, std::ios::out);
+			cereal::JSONOutputArchive oarchive(f);
+
+			oarchive(cereal::make_nvp("fileUUID", uuid));
+		}
+
+		AssetInfo info{ path, assetType };
+		kb::UUID fileId{ uuid };
+		s_AssetManagerData.managedAssets[fileId] = info;
 	}
 }

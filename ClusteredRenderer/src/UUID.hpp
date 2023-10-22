@@ -9,6 +9,7 @@ namespace kb {
 		UUID();
 		UUID(uint64_t uuid);
 		UUID(const UUID&) = default;
+		~UUID() noexcept;
 
 		operator uint64_t() const { return m_UUID; }
 

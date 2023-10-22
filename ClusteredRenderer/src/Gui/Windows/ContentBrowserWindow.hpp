@@ -61,10 +61,14 @@ public:
 
 			for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory)) {
 				const auto& path = directoryEntry.path();
+				const auto extension = path.extension().string();
+				if (extension == ".meta")
+					continue;
+
 				std::string filenameString = path.filename().string();
 
 				const auto filenameCStr = filenameString.c_str();
-				//ImGui::PushID(filenameCStr);
+				ImGui::PushID(filenameCStr);
 
 				Shared<Texture> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
 				if (m_SelectedFile != filenameString) {
@@ -96,7 +100,7 @@ public:
 
 				ImGui::NextColumn();
 
-				//ImGui::PopID();
+				ImGui::PopID();
 			}
 
 			ImGui::Columns(1);

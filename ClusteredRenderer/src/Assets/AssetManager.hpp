@@ -6,7 +6,8 @@
 enum class AssetType {
 	UNKNOWN,
 	MATERIAL,
-	TEXT
+	TEXT,
+	TEXTURE_2D
 };
 
 constexpr std::string AssetTypeToString(AssetType type) {
@@ -17,6 +18,8 @@ constexpr std::string AssetTypeToString(AssetType type) {
 		return "Material";
 	case AssetType::TEXT:
 		return "Text";
+	case AssetType::TEXTURE_2D:
+		return "Texture 2D";
 	}
 
 	throw std::invalid_argument("Invalid enum value");
@@ -26,6 +29,7 @@ constexpr std::string AssetTypeToString(AssetType type) {
 struct AssetInfo {
 	std::filesystem::path path;
 	AssetType assetType;
+
 };
 
 struct AssetManager {
@@ -34,6 +38,8 @@ public:
 
 	static const std::unordered_map<kb::UUID, AssetInfo>& GetManagedAssets();
 	static const std::unordered_set<std::filesystem::path>& GetUnmanagedAssets();
+
+	static void Clear();
 
 private:
 	static void DiscoverAssets(const std::string& basePath);

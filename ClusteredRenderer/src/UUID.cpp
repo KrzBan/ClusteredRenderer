@@ -31,4 +31,7 @@ namespace kb {
 		}
 	}
 
+	UUID::~UUID() noexcept {
+		s_ReservedUUIDs.erase(m_UUID);
+	}
 }
