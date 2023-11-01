@@ -4,6 +4,9 @@
 #include "TextAsset.hpp"
 #include "FileUtils.hpp"
 
+#include "AssetWatcher.hpp"
+#include "MetaData.hpp"
+
 #include <cereal/archives/json.hpp>
 
 using Asset = std::variant<MaterialAsset, TextAsset>;
@@ -51,6 +54,12 @@ void AssetManager::Clear() {
 
 void AssetManager::Init(const std::string& basePath) {
 	DiscoverAssets(basePath);
+
+	efsw::FileWatcher* fileWatcher = new efsw::FileWatcher();
+	UpdateListener* listener = new UpdateListener();
+	efsw::WatchID watchID = fileWatcher->addWatch(basePath, listener, true);
+
+	fileWatcher->watch();
 }
 
 void AssetManager::DiscoverAssets(const std::string& basePath) {
@@ -76,26 +85,23 @@ void AssetManager::DiscoverAssets(const std::string& basePath) {
 		auto metaPath = path;
 		metaPath += std::filesystem::path{ ".meta" };
 
-		uint64_t uuid{};
-
+		MetaData metaData{};
 		if (std::filesystem::exists(metaPath)) {
 			std::ifstream f(metaPath, std::ios::in);
 			cereal::JSONInputArchive iarchive(f);
 
-			iarchive(uuid);
+			iarchive(cereal::make_nvp("meta", metaData));
 		}
 		else {
-			kb::UUID newUuid{};
-			uuid = newUuid;
-
+			metaData.lastModified = std::filesystem::last_write_time(path);
 			std::ofstream f(metaPath, std::ios::out);
 			cereal::JSONOutputArchive oarchive(f);
 
-			oarchive(cereal::make_nvp("fileUUID", uuid));
+			oarchive(cereal::make_nvp("meta", metaData));
 		}
 
-		AssetInfo info{ path, assetType };
-		kb::UUID fileId{ uuid };
+		AssetInfo info{ path, assetType, metaData.lastModified };
+		kb::UUID fileId{ metaData.assetID };
 		s_AssetManagerData.managedAssets[fileId] = info;
 	}
 }

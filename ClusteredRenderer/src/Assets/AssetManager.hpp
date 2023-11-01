@@ -29,7 +29,7 @@ constexpr std::string AssetTypeToString(AssetType type) {
 struct AssetInfo {
 	std::filesystem::path path;
 	AssetType assetType;
-
+	std::filesystem::file_time_type lastWrite;
 };
 
 struct AssetManager {

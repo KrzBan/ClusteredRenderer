@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.hpp"
+#include <cereal/cereal.hpp>
 
 namespace kb {
 
@@ -17,6 +18,12 @@ namespace kb {
 		uint64_t m_UUID;
 
 		friend struct std::formatter<UUID>;
+
+	public:
+		template <class Archive>
+		void serialize(Archive& archive) {
+			archive(cereal::make_nvp("uuid", m_UUID));
+		}
 	};
 }
 

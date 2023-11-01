@@ -15,6 +15,7 @@
 
 int App::Run() {
 	
+	spdlog::set_level(spdlog::level::trace);
 	Window window(1920, 1080, config::windowTitle, config::openGLVersion);
 
 	Input::Init(window.glfwWindow());

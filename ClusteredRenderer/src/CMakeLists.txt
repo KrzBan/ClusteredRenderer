@@ -6,8 +6,10 @@ target_sources(ClusteredRendererLib PUBLIC
 	"App.hpp" "App.cpp" 
 
 	"Assets/AssetManager.hpp" "Assets/AssetManager.cpp"
+	"Assets/AssetWatcher.hpp" "Assets/AssetWatcher.cpp"
 	"Assets/FileUtils.hpp"
 	"Assets/MaterialAsset.hpp"
+	"Assets/MetaData.hpp" "Assets/MetaData.cpp"
 	"Assets/TextAsset.hpp"
 
 	"Components.hpp"
@@ -46,7 +48,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
 	"Renderer/Window.hpp" "Renderer/Window.cpp"    
 	
-	"UUID.hpp" "UUID.cpp"    "Gui/ControlUtils.cpp" "Assets/AssetManager.cpp")
+	"UUID.hpp" "UUID.cpp")
 
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)
