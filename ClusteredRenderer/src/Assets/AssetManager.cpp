@@ -54,12 +54,6 @@ void AssetManager::Clear() {
 
 void AssetManager::Init(const std::string& basePath) {
 	DiscoverAssets(basePath);
-
-	efsw::FileWatcher* fileWatcher = new efsw::FileWatcher();
-	UpdateListener* listener = new UpdateListener();
-	efsw::WatchID watchID = fileWatcher->addWatch(basePath, listener, true);
-
-	fileWatcher->watch();
 }
 
 void AssetManager::DiscoverAssets(const std::string& basePath) {
@@ -87,21 +81,39 @@ void AssetManager::DiscoverAssets(const std::string& basePath) {
 
 		MetaData metaData{};
 		if (std::filesystem::exists(metaPath)) {
-			std::ifstream f(metaPath, std::ios::in);
-			cereal::JSONInputArchive iarchive(f);
-
-			iarchive(cereal::make_nvp("meta", metaData));
+			metaData = MetaData::ReadMetaFile(metaPath);
 		}
 		else {
 			metaData.lastModified = std::filesystem::last_write_time(path);
-			std::ofstream f(metaPath, std::ios::out);
-			cereal::JSONOutputArchive oarchive(f);
-
-			oarchive(cereal::make_nvp("meta", metaData));
+			MetaData::WriteMetaFile(metaPath, metaData);
 		}
 
 		AssetInfo info{ path, assetType, metaData.lastModified };
 		kb::UUID fileId{ metaData.assetID };
 		s_AssetManagerData.managedAssets[fileId] = info;
 	}
+}
+
+void AssetManager::HandleFileChanges(const std::vector<FileActions>& queue) {
+
+	for (const auto& action : queue) {
+		switch (action.action) {
+		case efsw::Actions::Add:
+			spdlog::debug("DIR ({}) FILE ({}) has event Added", action.directory, action.filename);
+			break;
+		case efsw::Actions::Delete:
+			spdlog::debug("DIR ({}) FILE ({}) has event Delete", action.directory, action.filename);
+			break;
+		case efsw::Actions::Modified:
+			spdlog::debug("DIR ({}) FILE ({}) has event Modified", action.directory, action.filename);
+			break;
+		case efsw::Actions::Moved:
+			spdlog::debug("DIR ({}) FILE ({}) has event Moved from ({})",
+				action.directory, action.filename, action.oldFilename);
+			break;
+		default:
+			std::cout << "Should never happen!" << std::endl;
+		}
+	}
+	
 }

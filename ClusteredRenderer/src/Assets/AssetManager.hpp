@@ -3,6 +3,8 @@
 #include <Core.hpp>
 #include <UUID.hpp>
 
+#include "AssetWatcher.hpp"
+
 enum class AssetType {
 	UNKNOWN,
 	MATERIAL,
@@ -35,6 +37,8 @@ struct AssetInfo {
 struct AssetManager {
 public:
 	static void Init(const std::string& basePath);
+
+	static void HandleFileChanges(const std::vector<FileActions>& queue);
 
 	static const std::unordered_map<kb::UUID, AssetInfo>& GetManagedAssets();
 	static const std::unordered_set<std::filesystem::path>& GetUnmanagedAssets();

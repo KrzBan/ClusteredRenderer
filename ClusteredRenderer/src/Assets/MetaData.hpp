@@ -13,6 +13,9 @@ struct MetaData {
 	kb::UUID assetID;
 	std::filesystem::file_time_type lastModified;
 
+	static MetaData ReadMetaFile(const std::filesystem::path& path);
+	static void WriteMetaFile(const std::filesystem::path& path, const MetaData& metaData);
+
 	template <class Archive>
 	void save(Archive& archive) const {
 		archive(

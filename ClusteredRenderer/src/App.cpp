@@ -4,6 +4,7 @@
 #include <Core/Time.hpp>
 
 #include "Assets/AssetManager.hpp"
+#include "Assets/AssetWatcher.hpp"
 
 #include "Scene.hpp"
 
@@ -24,6 +25,12 @@ int App::Run() {
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
 
 	AssetManager::Init(ASSETS_DIR);
+
+	// File Watcher
+	const auto listener = std::make_unique<UpdateListener>();
+	efsw::FileWatcher* fileWatcher = new efsw::FileWatcher();
+	efsw::WatchID watchID = fileWatcher->addWatch(ASSETS_DIR, listener.get(), true);
+	fileWatcher->watch();
 
 	Gui gui(window);
 	AssetManagerWindow assetManagerWindow{};
@@ -108,6 +115,9 @@ int App::Run() {
 				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			}
 		}
+
+		// Update asset changes
+		AssetManager::HandleFileChanges(listener->FlushQueue());
 
 		// Show frame
 		window.SwapBuffers();
