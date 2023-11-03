@@ -34,7 +34,7 @@ public:
 					const auto uuidStr = std::format("{}", uuid);
 					if (ImGui::TreeNode(uuidStr.c_str())) {
 						ImGui::Text(std::format("ID: {}", uuidStr).c_str());
-						ImGui::Text(std::format("Path: {}", info.path.string()).c_str());
+						ImGui::Text(std::format("Path: {}", AssetManager::GetPath(uuid).string()).c_str());
 						ImGui::Text(std::format("Type: {}", AssetTypeToString(info.assetType)).c_str());
 						ImGui::Text(std::format("Last Modified: {}", info.lastWrite).c_str());
 

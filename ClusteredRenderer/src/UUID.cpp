@@ -25,13 +25,5 @@ namespace kb {
 	}
 
 	UUID::UUID(uint64_t uuid)
-		: m_UUID(uuid) {
-		if (s_ReservedUUIDs.contains(m_UUID)) {
-			spdlog::error("UUID {} already exists!", m_UUID);
-		}
-	}
-
-	UUID::~UUID() noexcept {
-		s_ReservedUUIDs.erase(m_UUID);
-	}
+		: m_UUID(uuid) {}
 }
