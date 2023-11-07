@@ -64,13 +64,13 @@ private:
 
 		if (ImGui::BeginPopup("AddComponent")) {
 			AddComponentEntry<CameraComponent>("Camera", entity);
+			AddComponentEntry<TextComponent>("Text Component", entity);
 			// DisplayAddComponentEntry<ScriptComponent>("Script");
 			// DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			// DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			// DisplayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
 			// DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 			// DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
-			// DisplayAddComponentEntry<TextComponent>("Text Component");
 
 			ImGui::EndPopup();
 		}
@@ -136,6 +136,18 @@ private:
 
 				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 			}
+		});
+
+		DrawComponent<TextComponent>("Text", entity, [](TextComponent& textComponent) {
+			
+			// Drag&Drop Target
+
+			if (textComponent.textAsset) {
+				if (auto& assetPtr = textComponent.textAsset->Get(); assetPtr) {
+					ImGui::Text(assetPtr->text.c_str());
+				}
+			}
+
 		});
 	}
 

@@ -1,37 +1,9 @@
 #include "AssetManager.hpp"
 
-#include "MaterialAsset.hpp"
-#include "TextAsset.hpp"
 #include "FileUtils.hpp"
-
-#include "AssetWatcher.hpp"
 #include "MetaData.hpp"
 
 #include <cereal/archives/json.hpp>
-
-using Asset = std::variant<MaterialAsset, TextAsset>;
-
-constexpr AssetType ExtensionToAssetType(const std::string& ext) {
-	if (ext == ".mat") {
-		return AssetType::MATERIAL;
-	}
-	if (ext == ".txt") {
-		return AssetType::TEXT;
-	}
-	if (ext == ".png") {
-		return AssetType::TEXTURE_2D;
-	}
-	return AssetType::UNKNOWN;
-}
-
-constexpr std::string AssetToString(const Asset& asset) {
-	std::string name = std::visit(overload(
-		[](const MaterialAsset& material) { return "Material"; },
-		[](const TextAsset& text) { return "Text"; }
-	), asset);
-
-	return name;
-}
 
 struct AssetManagerData {
 	std::unordered_map<kb::UUID, AssetInfo> managedAssets;
@@ -41,6 +13,8 @@ struct AssetManagerData {
 
 	std::unordered_set<std::filesystem::path> unmanagedAssets;
 	std::unordered_map<std::filesystem::path, MetaData> strayMetaFiles;
+
+	std::unordered_map<kb::UUID, std::weak_ptr<ProxyBase>> assets;
 };
 
 static AssetManagerData s_AssetManagerData;
@@ -50,6 +24,40 @@ const std::unordered_map<kb::UUID, AssetInfo>& AssetManager::GetManagedAssets() 
 }
 const std::unordered_set<std::filesystem::path>& AssetManager::GetUnmanagedAssets() {
 	return s_AssetManagerData.unmanagedAssets;
+}
+
+template<typename T>
+std::shared_ptr<Proxy<T>> GetAsset(kb::UUID id) {
+	const auto assetType = TypeToAssetType<T>();
+
+	const auto assetInfo = s_AssetManagerData.managedAssets.at(id);
+
+	if (assetType != assetInfo.assetType) {
+		throw std::runtime_error("GetAsset() asset type mismatch");
+	}
+
+	if (s_AssetManagerData.assets.contains(id)) {
+		auto& weakProxy = s_AssetManagerData.assets.at(id);
+
+		if (weakProxy.expired()) {
+			s_AssetManagerData.assets.erase(id);
+		}
+		else {
+			const auto cast = std::dynamic_pointer_cast<Proxy<T>>(weakProxy.lock());
+			if (cast == nullptr) {
+				throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
+			}
+
+			return cast;
+		}
+	}
+
+	const auto assetPath = s_AssetManagerData.idToPath.at(id);
+	const auto sharedAsset = std::make_shared<Proxy<T>>(assetPath);
+
+	s_AssetManagerData.assets.insert({ id, sharedAsset });
+
+	return sharedAsset;
 }
 
 std::filesystem::path AssetManager::GetPath(kb::UUID id) {

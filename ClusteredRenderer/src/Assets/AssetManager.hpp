@@ -3,30 +3,9 @@
 #include <Core.hpp>
 #include <UUID.hpp>
 
+#include "Assets.hpp"
 #include "AssetWatcher.hpp"
-
-enum class AssetType {
-	UNKNOWN,
-	MATERIAL,
-	TEXT,
-	TEXTURE_2D
-};
-
-constexpr std::string AssetTypeToString(AssetType type) {
-	switch (type) {
-	case AssetType::UNKNOWN:
-		return "Unknown";
-	case AssetType::MATERIAL:
-		return "Material";
-	case AssetType::TEXT:
-		return "Text";
-	case AssetType::TEXTURE_2D:
-		return "Texture 2D";
-	}
-
-	throw std::invalid_argument("Invalid enum value");
-}
-
+#include "Proxy.hpp"
 
 struct AssetInfo {
 	AssetType assetType;

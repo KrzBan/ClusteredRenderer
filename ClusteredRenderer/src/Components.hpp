@@ -5,6 +5,9 @@
 #include "UUID.hpp"
 #include "SceneCamera.hpp"
 
+#include <Assets/Proxy.hpp>
+#include <Assets/Assets.hpp>
+
 struct IDComponent {
 	kb::UUID ID;
 
@@ -77,6 +80,13 @@ struct NativeScriptComponent {
 	}
 };
 
+struct TextComponent {
+	TextComponent() = default;
+	TextComponent(const TextComponent&) = default;
+
+	std::shared_ptr<Proxy<TextAsset>> textAsset;
+};
+
 // Physics
 
 // struct Rigidbody2DComponent
@@ -136,5 +146,5 @@ ComponentGroup<
 	CameraComponent, 
 	MeshRendererComponent,
 	NativeScriptComponent,
-	TransformComponent
->;
+	TransformComponent,
+	TextComponent>;

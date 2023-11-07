@@ -8,9 +8,11 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Assets/AssetManager.hpp" "Assets/AssetManager.cpp"
 	"Assets/AssetWatcher.hpp" "Assets/AssetWatcher.cpp"
 	"Assets/FileUtils.hpp"
-	"Assets/MaterialAsset.hpp"
 	"Assets/MetaData.hpp" "Assets/MetaData.cpp"
-	"Assets/TextAsset.hpp"
+
+	"Assets/AssetTypes/AssetType.hpp"
+	"Assets/AssetTypes/MaterialAsset.hpp"
+	"Assets/AssetTypes/TextAsset.hpp"
 
 	"Components.hpp"
 
