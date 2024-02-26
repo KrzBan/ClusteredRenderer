@@ -3,16 +3,12 @@
 #include <Core.hpp>
 #include "AssetType.hpp"
 
-struct MaterialAsset {
-	int test = 0;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		archive(test);
-	}
+struct MaterialAsset : public Asset {
+	MaterialAsset() = default;
+	virtual constexpr AssetType GetType() const override { return AssetType::MATERIAL; };
 };
 
 template <>
-constexpr AssetType TypeToAssetType<MaterialAsset>() {
+inline AssetType AssetTypeFromType<MaterialAsset>() {
 	return AssetType::MATERIAL;
 }

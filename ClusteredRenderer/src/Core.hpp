@@ -53,7 +53,7 @@ struct OpenGLVersion {
 	int minor = 0;
 };
 
-#define ASSETS_DIR "./assets/"
+#define ASSETS_DIR "F:/dev/ClusteredRendererWorkspace"
 #define RESOURCES_DIR "./resources/"
 
 namespace config {
@@ -61,7 +61,7 @@ namespace config {
 	constexpr char const* glslVersion = "#version 400";
 	constexpr OpenGLVersion openGLVersion{ 4, 0 };
 
-	constexpr char const* assetDirectory = "assets";
+	constexpr char const* assetDirectory = ASSETS_DIR;
 }
 
 template<typename T>

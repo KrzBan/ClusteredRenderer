@@ -1,7 +1,7 @@
-#include "MetaData.hpp"
+#include "CommonMetaData.hpp"
 
-MetaData MetaData::ReadMetaFile(const std::filesystem::path& path) {
-	MetaData meta;
+CommonMetaData CommonMetaData::ReadMetaFile(const std::filesystem::path& path) {
+	CommonMetaData meta;
 	std::ifstream f(path, std::ios::in);
 	cereal::JSONInputArchive iarchive(f);
 
@@ -9,7 +9,7 @@ MetaData MetaData::ReadMetaFile(const std::filesystem::path& path) {
 
 	return meta;
 }
-void MetaData::WriteMetaFile(const std::filesystem::path& path, const MetaData& metaData) {
+void CommonMetaData::WriteMetaFile(const std::filesystem::path& path, const CommonMetaData& metaData) {
 	std::ofstream f(path, std::ios::out);
 	cereal::JSONOutputArchive oarchive(f);
 

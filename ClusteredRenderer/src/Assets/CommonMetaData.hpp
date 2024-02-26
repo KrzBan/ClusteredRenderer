@@ -2,6 +2,7 @@
 
 #include <Core.hpp>
 #include <UUID.hpp>
+#include "AssetTypes/AssetType.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/types/chrono.hpp>
@@ -9,19 +10,21 @@
 
 constexpr uint32 g_MetaFileVersion = 1;
 
-struct MetaData {
+struct CommonMetaData {
 	kb::UUID assetID;
 	std::filesystem::file_time_type lastModified;
+	AssetType assetType;
 
-	static MetaData ReadMetaFile(const std::filesystem::path& path);
-	static void WriteMetaFile(const std::filesystem::path& path, const MetaData& metaData);
+	static CommonMetaData ReadMetaFile(const std::filesystem::path& path);
+	static void WriteMetaFile(const std::filesystem::path& path, const CommonMetaData& metaData);
 
 	template <class Archive>
 	void save(Archive& archive) const {
 		archive(
 			cereal::make_nvp("version", g_MetaFileVersion), 
 			cereal::make_nvp("file_id", assetID), 
-			cereal::make_nvp("last_modified", lastModified));
+			cereal::make_nvp("last_modified", lastModified),
+			cereal::make_nvp("asset_type", std::string(magic_enum::enum_name(assetType))));
 	}
 
 	template <class Archive>
@@ -34,8 +37,13 @@ struct MetaData {
 				std::format("MeteFileVersion mismatch. Read {}, but current is {}", metaFileVersion, g_MetaFileVersion));
 		}
 
+		std::string assetTypeStr;
+
 		archive(
 			cereal::make_nvp("file_id", assetID),
-			cereal::make_nvp("last_modified", lastModified));
+			cereal::make_nvp("last_modified", lastModified),
+			cereal::make_nvp("asset_type", assetTypeStr));
+
+		assetType = magic_enum::enum_cast<AssetType>(assetTypeStr).value_or(AssetType::UNKNOWN);
 	}
 };

@@ -35,8 +35,8 @@ public:
 					if (ImGui::TreeNode(uuidStr.c_str())) {
 						ImGui::Text(std::format("ID: {}", uuidStr).c_str());
 						ImGui::Text(std::format("Path: {}", AssetManager::GetPath(uuid).string()).c_str());
-						ImGui::Text(std::format("Type: {}", AssetTypeToString(info.assetType)).c_str());
-						ImGui::Text(std::format("Last Modified: {}", info.lastWrite).c_str());
+						ImGui::Text(std::format("Type: {}", magic_enum::enum_name(info.commonMetaData.assetType)).c_str());
+						ImGui::Text(std::format("Last Modified: {}", info.commonMetaData.lastModified).c_str());
 
 						ImGui::TreePop();
 					}

@@ -8,7 +8,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Assets/AssetManager.hpp" "Assets/AssetManager.cpp"
 	"Assets/AssetWatcher.hpp" "Assets/AssetWatcher.cpp"
 	"Assets/FileUtils.hpp"
-	"Assets/MetaData.hpp" "Assets/MetaData.cpp"
+	"Assets/CommonMetaData.hpp" "Assets/CommonMetaData.cpp"
 
 	"Assets/AssetTypes/AssetType.hpp"
 	"Assets/AssetTypes/MaterialAsset.hpp"
@@ -22,7 +22,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Core/Time.hpp" "Core/Time.cpp"
 
 	"Entity.hpp" "Entity.cpp"
-
+	
 	"Gui.hpp" "Gui.cpp"
 	"Gui/ControlUtils.hpp" "Gui/ControlUtils.cpp"
 
@@ -60,9 +60,10 @@ find_package(glm REQUIRED)
 find_package(Stb REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 find_package(efsw CONFIG REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
 
 target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib 
-	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal efsw::efsw)
+	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal efsw::efsw magic_enum::magic_enum)
 
 # Supress warnings - Spdlog does not set it's includes as SYSTEM
 get_target_property(_inc spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)

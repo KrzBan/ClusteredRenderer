@@ -5,14 +5,14 @@
 
 #include "Assets.hpp"
 #include "AssetWatcher.hpp"
-#include "Proxy.hpp"
+#include "CommonMetaData.hpp"
 
-struct AssetInfo {
-	AssetType assetType;
-	std::filesystem::file_time_type lastWrite;
+
+struct AssetRegistryEntry {
+	CommonMetaData commonMetaData;
+	Weak<Unique<Asset>> asset;
 };
 
-class MetaData;
 
 struct AssetManager {
 public:
@@ -20,7 +20,7 @@ public:
 
 	static void HandleFileChanges(const std::vector<FileActions>& queue);
 
-	static const std::unordered_map<kb::UUID, AssetInfo>& GetManagedAssets();
+	static const std::unordered_map<kb::UUID, AssetRegistryEntry>& GetManagedAssets();
 	static const std::unordered_set<std::filesystem::path>& GetUnmanagedAssets();
 
 	static std::filesystem::path GetPath(kb::UUID);
@@ -32,6 +32,6 @@ private:
 
 	static void AddFile(const std::filesystem::path& path);
 
-	static std::optional<MetaData> FetchStrayMetaData(std::filesystem::path path);
-	static std::optional<MetaData> FetchFileMetaData(std::filesystem::path path);
+	static std::optional<std::string> FetchStrayMetaDataRaw(std::filesystem::path path);
+	static std::optional<CommonMetaData> FetchFileCommonMetaData(std::filesystem::path path);
 };

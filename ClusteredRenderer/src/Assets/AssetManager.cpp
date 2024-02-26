@@ -1,61 +1,69 @@
 #include "AssetManager.hpp"
 
+#include "AssetTypes/AssetType.hpp"
+
 #include "FileUtils.hpp"
-#include "MetaData.hpp"
+#include "CommonMetaData.hpp"
 
 #include <cereal/archives/json.hpp>
 
 struct AssetManagerData {
-	std::unordered_map<kb::UUID, AssetInfo> managedAssets;
-
 	std::unordered_map<kb::UUID, std::filesystem::path> idToPath;
 	std::unordered_map<std::filesystem::path, kb::UUID> pathToId;
 
 	std::unordered_set<std::filesystem::path> unmanagedAssets;
-	std::unordered_map<std::filesystem::path, MetaData> strayMetaFiles;
+	std::unordered_map<std::filesystem::path, std::string> strayMetaData;
 
-	std::unordered_map<kb::UUID, std::weak_ptr<ProxyBase>> assets;
+	std::unordered_map<kb::UUID, AssetRegistryEntry> assets;
 };
 
 static AssetManagerData s_AssetManagerData;
 
-const std::unordered_map<kb::UUID, AssetInfo>& AssetManager::GetManagedAssets() {
-	return s_AssetManagerData.managedAssets;
+const std::unordered_map<kb::UUID, AssetRegistryEntry>& AssetManager::GetManagedAssets() {
+	return s_AssetManagerData.assets;
 }
 const std::unordered_set<std::filesystem::path>& AssetManager::GetUnmanagedAssets() {
 	return s_AssetManagerData.unmanagedAssets;
 }
 
 template<typename T>
-std::shared_ptr<Proxy<T>> GetAsset(kb::UUID id) {
-	const auto assetType = TypeToAssetType<T>();
+std::shared_ptr<Unique<T>> GetAsset(kb::UUID id) {
 
-	const auto assetInfo = s_AssetManagerData.managedAssets.at(id);
-
-	if (assetType != assetInfo.assetType) {
-		throw std::runtime_error("GetAsset() asset type mismatch");
+	if (s_AssetManagerData.assets.contains(id) == false) {
+		spdlog::error("Asset ID: {} unmanaged", id);
+		return nullptr;
 	}
 
-	if (s_AssetManagerData.assets.contains(id)) {
-		auto& weakProxy = s_AssetManagerData.assets.at(id);
-
-		if (weakProxy.expired()) {
-			s_AssetManagerData.assets.erase(id);
-		}
-		else {
-			const auto cast = std::dynamic_pointer_cast<Proxy<T>>(weakProxy.lock());
-			if (cast == nullptr) {
-				throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
-			}
-
-			return cast;
-		}
+	auto& assetEntry = s_AssetManagerData.assets.at(id);
+	if (assetEntry.commonMetaData.assetType != AssetTypeFromType<T>()) {
+		spdlog::error("Asset ID: {} type mismatch", id);
+		return nullptr;
 	}
+
+	if (assetEntry.asset.expired()) {
+		const auto cast = std::dynamic_pointer_cast<Unique<T>>(assetEntry.asset.lock());
+		if (cast == nullptr) {
+			throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
+		}
+
+		return cast;
+	}
+	
+	// Create new
+	auto sharedAsset = std::make_shared<Unique<T>>();
 
 	const auto assetPath = s_AssetManagerData.idToPath.at(id);
-	const auto sharedAsset = std::make_shared<Proxy<T>>(assetPath);
+	auto metaPath = assetPath;
+	metaPath+=std::filesystem::path(".meta");
 
-	s_AssetManagerData.assets.insert({ id, sharedAsset });
+	std::ifstream input(metaPath);
+	cereal::JSONInputArchive archive(input);
+
+	(**sharedAsset).LoadMeta(archive);
+	(**sharedAsset).LoadAsset(assetPath);
+
+	Weak<Unique<Asset>> weak = std::static_pointer_cast<Unique<Asset>>(sharedAsset);
+	assetEntry.asset = weak;
 
 	return sharedAsset;
 }
@@ -68,7 +76,6 @@ std::filesystem::path AssetManager::GetPath(kb::UUID id) {
 }
 
 void AssetManager::Clear() {
-	s_AssetManagerData.managedAssets.clear();
 	s_AssetManagerData.unmanagedAssets.clear();
 }
 
@@ -117,7 +124,10 @@ void AssetManager::HandleFileChanges(const std::vector<FileActions>& queue) {
 			// Remove from registers
 			if (s_AssetManagerData.pathToId.contains(path)) {
 				const auto fileId = s_AssetManagerData.pathToId[path];
-				s_AssetManagerData.managedAssets.erase(fileId);
+				if (s_AssetManagerData.assets.contains(fileId)) {
+					s_AssetManagerData.assets.erase(fileId);
+				}
+				
 				s_AssetManagerData.idToPath.erase(fileId);
 				s_AssetManagerData.pathToId.erase(path);
 			}
@@ -126,10 +136,23 @@ void AssetManager::HandleFileChanges(const std::vector<FileActions>& queue) {
 			}
 			
 			if (std::filesystem::exists(pathMeta)) {
-				MetaData strayMetaFile = MetaData::ReadMetaFile(pathMeta);
-				s_AssetManagerData.strayMetaFiles[path.filename()] = strayMetaFile;
-				filesystem::remove(pathMeta);
-				spdlog::debug("Saved MetaData of {}", pathMeta);
+				{
+					std::ifstream input{ pathMeta, std::ios::in | std::ios::binary };
+					const auto sz = filesystem::file_size(pathMeta);
+					std::string metaFile(sz, '\0');
+					input.read(metaFile.data(), sz);
+					s_AssetManagerData.strayMetaData[path.filename()] = metaFile;
+					spdlog::debug("Saved MetaData of {}", pathMeta);
+				}
+				
+				try {
+					filesystem::remove(pathMeta);
+					spdlog::debug("Removed .meta {}", pathMeta);
+				}
+				catch (...) {
+					spdlog::debug("Couldn't remove {}", pathMeta);
+				}
+				
 			}
 			break;
 		}
@@ -139,17 +162,19 @@ void AssetManager::HandleFileChanges(const std::vector<FileActions>& queue) {
 			// Update register timestamp
 			if (s_AssetManagerData.pathToId.contains(path)) {
 				const auto fileId = s_AssetManagerData.pathToId[path];
-				s_AssetManagerData.managedAssets[fileId].lastWrite = lastModified;
+				s_AssetManagerData.assets.at(fileId).commonMetaData.lastModified = lastModified;
 			}
 			// Update .meta timestamp
 			if (std::filesystem::exists(pathMeta)) {
-				MetaData metaData = MetaData::ReadMetaFile(pathMeta);
-				metaData.lastModified = lastModified;
-				MetaData::WriteMetaFile(pathMeta, metaData);
-				spdlog::debug("Updated MetaData of {}", pathMeta);
+				//TODO: composite edits of .meta
+				//CommonMetaData metaData = CommonMetaData::ReadMetaFile(pathMeta);
+				//metaData.lastModified = lastModified;
+				//CommonMetaData::WriteMetaFile(pathMeta, metaData);
+				//spdlog::debug("Updated MetaData of {}", pathMeta);
 			}
 
 			// Reload assset
+			// TODO
 
 			break;
 		}
@@ -205,59 +230,63 @@ void AssetManager::AddFile(const std::filesystem::path& path) {
 	auto metaPath = path;
 	metaPath += std::filesystem::path{ ".meta" };
 
-	MetaData metaData{};
-	if (const auto strayMetaData = FetchStrayMetaData(path); strayMetaData) {
-		metaData = strayMetaData.value();
-		MetaData::WriteMetaFile(metaPath, metaData);
+	CommonMetaData metaData{};
+	if (const auto strayMetaData = FetchStrayMetaDataRaw(path); strayMetaData) {
+		const auto metaDataStr = strayMetaData.value();
+		{
+			std::ofstream output{ metaPath, std::ios::out | std::ios::binary };
+			output.write(metaDataStr.data(), metaDataStr.size());
+		}
+
+		metaData = CommonMetaData::ReadMetaFile(metaPath);
+
+		if (metaData.assetType != assetType)
+			spdlog::error("Type mismatch loading stray meta data");
 	}
-	else if (const auto loadedMetaData = FetchFileMetaData(path); loadedMetaData) {
+	else if (const auto loadedMetaData = FetchFileCommonMetaData(path); loadedMetaData) {
 		metaData = loadedMetaData.value();
+		if (metaData.assetType != assetType)
+			spdlog::error("Type mismatch loading file meta data");
 	}
 	else {
 		metaData.lastModified = std::filesystem::last_write_time(path);
-		MetaData::WriteMetaFile(metaPath, metaData);
+		metaData.assetType = assetType;
+		CommonMetaData::WriteMetaFile(metaPath, metaData);
 	}
 
-	AssetInfo info{ assetType, metaData.lastModified };
-	kb::UUID fileId{ metaData.assetID };
-	s_AssetManagerData.managedAssets[fileId] = info;
+	s_AssetManagerData.assets[metaData.assetID] = AssetRegistryEntry{ metaData, {} };
 
-	s_AssetManagerData.idToPath[fileId] = path;
-	s_AssetManagerData.pathToId[path] = fileId;
+	s_AssetManagerData.idToPath[metaData.assetID] = path;
+	s_AssetManagerData.pathToId[path] = metaData.assetID;
 }
 
-std::optional<MetaData> AssetManager::FetchStrayMetaData(std::filesystem::path path) {
+std::optional<std::string> AssetManager::FetchStrayMetaDataRaw(std::filesystem::path path) {
 	const auto filename = path.filename();
-	if (not s_AssetManagerData.strayMetaFiles.contains(filename))
+	if (not s_AssetManagerData.strayMetaData.contains(filename))
 		return {};
 
 	auto metaPath = path; metaPath += ".meta";
 	auto lastModified = std::filesystem::last_write_time(path);
 
-	MetaData metaData = s_AssetManagerData.strayMetaFiles.at(filename);
+	std::string metaData = s_AssetManagerData.strayMetaData.at(filename);
 
 	if (std::filesystem::exists(metaPath)) {
 		spdlog::error("Stray .meta data available, but file {} already exists", metaPath);
 		return {};
 	}
 
-	if (lastModified != metaData.lastModified) {
-		spdlog::error("LastModified timestamp mismatch when fetching stray .meta data for path {}", path);
-		return {};
-	}
-
-	s_AssetManagerData.strayMetaFiles.erase(path);
+	s_AssetManagerData.strayMetaData.erase(path);
 	return metaData;
 }
 
-std::optional<MetaData> AssetManager::FetchFileMetaData(std::filesystem::path path) {
+std::optional<CommonMetaData> AssetManager::FetchFileCommonMetaData(std::filesystem::path path) {
 	auto metaPath = path;
 	metaPath += ".meta";
 
 	if (not std::filesystem::exists(metaPath))
 		return {};
 	
-	MetaData loadedMetaData = MetaData::ReadMetaFile(metaPath);
+	CommonMetaData loadedMetaData = CommonMetaData::ReadMetaFile(metaPath);
 	if (loadedMetaData.lastModified != std::filesystem::last_write_time(path)) {
 		spdlog::error("LastModified timestamp mismatch when loading existing .meta file");
 

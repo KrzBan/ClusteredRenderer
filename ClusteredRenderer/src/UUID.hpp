@@ -26,6 +26,8 @@ namespace kb {
 	};
 }
 
+// ---- Hash and Formatter ----
+
 namespace std {
 	template <typename T>
 	struct hash;

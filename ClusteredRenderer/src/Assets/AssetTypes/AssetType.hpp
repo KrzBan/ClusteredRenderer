@@ -1,6 +1,9 @@
 #pragma once
 
 #include <Core.hpp>
+#include <magic_enum.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/optional.hpp>
 
 enum class AssetType {
 	UNKNOWN,
@@ -9,20 +12,24 @@ enum class AssetType {
 	TEXTURE_2D
 };
 
-constexpr std::string AssetTypeToString(AssetType type) {
-	switch (type) {
-	case AssetType::UNKNOWN:
-		return "Unknown";
-	case AssetType::MATERIAL:
-		return "Material";
-	case AssetType::TEXT:
-		return "Text";
-	case AssetType::TEXTURE_2D:
-		return "Texture 2D";
-	}
-
-	throw std::invalid_argument("Invalid enum value");
+template<class Asset>
+inline AssetType AssetTypeFromType() {
+	return AssetType::UNKNOWN;
 }
+
+class Asset {
+public:
+	// Making Type par of Asset<Type> signature, doesn't let us use this as common base class
+	virtual constexpr AssetType GetType() const = 0;
+
+	virtual void LoadMeta(cereal::JSONInputArchive& archive) {};
+	virtual void SaveMeta(cereal::JSONOutputArchive& archive) const{};
+
+	virtual void LoadAsset(const std::filesystem::path& path) {}
+	virtual void SaveAsset(const std::filesystem::path& path) const {}
+
+	virtual ~Asset() = default;
+};
 
 constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	if (ext == ".mat") {
@@ -35,14 +42,4 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 		return AssetType::TEXTURE_2D;
 	}
 	return AssetType::UNKNOWN;
-}
-
-class Texture2D;
-template <typename T>
-constexpr AssetType TypeToAssetType() {
-	return AssetType::UNKNOWN;
-}
-template <>
-constexpr AssetType TypeToAssetType<Texture2D>() {
-	return AssetType::TEXTURE_2D;
 }

@@ -143,7 +143,7 @@ private:
 			// Drag&Drop Target
 
 			if (textComponent.textAsset) {
-				if (auto& assetPtr = textComponent.textAsset->Get(); assetPtr) {
+				if (auto& assetPtr = *textComponent.textAsset; assetPtr) {
 					ImGui::Text(assetPtr->text.c_str());
 				}
 			}

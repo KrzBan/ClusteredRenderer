@@ -5,7 +5,6 @@
 #include "UUID.hpp"
 #include "SceneCamera.hpp"
 
-#include <Assets/Proxy.hpp>
 #include <Assets/Assets.hpp>
 
 struct IDComponent {
@@ -84,7 +83,7 @@ struct TextComponent {
 	TextComponent() = default;
 	TextComponent(const TextComponent&) = default;
 
-	std::shared_ptr<Proxy<TextAsset>> textAsset;
+	std::shared_ptr<Unique<TextAsset>> textAsset;
 };
 
 // Physics
