@@ -3,7 +3,7 @@
 #define FONT_TEXT_REGULAR RESOURCES_DIR "fonts/Roboto-Light.ttf"
 
 static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-static float baseFontSize = 26.0f;						 // 13.0f is the size of the default font. Change to the font size you use.
+static float baseFontSize = 18.0f;						 // 13.0f is the size of the default font. Change to the font size you use.
 static float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
 
 void InitStyle(float scale) {
