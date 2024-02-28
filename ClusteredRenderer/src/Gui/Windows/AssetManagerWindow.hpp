@@ -37,6 +37,7 @@ public:
 						ImGui::Text(std::format("Path: {}", AssetManager::GetPath(uuid).string()).c_str());
 						ImGui::Text(std::format("Type: {}", magic_enum::enum_name(info.commonMetaData.assetType)).c_str());
 						ImGui::Text(std::format("Last Modified: {}", info.commonMetaData.lastModified).c_str());
+						ImGui::Text(std::format("Loaded: {}", info.asset != nullptr ? "true" : "false").c_str());
 
 						ImGui::TreePop();
 					}

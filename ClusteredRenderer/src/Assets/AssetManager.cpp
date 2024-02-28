@@ -40,8 +40,8 @@ std::shared_ptr<Unique<T>> GetAsset(kb::UUID id) {
 		return nullptr;
 	}
 
-	if (assetEntry.asset.expired()) {
-		const auto cast = std::dynamic_pointer_cast<Unique<T>>(assetEntry.asset.lock());
+	if (assetEntry.asset != nullptr) {
+		const auto cast = std::dynamic_pointer_cast<Unique<T>>(assetEntry.asset);
 		if (cast == nullptr) {
 			throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
 		}
@@ -62,8 +62,8 @@ std::shared_ptr<Unique<T>> GetAsset(kb::UUID id) {
 	(**sharedAsset).LoadMeta(archive);
 	(**sharedAsset).LoadAsset(assetPath);
 
-	Weak<Unique<Asset>> weak = std::static_pointer_cast<Unique<Asset>>(sharedAsset);
-	assetEntry.asset = weak;
+	Shared<Unique<Asset>> sharedBase = std::static_pointer_cast<Unique<Asset>>(sharedAsset);
+	assetEntry.asset = sharedBase;
 
 	return sharedAsset;
 }

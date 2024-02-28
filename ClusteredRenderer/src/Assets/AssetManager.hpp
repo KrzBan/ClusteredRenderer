@@ -7,12 +7,10 @@
 #include "AssetWatcher.hpp"
 #include "CommonMetaData.hpp"
 
-
 struct AssetRegistryEntry {
 	CommonMetaData commonMetaData;
-	Weak<Unique<Asset>> asset;
+	Shared<Unique<Asset>> asset;
 };
-
 
 struct AssetManager {
 public:
