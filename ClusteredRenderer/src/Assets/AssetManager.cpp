@@ -19,53 +19,19 @@ struct AssetManagerData {
 
 static AssetManagerData s_AssetManagerData;
 
-const std::unordered_map<kb::UUID, AssetRegistryEntry>& AssetManager::GetManagedAssets() {
+std::unordered_map<kb::UUID, AssetRegistryEntry>& AssetManager::GetManagedAssets() {
 	return s_AssetManagerData.assets;
 }
-const std::unordered_set<std::filesystem::path>& AssetManager::GetUnmanagedAssets() {
+std::unordered_set<std::filesystem::path>& AssetManager::GetUnmanagedAssets() {
 	return s_AssetManagerData.unmanagedAssets;
 }
 
-template<typename T>
-std::shared_ptr<Unique<T>> GetAsset(kb::UUID id) {
+bool AssetManager::AssetManaged(kb::UUID id) {
+	return s_AssetManagerData.assets.contains(id);
+}
 
-	if (s_AssetManagerData.assets.contains(id) == false) {
-		spdlog::error("Asset ID: {} unmanaged", id);
-		return nullptr;
-	}
-
-	auto& assetEntry = s_AssetManagerData.assets.at(id);
-	if (assetEntry.commonMetaData.assetType != AssetTypeFromType<T>()) {
-		spdlog::error("Asset ID: {} type mismatch", id);
-		return nullptr;
-	}
-
-	if (assetEntry.asset != nullptr) {
-		const auto cast = std::dynamic_pointer_cast<Unique<T>>(assetEntry.asset);
-		if (cast == nullptr) {
-			throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
-		}
-
-		return cast;
-	}
-	
-	// Create new
-	auto sharedAsset = std::make_shared<Unique<T>>();
-
-	const auto assetPath = s_AssetManagerData.idToPath.at(id);
-	auto metaPath = assetPath;
-	metaPath+=std::filesystem::path(".meta");
-
-	std::ifstream input(metaPath);
-	cereal::JSONInputArchive archive(input);
-
-	(**sharedAsset).LoadMeta(archive);
-	(**sharedAsset).LoadAsset(assetPath);
-
-	Shared<Unique<Asset>> sharedBase = std::static_pointer_cast<Unique<Asset>>(sharedAsset);
-	assetEntry.asset = sharedBase;
-
-	return sharedAsset;
+std::filesystem::path AssetManager::IdToPath(kb::UUID id) {
+	s_AssetManagerData.idToPath.at(id);
 }
 
 std::filesystem::path AssetManager::GetPath(kb::UUID id) {
