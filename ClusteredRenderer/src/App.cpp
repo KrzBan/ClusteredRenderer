@@ -94,7 +94,7 @@ int App::Run() {
 		if (sceneWindowOutput.selectionChanged)
 			contentBrowserWindow.ResetSelection();
 
-		std::variant<std::monostate, Entity, std::string> selection;
+		std::variant<std::monostate, Entity, std::filesystem::path> selection;
 		if (contentBrowserWindowOutput.selectedFile != "") {
 			selection = contentBrowserWindowOutput.selectedFile;
 		}

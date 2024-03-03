@@ -20,7 +20,7 @@ struct TextAsset : public Asset {
 
 	virtual void LoadMeta(cereal::JSONInputArchive& archive) override{
 		std::optional<int> text_size_opt{};
-		archive(cereal::make_nvp("text_size", text_size_opt));
+		cereal::make_optional_nvp(archive, "text_size", text_size_opt);
 
 		const auto text_size = text_size_opt.value_or(0);
 		spdlog::debug("Reading test text_size: {}", text_size);

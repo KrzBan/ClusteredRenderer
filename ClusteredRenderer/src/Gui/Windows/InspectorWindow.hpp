@@ -3,6 +3,8 @@
 #include <Core.hpp>
 #include <Entity.hpp>
 
+#include <Assets/AssetManager.hpp>
+
 #include "GuiWindow.hpp"
 #include <Gui/ControlUtils.hpp>
 
@@ -20,7 +22,7 @@ public:
 		return INSPECTOR_NAME;
 	};
 
-	InspectorWindowOutput Draw(std::variant<std::monostate, Entity, std::string> selection) {
+	InspectorWindowOutput Draw(std::variant<std::monostate, Entity, std::filesystem::path> selection) {
 		InspectorWindowOutput output{};
 
 		if (m_DrawThis == false) return output;
@@ -31,7 +33,7 @@ public:
 				overload(
 					[](std::monostate monostate) { /* Nothing selected */ },
 					[&](Entity entity) { DrawComponents(entity); },
-					[&](const std::string& filename) { DrawFile(filename); }
+					[&](const std::filesystem::path& filename) { DrawAsset(filename); }
 				),
 				selection);
 		}
@@ -41,8 +43,32 @@ public:
 	}
 
 private:
-	void DrawFile(std::string filename) {
-		ImGui::Text(filename.c_str());
+	void DrawAsset(const std::filesystem::path& filename) {
+		ImGui::Text(filename.string().c_str());
+
+		const auto assetIdOpt = AssetManager::PathToId(filename);
+		if (assetIdOpt.has_value() == false)
+			return;
+
+		const auto assetId = assetIdOpt.value();
+		ImGui::Text(std::format("Id: {}", assetId).c_str());
+
+		const auto assetType = AssetManager::GetAssetType(assetId);
+
+		switch (assetType) {
+		case AssetType::TEXT: {
+			auto textAsset = AssetManager::GetAsset<TextAsset>(assetId);
+			DrawAssetText(*textAsset);
+			break;
+		}	
+		default:
+
+			break;
+		}
+	}
+
+	void DrawAssetText(TextAsset& textAsset) {
+		ImGui::Text(textAsset.text.c_str());
 	}
 
 	void DrawComponents(Entity entity) {

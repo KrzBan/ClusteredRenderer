@@ -30,15 +30,19 @@ bool AssetManager::AssetManaged(kb::UUID id) {
 	return s_AssetManagerData.assets.contains(id);
 }
 
-std::filesystem::path AssetManager::IdToPath(kb::UUID id) {
-	s_AssetManagerData.idToPath.at(id);
+std::optional<std::filesystem::path> AssetManager::IdToPath(kb::UUID id) {
+	if (s_AssetManagerData.idToPath.contains(id) == false)
+		return {};
+	return s_AssetManagerData.idToPath[id];
+}
+std::optional<kb::UUID> AssetManager::PathToId(const std::filesystem::path& path) {
+	if (s_AssetManagerData.pathToId.contains(path) == false)
+		return {};
+	return s_AssetManagerData.pathToId[path];
 }
 
-std::filesystem::path AssetManager::GetPath(kb::UUID id) {
-	if (s_AssetManagerData.idToPath.contains(id)) {
-		return s_AssetManagerData.idToPath[id];
-	}
-	return {};
+AssetType AssetManager::GetAssetType(kb::UUID id) {
+	return s_AssetManagerData.assets.at(id).commonMetaData.assetType;
 }
 
 void AssetManager::Clear() {

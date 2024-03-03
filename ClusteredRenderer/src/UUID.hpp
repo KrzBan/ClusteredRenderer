@@ -17,6 +17,7 @@ namespace kb {
 		uint64_t m_UUID;
 
 		friend struct std::formatter<UUID>;
+		friend struct fmt::formatter<UUID>;
 
 	public:
 		template <class Archive>
@@ -46,4 +47,23 @@ namespace std {
 				std::format("{}", uuid.m_UUID), ctx);
 		}
 	};
+}
+
+template <>
+struct fmt::formatter<kb::UUID> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx);
+
+	template <typename FormatContext>
+	auto format(kb::UUID const& id, FormatContext& ctx);
+};
+
+template <typename ParseContext>
+constexpr auto fmt::formatter<kb::UUID>::parse(ParseContext& ctx) {
+	return ctx.begin();
+}
+
+template <typename FormatContext>
+auto fmt::formatter<kb::UUID>::format(kb::UUID const& id, FormatContext& ctx) {
+	return fmt::format_to(ctx.out(), "{0}", id.m_UUID);
 }

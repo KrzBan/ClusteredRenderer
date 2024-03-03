@@ -9,7 +9,7 @@
 
 struct AssetRegistryEntry {
 	CommonMetaData commonMetaData;
-	Shared<Unique<Asset>> asset;
+	Shared<Asset> asset;
 };
 
 struct AssetManager {
@@ -21,15 +21,16 @@ public:
 	static std::unordered_map<kb::UUID, AssetRegistryEntry>& GetManagedAssets();
 	static std::unordered_set<std::filesystem::path>& GetUnmanagedAssets();
 
-	static std::filesystem::path GetPath(kb::UUID);
-
 	static void Clear();
 	static bool AssetManaged(kb::UUID id);
 
 	template <typename T>
-	static std::shared_ptr<Unique<T>> GetAsset(kb::UUID id);
+	static std::shared_ptr<T> GetAsset(kb::UUID id);
 
-	static std::filesystem::path IdToPath(kb::UUID id);
+	static AssetType GetAssetType(kb::UUID id);
+
+	static std::optional<std::filesystem::path> IdToPath(kb::UUID id);
+	static std::optional<kb::UUID> PathToId(const std::filesystem::path& path);
 
 private:
 	static void DiscoverAssets(const std::string& basePath);
@@ -41,7 +42,7 @@ private:
 };
 
 template <typename T>
-std::shared_ptr<Unique<T>> AssetManager::GetAsset(kb::UUID id) {
+std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 
 	if (AssetManaged(id) == false) {
 		spdlog::error("Asset ID: {} unmanaged", id);
@@ -55,7 +56,7 @@ std::shared_ptr<Unique<T>> AssetManager::GetAsset(kb::UUID id) {
 	}
 
 	if (assetEntry.asset != nullptr) {
-		const auto cast = std::dynamic_pointer_cast<Unique<T>>(assetEntry.asset);
+		const auto cast = std::dynamic_pointer_cast<T>(assetEntry.asset);
 		if (cast == nullptr) {
 			throw std::runtime_error("GetAsset() dynamic_pointer_cast failed");
 		}
@@ -64,19 +65,19 @@ std::shared_ptr<Unique<T>> AssetManager::GetAsset(kb::UUID id) {
 	}
 
 	// Create new
-	auto sharedAsset = std::make_shared<Unique<T>>();
+	auto sharedAsset = std::make_shared<T>();
 
-	const auto assetPath = IdToPath(id);
+	const auto assetPath = IdToPath(id).value();
 	auto metaPath = assetPath;
 	metaPath += std::filesystem::path(".meta");
 
 	std::ifstream input(metaPath);
 	cereal::JSONInputArchive archive(input);
 
-	(**sharedAsset).LoadMeta(archive);
-	(**sharedAsset).LoadAsset(assetPath);
+	(*sharedAsset).LoadMeta(archive);
+	(*sharedAsset).LoadAsset(assetPath);
 
-	Shared<Unique<Asset>> sharedBase = std::static_pointer_cast<Unique<Asset>>(sharedAsset);
+	Shared<Asset> sharedBase = std::static_pointer_cast<Asset>(sharedAsset);
 	assetEntry.asset = sharedBase;
 
 	return sharedAsset;

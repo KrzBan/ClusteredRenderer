@@ -6,7 +6,7 @@
 #include "GuiWindow.hpp"
 
 struct ContentBrowserWindowOutput {
-	std::string selectedFile;
+	std::filesystem::path selectedFile;
 	bool selectionChanged = false;
 };
 
@@ -15,7 +15,7 @@ class ContentBrowserWindow : public GuiWindow {
 #define CONTENT_BROWSER_NAME "Content Browser"
 private:
 
-	std::string m_SelectedFile;
+	std::filesystem::path m_SelectedFile;
 
 	std::filesystem::path m_BaseDirectory;
 	std::filesystem::path m_CurrentDirectory;
@@ -32,7 +32,7 @@ public:
 	};
 
 	void ResetSelection() {
-		m_SelectedFile = {};
+		m_SelectedFile = std::filesystem::path{};
 	}
 
 	ContentBrowserWindowOutput Draw() {
@@ -71,7 +71,7 @@ public:
 				ImGui::PushID(filenameCStr);
 
 				Shared<Texture> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
-				if (m_SelectedFile != filenameString) {
+				if (m_SelectedFile != path) {
 					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(109, 108, 112, 255)));
 				}
 				else {
@@ -79,7 +79,7 @@ public:
 				}
 
 				if (ImGui::ImageButton(filenameCStr, reinterpret_cast<ImTextureID>(static_cast<size_t>(icon->GetHandle())), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 })) {
-					m_SelectedFile = filenameString;
+					m_SelectedFile = path;
 					output.selectionChanged = true;
 				}
 
@@ -109,7 +109,7 @@ public:
 			ImGui::SliderFloat("Padding", &padding, 0, 32);
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-				m_SelectedFile = {};
+				m_SelectedFile = std::filesystem::path{};
 		}
 		ImGui::End();
 

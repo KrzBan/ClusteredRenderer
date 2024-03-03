@@ -14,6 +14,8 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Assets/AssetTypes/MaterialAsset.hpp"
 	"Assets/AssetTypes/TextAsset.hpp"
 
+	"cereal_optional_nvp.h"
+
 	"Components.hpp"
 
 	"Core.hpp" "Core.cpp" 
@@ -62,7 +64,7 @@ find_package(cereal CONFIG REQUIRED)
 find_package(efsw CONFIG REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 
-target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib 
+target_link_libraries(ClusteredRendererLib PUBLIC imguiLib gladLib
 	spdlog::spdlog glfw assimp::assimp EnTT::EnTT glm::glm cereal::cereal efsw::efsw magic_enum::magic_enum)
 
 # Supress warnings - Spdlog does not set it's includes as SYSTEM

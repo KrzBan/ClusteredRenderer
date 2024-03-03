@@ -4,6 +4,7 @@
 #include <magic_enum.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/optional.hpp>
+#include <cereal_optional_nvp.h>
 
 enum class AssetType {
 	UNKNOWN,
@@ -20,7 +21,7 @@ inline AssetType AssetTypeFromType() {
 class Asset {
 public:
 	// Making Type par of Asset<Type> signature, doesn't let us use this as common base class
-	virtual constexpr AssetType GetType() const = 0;
+	virtual constexpr AssetType GetType() const { return AssetType::UNKNOWN; };
 
 	virtual void LoadMeta(cereal::JSONInputArchive& archive) {};
 	virtual void SaveMeta(cereal::JSONOutputArchive& archive) const{};
