@@ -16,7 +16,7 @@ struct CommonMetaData {
 	AssetType assetType;
 
 	static CommonMetaData ReadMetaFile(const std::filesystem::path& path);
-	static void WriteMetaFile(const std::filesystem::path& path, const CommonMetaData& metaData);
+	static void WriteMetaFile(cereal::JSONOutputArchive& oarchive, const CommonMetaData& metaData);
 
 	template <class Archive>
 	void save(Archive& archive) const {

@@ -49,6 +49,36 @@ void AssetManager::Clear() {
 	s_AssetManagerData.unmanagedAssets.clear();
 }
 
+void AssetManager::SaveAsset(kb::UUID id) {
+
+	if (s_AssetManagerData.assets.contains(id) == false) {
+		spdlog::error("[SaveAsset] Asset: {} is not part of managed assets", id);
+		return;
+	}
+
+	auto& assetData = s_AssetManagerData.assets[id];
+	if (assetData.asset == nullptr) {
+		spdlog::error("[SaveAsset] Asset: {} is not loaded", id);
+		return;
+	}
+
+	const auto assetPath = s_AssetManagerData.idToPath.at(id);
+
+	assetData.asset->SaveAsset(assetPath);
+	assetData.commonMetaData.lastModified = std::filesystem::last_write_time(assetPath);
+
+	auto metaPath = assetPath;
+	metaPath += ".meta";
+
+	std::ofstream output{ metaPath };
+	cereal::JSONOutputArchive archive{ output };
+
+	archive(cereal::make_nvp("meta", assetData.commonMetaData));
+
+	assetData.asset->SaveMeta(archive);
+}
+
+
 void AssetManager::Init(const std::string& basePath) {
 	DiscoverAssets(basePath);
 }
@@ -221,7 +251,10 @@ void AssetManager::AddFile(const std::filesystem::path& path) {
 	else {
 		metaData.lastModified = std::filesystem::last_write_time(path);
 		metaData.assetType = assetType;
-		CommonMetaData::WriteMetaFile(metaPath, metaData);
+
+		std::ofstream output{ metaPath };
+		cereal::JSONOutputArchive archive{ output };
+		archive(cereal::make_nvp("meta", metaData));
 	}
 
 	s_AssetManagerData.assets[metaData.assetID] = AssetRegistryEntry{ metaData, {} };
@@ -258,7 +291,7 @@ std::optional<CommonMetaData> AssetManager::FetchFileCommonMetaData(std::filesys
 	
 	CommonMetaData loadedMetaData = CommonMetaData::ReadMetaFile(metaPath);
 	if (loadedMetaData.lastModified != std::filesystem::last_write_time(path)) {
-		spdlog::error("LastModified timestamp mismatch when loading existing .meta file");
+		spdlog::error("LastModified timestamp mismatch when loading existing .meta file for {}", path);
 
 		spdlog::info("Removing {}", metaPath);
 		std::filesystem::remove(metaPath);

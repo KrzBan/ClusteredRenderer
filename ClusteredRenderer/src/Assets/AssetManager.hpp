@@ -26,6 +26,7 @@ public:
 
 	template <typename T>
 	static std::shared_ptr<T> GetAsset(kb::UUID id);
+	static void SaveAsset(kb::UUID id);
 
 	static AssetType GetAssetType(kb::UUID id);
 
@@ -36,6 +37,7 @@ private:
 	static void DiscoverAssets(const std::string& basePath);
 
 	static void AddFile(const std::filesystem::path& path);
+	
 
 	static std::optional<std::string> FetchStrayMetaDataRaw(std::filesystem::path path);
 	static std::optional<CommonMetaData> FetchFileCommonMetaData(std::filesystem::path path);

@@ -9,6 +9,7 @@ add_library(imguiLib STATIC
 	"imgui/imgui_impl_opengl3.h" "imgui/imgui_impl_opengl3.cpp" "imgui/imgui_impl_win32.h" "imgui/imgui_impl_win32.cpp"
 	"imgui/imgui.h" "imgui/imgui.cpp" "imgui/imgui_internal.h" "imgui/imgui_draw.cpp" "imgui/imgui_tables.cpp" "imgui/imgui_widgets.cpp" "imgui/imgui_demo.cpp"
 	"imgui/imstb_rectpack.h" "imgui/imstb_textedit.h" "imgui/imstb_truetype.h"
+	"imgui/imgui_stdlib.h" "imgui/imgui_stdlib.cpp"
 	)
 
 find_package(glfw3)

@@ -49,8 +49,12 @@ private:
 		const auto assetIdOpt = AssetManager::PathToId(filename);
 		if (assetIdOpt.has_value() == false)
 			return;
-
 		const auto assetId = assetIdOpt.value();
+
+		if (ImGui::Button("Update")) {
+			AssetManager::SaveAsset(assetId);
+		}
+
 		ImGui::Text(std::format("Id: {}", assetId).c_str());
 
 		const auto assetType = AssetManager::GetAssetType(assetId);
@@ -68,7 +72,7 @@ private:
 	}
 
 	void DrawAssetText(TextAsset& textAsset) {
-		ImGui::Text(textAsset.text.c_str());
+		ImGui::InputTextMultiline("text", &textAsset.text);
 	}
 
 	void DrawComponents(Entity entity) {
