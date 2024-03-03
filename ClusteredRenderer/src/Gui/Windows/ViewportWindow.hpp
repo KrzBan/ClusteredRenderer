@@ -22,6 +22,8 @@ public:
 
 		if (m_DrawThis == false) return output;
 
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
+
 		if (ImGui::Begin(ICON_FA_GAMEPAD " " VIEWPORT_NAME, &m_DrawThis)) {
 			ImGui::BeginChild("ViewportRender");
 
@@ -33,6 +35,8 @@ public:
 			ImGui::EndChild();
 		}
 		ImGui::End();
+
+		ImGui::PopStyleVar();
 
 		return output;
 	}

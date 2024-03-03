@@ -72,7 +72,7 @@ private:
 	}
 
 	void DrawAssetText(TextAsset& textAsset) {
-		ImGui::InputTextMultiline("text", &textAsset.text);
+		ImGui::InputTextMultiline("Contents", &textAsset.text);
 	}
 
 	void DrawComponents(Entity entity) {

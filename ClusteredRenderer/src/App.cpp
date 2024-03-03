@@ -8,10 +8,10 @@
 
 #include "Scene.hpp"
 
+#include "Renderer/Renderer.hpp"
 #include "Renderer/Window.hpp"
 #include "Gui.hpp"
 
-#include "Renderer/Framebuffer.hpp"
 #include "Renderer/EditorCamera.hpp"
 
 int App::Run() {
@@ -23,6 +23,7 @@ int App::Run() {
 
 	Scene scene{};
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
+	TransformComponent editorCameraTransform{};
 
 	AssetManager::Init(ASSETS_DIR);
 
@@ -43,7 +44,7 @@ int App::Run() {
 
 	MenuBar menuBar;
 
-	Framebuffer viewportFB{ 1, 1, 0 };
+	Renderer renderer{};
 
 	bool runtime = false;
 	Timestep physicsAccumulator{ 0.0 };
@@ -67,20 +68,17 @@ int App::Run() {
 		} else {
 			scene.OnUpdateEditor(Time::DeltaTime());
 		}
-
-		// Clear Screen
-		viewportFB.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		// Render
 		if (runtime) {
-			scene.RenderSceneRuntime();
+			auto cameraEntity = scene.GetPrimaryCameraEntity();
+			renderer.RenderScene(scene, cameraEntity.GetComponent<CameraComponent>().Camera, cameraEntity.GetComponent<TransformComponent>());
+			//scene.RenderSceneRuntime();
 		}
 		else {
-			scene.RenderSceneEditor(editorCamera);
+			renderer.RenderScene(scene, editorCamera, editorCameraTransform);
+			//scene.RenderSceneEditor(editorCamera);
 		}
-
-		viewportFB.Unbind();
 
 		// Prepare GUI
 		gui.NewFrame(); 
@@ -103,13 +101,13 @@ int App::Run() {
 		} 
 
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
-		auto viewportWindowOutput = viewportWindow.Draw(viewportFB.GetColorAttachmentTextureID());
+		auto viewportWindowOutput = viewportWindow.Draw(renderer.framebuffer.GetColorAttachmentTextureID());
 		auto assetManagerWindowOutput = assetManagerWindow.Draw();
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
 		if (viewportWindowOutput.windowWidth != 0 && viewportWindowOutput.windowHeight != 0) {
-			viewportFB.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			renderer.framebuffer.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			if (runtime) {
 				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);

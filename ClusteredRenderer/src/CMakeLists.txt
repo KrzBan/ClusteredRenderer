@@ -47,6 +47,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Renderer/Camera.hpp"
 	"Renderer/EditorCamera.hpp" "Renderer/EditorCamera.cpp"
 	"Renderer/Framebuffer.hpp" "Renderer/Framebuffer.cpp" 
+	"Renderer/Renderer.hpp" "Renderer/Renderer.cpp"
 	"Renderer/Shader.hpp" "Renderer/Shader.cpp" 
 	"Renderer/ShaderProgram.hpp" "Renderer/ShaderProgram.cpp" 
 	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
