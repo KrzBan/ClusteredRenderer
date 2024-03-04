@@ -10,7 +10,8 @@ enum class AssetType {
 	UNKNOWN,
 	MATERIAL,
 	TEXT,
-	TEXTURE_2D
+	TEXTURE_2D,
+	MESH
 };
 
 template<class Asset>
@@ -41,6 +42,9 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	}
 	if (ext == ".png") {
 		return AssetType::TEXTURE_2D;
+	}
+	if (std::set<std::string>{ ".obj", ".fbx" }.contains(ext)) {
+		return AssetType::MESH;
 	}
 	return AssetType::UNKNOWN;
 }

@@ -4,3 +4,4 @@
 
 #include "AssetTypes/MaterialAsset.hpp"
 #include "AssetTypes/TextAsset.hpp"
+#include "AssetTypes/MeshAsset.hpp"

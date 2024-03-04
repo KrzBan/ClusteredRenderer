@@ -64,6 +64,11 @@ private:
 			auto textAsset = AssetManager::GetAsset<TextAsset>(assetId);
 			DrawAssetText(*textAsset);
 			break;
+		}
+		case AssetType::MESH: {
+			auto meshAsset = AssetManager::GetAsset<MeshAsset>(assetId);
+			DrawAssetMesh(*meshAsset);
+			break;
 		}	
 		default:
 
@@ -73,6 +78,10 @@ private:
 
 	void DrawAssetText(TextAsset& textAsset) {
 		ImGui::InputTextMultiline("Contents", &textAsset.text);
+	}
+	void DrawAssetMesh(MeshAsset& meshAsset) {
+		ImGui::Text(std::format("Vertices: {}", meshAsset.vertices.size()).c_str());
+		ImGui::Text(std::format("Indices: {}", meshAsset.indices.size()).c_str());
 	}
 
 	void DrawComponents(Entity entity) {
