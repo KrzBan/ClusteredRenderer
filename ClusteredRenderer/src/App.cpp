@@ -23,7 +23,6 @@ int App::Run() {
 
 	Scene scene{};
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
-	TransformComponent editorCameraTransform{};
 
 	AssetManager::Init(ASSETS_DIR);
 
@@ -72,12 +71,12 @@ int App::Run() {
 		// Render
 		if (runtime) {
 			auto cameraEntity = scene.GetPrimaryCameraEntity();
-			renderer.RenderScene(scene, cameraEntity.GetComponent<CameraComponent>().Camera, cameraEntity.GetComponent<TransformComponent>());
-			//scene.RenderSceneRuntime();
+			renderer.RenderScene(scene, 
+				cameraEntity.GetComponent<CameraComponent>().Camera, 
+				cameraEntity.GetComponent<TransformComponent>().GetTransform());
 		}
 		else {
-			renderer.RenderScene(scene, editorCamera, editorCameraTransform);
-			//scene.RenderSceneEditor(editorCamera);
+			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
 		}
 
 		// Prepare GUI
@@ -112,6 +111,11 @@ int App::Run() {
 			if (runtime) {
 				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			}
+		}
+
+		if (viewportWindowOutput.isWindowFocused && runtime == false) {
+			// Update editor camera
+			editorCamera.OnUpdate(Time::DeltaTime());
 		}
 
 		// Update asset changes

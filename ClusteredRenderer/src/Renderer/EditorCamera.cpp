@@ -70,20 +70,6 @@ void EditorCamera::OnUpdate(Timestep ts)
 	UpdateView();
 }
 
-// void EditorCamera::OnEvent(Event& e)
-// {
-// 	EventDispatcher dispatcher(e);
-// 	dispatcher.Dispatch<MouseScrolledEvent>(HZ_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
-// }
-// 
-// bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)
-// {
-// 	float delta = e.GetYOffset() * 0.1f;
-// 	MouseZoom(delta);
-// 	UpdateView();
-// 	return false;
-// }
-
 void EditorCamera::MousePan(const glm::vec2& delta)
 {
 	auto [xSpeed, ySpeed] = PanSpeed();

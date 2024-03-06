@@ -31,6 +31,9 @@ public:
 	virtual void SaveAsset(const std::filesystem::path& path) const {}
 
 	virtual ~Asset() = default;
+
+public:
+	bool isDirty = false;
 };
 
 constexpr AssetType ExtensionToAssetType(const std::string& ext) {

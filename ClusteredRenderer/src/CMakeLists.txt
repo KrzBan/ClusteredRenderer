@@ -46,7 +46,11 @@ target_sources(ClusteredRendererLib PUBLIC
 
 	"Renderer/Camera.hpp"
 	"Renderer/EditorCamera.hpp" "Renderer/EditorCamera.cpp"
-	"Renderer/Framebuffer.hpp" "Renderer/Framebuffer.cpp" 
+	"Renderer/Framebuffer.hpp" "Renderer/Framebuffer.cpp"
+
+	"Renderer/OpenGL/Buffer.hpp" "Renderer/OpenGL/Buffer.cpp"
+	"Renderer/OpenGL/VertexArray.hpp" "Renderer/OpenGL/VertexArray.cpp"
+
 	"Renderer/Renderer.hpp" "Renderer/Renderer.cpp"
 	"Renderer/Shader.hpp" "Renderer/Shader.cpp" 
 	"Renderer/ShaderProgram.hpp" "Renderer/ShaderProgram.cpp" 

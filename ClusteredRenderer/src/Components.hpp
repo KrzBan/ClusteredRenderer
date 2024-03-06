@@ -79,13 +79,6 @@ struct NativeScriptComponent {
 	}
 };
 
-struct TextComponent {
-	TextComponent() = default;
-	TextComponent(const TextComponent&) = default;
-
-	std::shared_ptr<Unique<TextAsset>> textAsset;
-};
-
 // Physics
 
 // struct Rigidbody2DComponent
@@ -145,5 +138,4 @@ ComponentGroup<
 	CameraComponent, 
 	MeshRendererComponent,
 	NativeScriptComponent,
-	TransformComponent,
-	TextComponent>;
+	TransformComponent>;

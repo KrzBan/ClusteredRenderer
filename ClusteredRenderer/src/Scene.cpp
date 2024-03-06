@@ -376,6 +376,3 @@ template<>
 void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
 {
 }
-
-template <>
-void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component) {}

@@ -6,6 +6,7 @@
 
 struct ViewportWindowOutput {
 	uint32 windowWidth{}, windowHeight{};
+	bool isWindowFocused{};
 };
 
 class ViewportWindow : public GuiWindow {
@@ -26,6 +27,8 @@ public:
 
 		if (ImGui::Begin(ICON_FA_GAMEPAD " " VIEWPORT_NAME, &m_DrawThis)) {
 			ImGui::BeginChild("ViewportRender");
+
+			output.isWindowFocused = ImGui::IsWindowFocused();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
 			output.windowWidth = static_cast<uint32>(windowSize.x);

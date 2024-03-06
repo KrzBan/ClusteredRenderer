@@ -103,7 +103,6 @@ private:
 
 		if (ImGui::BeginPopup("AddComponent")) {
 			AddComponentEntry<CameraComponent>("Camera", entity);
-			AddComponentEntry<TextComponent>("Text Component", entity);
 			// DisplayAddComponentEntry<ScriptComponent>("Script");
 			// DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			// DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
@@ -177,17 +176,6 @@ private:
 			}
 		});
 
-		DrawComponent<TextComponent>("Text", entity, [](TextComponent& textComponent) {
-			
-			// Drag&Drop Target
-
-			if (textComponent.textAsset) {
-				if (auto& assetPtr = *textComponent.textAsset; assetPtr) {
-					ImGui::Text(assetPtr->text.c_str());
-				}
-			}
-
-		});
 	}
 
 	template <typename T, typename UIFunction>
