@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Core.hpp>
+#include <UUID.hpp>
+
 #include <magic_enum.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/optional.hpp>
@@ -11,7 +13,9 @@ enum class AssetType {
 	MATERIAL,
 	TEXT,
 	TEXTURE_2D,
-	MESH
+	MESH,
+	SHADER_SOURCE,
+	SHADER
 };
 
 template<class Asset>
@@ -34,6 +38,7 @@ public:
 
 public:
 	bool isDirty = false;
+	kb::UUID assetId{ 0 };
 };
 
 constexpr AssetType ExtensionToAssetType(const std::string& ext) {
@@ -48,6 +53,12 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	}
 	if (std::set<std::string>{ ".obj", ".fbx" }.contains(ext)) {
 		return AssetType::MESH;
+	}
+	if (std::set<std::string>{ ".vert", ".tesc", ".tese", ".geom", ".frag", ".comp" }.contains(ext)) {
+		return AssetType::SHADER_SOURCE;
+	}
+	if (std::set<std::string>{ ".shader" }.contains(ext)) {
+		return AssetType::SHADER;
 	}
 	return AssetType::UNKNOWN;
 }

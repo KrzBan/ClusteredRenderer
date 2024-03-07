@@ -70,6 +70,11 @@ private:
 			DrawAssetMesh(*meshAsset);
 			break;
 		}	
+		case AssetType::SHADER_SOURCE: {
+			auto shadeerSourceAsset = AssetManager::GetAsset<ShaderSourceAsset>(assetId);
+			DrawAssetShaderSource(*shadeerSourceAsset);
+			break;
+		}	
 		default:
 
 			break;
@@ -77,11 +82,15 @@ private:
 	}
 
 	void DrawAssetText(TextAsset& textAsset) {
-		ImGui::InputTextMultiline("Contents", &textAsset.text);
+		ImGui::InputTextMultiline("##Contents", &textAsset.text);
 	}
 	void DrawAssetMesh(MeshAsset& meshAsset) {
 		ImGui::Text(std::format("Vertices: {}", meshAsset.vertices.size()).c_str());
 		ImGui::Text(std::format("Indices: {}", meshAsset.indices.size()).c_str());
+	}
+	void DrawAssetShaderSource(ShaderSourceAsset& shaderSourceAsset) {
+		ImGui::Text(std::format("Type: {}", magic_enum::enum_name(shaderSourceAsset.type)).c_str());
+		ImGui::InputTextMultiline("##Contents", &shaderSourceAsset.source);
 	}
 
 	void DrawComponents(Entity entity) {

@@ -68,6 +68,7 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 
 	// Create new
 	auto sharedAsset = std::make_shared<T>();
+	sharedAsset->assetId = id;
 
 	const auto assetPath = IdToPath(id).value();
 	auto metaPath = assetPath;
