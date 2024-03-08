@@ -77,7 +77,32 @@ void AssetManager::SaveAsset(kb::UUID id) {
 
 	assetData.asset->SaveMeta(archive);
 }
+void AssetManager::ReloadAsset(kb::UUID id) {
+	if (s_AssetManagerData.assets.contains(id) == false) {
+		spdlog::error("[ReloadAsset] Asset: {} is not part of managed assets", id);
+		return;
+	}
 
+	auto& assetData = s_AssetManagerData.assets[id];
+	if (assetData.asset == nullptr) {
+		spdlog::error("[ReloadAsset] Asset: {} is not loaded", id);
+		return;
+	}
+
+	const auto assetPath = s_AssetManagerData.idToPath.at(id);
+
+	assetData.asset->LoadAsset(assetPath);
+
+	auto metaPath = assetPath;
+	metaPath += ".meta";
+
+	std::ifstream input{ metaPath };
+	cereal::JSONInputArchive archive{ input };
+
+	archive(cereal::make_nvp("meta", assetData.commonMetaData));
+
+	assetData.asset->LoadMeta(archive);
+}
 
 void AssetManager::Init(const std::string& basePath) {
 	DiscoverAssets(basePath);

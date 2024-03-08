@@ -27,6 +27,10 @@ public:
 	template <typename T>
 	static std::shared_ptr<T> GetAsset(kb::UUID id);
 	static void SaveAsset(kb::UUID id);
+	static void ReloadAsset(kb::UUID id);
+
+	template<typename T>
+	static void CreateAsset(const std::filesystem::path& path);
 
 	static AssetType GetAssetType(kb::UUID id);
 
@@ -84,4 +88,12 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 	assetEntry.asset = sharedBase;
 
 	return sharedAsset;
+}
+
+template <typename T>
+void AssetManager::CreateAsset(const std::filesystem::path& path) {
+	if (std::filesystem::exists(path)) {
+		spdlog::error("[CreateAsset] {} already exists", path);
+		return;
+	}
 }

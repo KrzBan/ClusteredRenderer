@@ -51,8 +51,11 @@ private:
 			return;
 		const auto assetId = assetIdOpt.value();
 
-		if (ImGui::Button("Update")) {
+		if (ImGui::Button("Save")) {
 			AssetManager::SaveAsset(assetId);
+		}
+		if (ImGui::Button("Reload")) {
+			AssetManager::ReloadAsset(assetId);
 		}
 
 		ImGui::Text(std::format("Id: {}", assetId).c_str());
