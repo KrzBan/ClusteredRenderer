@@ -13,7 +13,7 @@ else()
 endif()
 
 
-set_property(TARGET ClusteredRenderer PROPERTY CXX_STANDARD 20)
+set_property(TARGET ClusteredRenderer PROPERTY CXX_STANDARD 23)
 
 add_subdirectory("src")
 target_link_libraries(ClusteredRenderer PRIVATE ClusteredRendererLib)

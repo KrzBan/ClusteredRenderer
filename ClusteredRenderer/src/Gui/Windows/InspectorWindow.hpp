@@ -4,6 +4,7 @@
 #include <Entity.hpp>
 
 #include <Assets/AssetManager.hpp>
+#include <Renderer/Renderer.hpp>
 
 #include "GuiWindow.hpp"
 #include <Gui/ControlUtils.hpp>
@@ -43,6 +44,9 @@ public:
 	}
 
 private:
+	template <typename T>
+	void DynamicAssetField(Shared<T>& asset, int id);
+
 	void DrawAsset(const std::filesystem::path& filename) {
 		ImGui::Text(filename.string().c_str());
 
@@ -104,35 +108,6 @@ private:
 		ImGui::InputTextMultiline("##Contents", &shaderSourceAsset.source);
 	}
 
-	template<typename T> 
-	void DynamicAssetField(Shared<T>& asset, int id) {
-		ImGui::PushID(id);
-
-		if (asset == nullptr) {
-			ImGui::Text("Empty");
-		}
-		else {
-			ImGui::Text(std::format("{}", asset->assetId).c_str());
-		}
-
-		if (ImGui::BeginPopupContextItem("Edit Asset")) {
-			if (ImGui::MenuItem("Clear")) {
-				asset = nullptr;
-			}
-			ImGui::EndPopup();
-		}
-
-		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
-				IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
-				kb::UUID id = *(const kb::UUID*)payload->Data;
-				asset = AssetManager::GetAsset<T>(id);
-			}
-			ImGui::EndDragDropTarget();
-		}
-		ImGui::PopID();
-	}
-
 	void DrawAssetShader(ShaderAsset& shaderAsset) {
 		ImGui::Text("Vertex"); ImGui::SameLine();
 		DynamicAssetField(shaderAsset.vertex, 0);
@@ -152,8 +127,11 @@ private:
 		ImGui::Text("Compute"); ImGui::SameLine();
 		DynamicAssetField(shaderAsset.compute, 5);
 
+		ImGui::Text("Status:"); ImGui::SameLine();
+		ImGui::TextWrapped(shaderAsset.status.c_str());
+
 		if (ImGui::Button("Build")) {
-			shaderAsset.Build();
+			Renderer::CompileShaderOneTime(shaderAsset);
 		}
 	}
 
@@ -300,3 +278,32 @@ private:
 		}
 	}
 };
+
+template <typename T>
+void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
+	ImGui::PushID(id);
+
+	if (asset == nullptr) {
+		ImGui::Text("Empty");
+	}
+	else {
+		ImGui::Text(std::format("{}", asset->assetId).c_str());
+	}
+
+	if (ImGui::BeginPopupContextItem("Edit Asset")) {
+		if (ImGui::MenuItem("Clear")) {
+			asset = nullptr;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
+			IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
+			kb::UUID id = *(const kb::UUID*)payload->Data;
+			asset = AssetManager::GetAsset<T>(id);
+		}
+		ImGui::EndDragDropTarget();
+	}
+	ImGui::PopID();
+}

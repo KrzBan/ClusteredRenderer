@@ -49,41 +49,7 @@ struct ShaderAsset : public Asset {
 		if (geometry) archive(cereal::make_nvp("geometry_id", geometry->assetId));
 		if (fragment) archive(cereal::make_nvp("fragment_id", fragment->assetId));
 		if (compute) archive(cereal::make_nvp("compute_id", compute->assetId));
-	}
-
-	void Build() {
-		const auto shaderTypesValid = CheckShaderTypeValidity();
-		if (shaderTypesValid == false)
-			return;
-
-	}
-	bool CheckShaderTypeValidity() {
-		bool isOk = true;
-		const auto checkValid = [&isOk](const Shared<ShaderSourceAsset>& ptr, ShaderSourceType expectedType) {
-			if (ptr && ptr->type != expectedType) {
-				spdlog::error("[Shader::Build] Assigned {} source is of type: {}", magic_enum::enum_name(expectedType), magic_enum::enum_name(ptr->type));
-				isOk = false;
-			}
-		};
-
-		if (vertex == nullptr) {
-			spdlog::error("[Shader::Build] Vertex shader is mandatory");
-			isOk = false;
-		}
-		if (fragment == nullptr) {
-			spdlog::error("[Shader::Build] Fragment shader is mandatory");
-			isOk = false;
-		}
-
-		checkValid(vertex, ShaderSourceType::VERTEX);
-		checkValid(tesselation_control, ShaderSourceType::TESSELATION_CONTROL);
-		checkValid(tesselation_evaluation, ShaderSourceType::TESSELATION_EVALUTATION);
-		checkValid(geometry, ShaderSourceType::GEOMETRY);
-		checkValid(fragment, ShaderSourceType::FRAGMENT);
-		checkValid(compute, ShaderSourceType::COMPUTE);
-
-		return isOk;
-	}
+	}	
 
 	Shared<ShaderSourceAsset> vertex;
 	Shared<ShaderSourceAsset> tesselation_control;
@@ -91,6 +57,8 @@ struct ShaderAsset : public Asset {
 	Shared<ShaderSourceAsset> geometry;
 	Shared<ShaderSourceAsset> fragment;
 	Shared<ShaderSourceAsset> compute;
+
+	std::string status = "Not built";
 };
 
 template <>

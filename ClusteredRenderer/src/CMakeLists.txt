@@ -1,6 +1,6 @@
 add_library(ClusteredRendererLib)
 
-set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 20)
+set_property(TARGET ClusteredRendererLib PROPERTY CXX_STANDARD 23)
 
 target_sources(ClusteredRendererLib PUBLIC 
 	"App.hpp" "App.cpp" 

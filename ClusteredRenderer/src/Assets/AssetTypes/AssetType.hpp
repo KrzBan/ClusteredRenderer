@@ -37,7 +37,7 @@ public:
 	virtual ~Asset() = default;
 
 public:
-	bool isDirty = false;
+	bool isDirty = true;	// For Renderer only
 	kb::UUID assetId{ 0 };
 };
 

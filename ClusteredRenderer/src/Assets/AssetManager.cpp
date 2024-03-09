@@ -108,6 +108,7 @@ void AssetManager::ReloadAsset(kb::UUID id) {
 	archive(cereal::make_nvp("meta", assetData.commonMetaData));
 
 	assetData.asset->LoadMeta(archive);
+	assetData.asset->isDirty = true;
 }
 
 void AssetManager::Init(const std::string& basePath) {
