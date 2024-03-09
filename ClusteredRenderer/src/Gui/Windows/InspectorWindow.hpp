@@ -107,13 +107,21 @@ private:
 	template<typename T> 
 	void DynamicAssetField(Shared<T>& asset, int id) {
 		ImGui::PushID(id);
-		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+
 		if (asset == nullptr) {
 			ImGui::Text("Empty");
 		}
 		else {
 			ImGui::Text(std::format("{}", asset->assetId).c_str());
 		}
+
+		if (ImGui::BeginPopupContextItem("Edit Asset")) {
+			if (ImGui::MenuItem("Clear")) {
+				asset = nullptr;
+			}
+			ImGui::EndPopup();
+		}
+
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
 				IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
@@ -122,7 +130,6 @@ private:
 			}
 			ImGui::EndDragDropTarget();
 		}
-		ImGui::PopStyleVar();
 		ImGui::PopID();
 	}
 
