@@ -54,11 +54,14 @@ private:
 		if (ImGui::Button("Save")) {
 			AssetManager::SaveAsset(assetId);
 		}
+		ImGui::SameLine();
 		if (ImGui::Button("Reload")) {
 			AssetManager::ReloadAsset(assetId);
 		}
 
 		ImGui::Text(std::format("Id: {}", assetId).c_str());
+
+		ImGui::SeparatorText("Asset Settings");
 
 		const auto assetType = AssetManager::GetAssetType(assetId);
 
@@ -74,8 +77,13 @@ private:
 			break;
 		}	
 		case AssetType::SHADER_SOURCE: {
-			auto shadeerSourceAsset = AssetManager::GetAsset<ShaderSourceAsset>(assetId);
-			DrawAssetShaderSource(*shadeerSourceAsset);
+			auto shaderSourceAsset = AssetManager::GetAsset<ShaderSourceAsset>(assetId);
+			DrawAssetShaderSource(*shaderSourceAsset);
+			break;
+		}
+		case AssetType::SHADER: {
+			auto shaderAsset = AssetManager::GetAsset<ShaderAsset>(assetId);
+			DrawAssetShader(*shaderAsset);
 			break;
 		}	
 		default:
@@ -94,6 +102,52 @@ private:
 	void DrawAssetShaderSource(ShaderSourceAsset& shaderSourceAsset) {
 		ImGui::Text(std::format("Type: {}", magic_enum::enum_name(shaderSourceAsset.type)).c_str());
 		ImGui::InputTextMultiline("##Contents", &shaderSourceAsset.source);
+	}
+
+	template<typename T> 
+	void DynamicAssetField(Shared<T>& asset, int id) {
+		ImGui::PushID(id);
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+		if (asset == nullptr) {
+			ImGui::Text("Empty");
+		}
+		else {
+			ImGui::Text(std::format("{}", asset->assetId).c_str());
+		}
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
+				IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
+				kb::UUID id = *(const kb::UUID*)payload->Data;
+				asset = AssetManager::GetAsset<T>(id);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopStyleVar();
+		ImGui::PopID();
+	}
+
+	void DrawAssetShader(ShaderAsset& shaderAsset) {
+		ImGui::Text("Vertex"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.vertex, 0);
+
+		ImGui::Text("Tesselation Control"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.tesselation_control, 1);
+
+		ImGui::Text("Tesselation Evaluation"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.tesselation_evaluation, 2);
+
+		ImGui::Text("Geometry"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.geometry, 3);
+
+		ImGui::Text("Fragment"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.fragment, 4);
+
+		ImGui::Text("Compute"); ImGui::SameLine();
+		DynamicAssetField(shaderAsset.compute, 5);
+
+		if (ImGui::Button("Build")) {
+			shaderAsset.Build();
+		}
 	}
 
 	void DrawComponents(Entity entity) {

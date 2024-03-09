@@ -3,7 +3,7 @@
 #include <Core.hpp>
 #include <UUID.hpp>
 
-#include "Assets.hpp"
+#include "AssetTypes/AssetType.hpp"
 #include "AssetWatcher.hpp"
 #include "CommonMetaData.hpp"
 
@@ -82,7 +82,12 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 	cereal::JSONInputArchive archive(input);
 
 	(*sharedAsset).LoadMeta(archive);
-	(*sharedAsset).LoadAsset(assetPath);
+	try {
+		(*sharedAsset).LoadAsset(assetPath);
+	}
+	catch (std::exception& e) {
+		spdlog::error("[LoadAsset] {}", e.what());
+	}
 
 	Shared<Asset> sharedBase = std::static_pointer_cast<Asset>(sharedAsset);
 	assetEntry.asset = sharedBase;
@@ -92,6 +97,7 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 
 template <typename T>
 void AssetManager::CreateAsset(const std::filesystem::path& path) {
+
 	if (std::filesystem::exists(path)) {
 		spdlog::error("[CreateAsset] {} already exists", path);
 		return;

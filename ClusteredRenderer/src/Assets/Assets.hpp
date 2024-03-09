@@ -6,3 +6,4 @@
 #include "AssetTypes/TextAsset.hpp"
 #include "AssetTypes/MeshAsset.hpp"
 #include "AssetTypes/ShaderSourceAsset.hpp"
+#include "AssetTypes/ShaderAsset.hpp"

@@ -2,6 +2,7 @@
 
 #include <Core.hpp>
 #include <Renderer/Texture.hpp>
+#include <Assets/AssetManager.hpp>
 
 #include "GuiWindow.hpp"
 
@@ -85,8 +86,11 @@ public:
 
 				if (ImGui::BeginDragDropSource()) {
 					std::filesystem::path relativePath(path);
-					const wchar_t* itemPath = relativePath.c_str();
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+					const auto idOpt = AssetManager::PathToId(path);
+					if (idOpt.has_value()) {
+						const auto id = idOpt.value();
+						ImGui::SetDragDropPayload("CONTENT_BROWSER_ASSET_ID", &id, sizeof(id));
+					}
 					ImGui::EndDragDropSource();
 				}
 

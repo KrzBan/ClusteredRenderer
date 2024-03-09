@@ -91,7 +91,13 @@ void AssetManager::ReloadAsset(kb::UUID id) {
 
 	const auto assetPath = s_AssetManagerData.idToPath.at(id);
 
-	assetData.asset->LoadAsset(assetPath);
+	try {
+		assetData.asset->LoadAsset(assetPath);
+	}
+	catch (std::exception& e) {
+		spdlog::error("[LoadAsset] {}", e.what());
+	}
+	
 
 	auto metaPath = assetPath;
 	metaPath += ".meta";
