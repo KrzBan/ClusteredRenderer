@@ -45,11 +45,8 @@ void Renderer::RenderScene(const Scene& scene, const Camera& camera, const glm::
 
 	// Render Editor Grid
 	static unsigned int VAO{ 0 };
-	static unsigned int VBO{ 0 };
 	if (VAO == 0) {
 		glGenVertexArrays(1, &VAO); 
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	}
 		 
 	glUseProgram(gridShaderRenderInfo.programId);
