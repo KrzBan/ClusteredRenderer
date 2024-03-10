@@ -30,7 +30,7 @@ public:
 	static void ReloadAsset(kb::UUID id);
 
 	template<typename T>
-	static void CreateAsset(const std::filesystem::path& path);
+	static void CreateAsset(const std::filesystem::path& path, const std::string& name);
 
 	static AssetType GetAssetType(kb::UUID id);
 
@@ -41,7 +41,8 @@ private:
 	static void DiscoverAssets(const std::string& basePath);
 
 	static void AddFile(const std::filesystem::path& path);
-	
+	static void InsertIdPath(const kb::UUID id, const std::filesystem::path& path);
+	static void InsertAssetRegistryEntry(const kb::UUID id, const AssetRegistryEntry& entry);
 
 	static std::optional<std::string> FetchStrayMetaDataRaw(std::filesystem::path path);
 	static std::optional<CommonMetaData> FetchFileCommonMetaData(std::filesystem::path path);
@@ -96,10 +97,42 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 }
 
 template <typename T>
-void AssetManager::CreateAsset(const std::filesystem::path& path) {
+void AssetManager::CreateAsset(const std::filesystem::path& path, const std::string& name) {
 
-	if (std::filesystem::exists(path)) {
-		spdlog::error("[CreateAsset] {} already exists", path);
-		return;
+	auto filePath = path / name;
+
+	uint32 nameId = 1;
+	while (std::filesystem::exists(filePath)) {
+		const auto newName = std::format("{} ({})", name, nameId++);
+		filePath = path / newName;
 	}
+
+	kb::UUID assetId{};
+	InsertIdPath(assetId, filePath);
+
+	auto sharedAsset = std::make_shared<T>();
+	sharedAsset->assetId = assetId;
+
+	sharedAsset->SaveAsset(filePath);
+	const auto lastModified = std::filesystem::last_write_time(filePath);
+
+	CommonMetaData metaData{};
+	metaData.assetID = assetId;
+	metaData.assetType = AssetTypeFromType<T>();
+	metaData.lastModified = lastModified;
+
+	AssetRegistryEntry registryEntry{};
+	registryEntry.asset = sharedAsset;
+	registryEntry.commonMetaData = metaData;
+
+	InsertAssetRegistryEntry(assetId, registryEntry);
+
+	auto metaPath = filePath;
+	metaPath += std::filesystem::path(".meta");
+
+	std::ofstream output{ metaPath };
+	cereal::JSONOutputArchive archive{ output };
+
+	archive(cereal::make_nvp("meta", metaData));
+	sharedAsset->SaveMeta(archive);
 }

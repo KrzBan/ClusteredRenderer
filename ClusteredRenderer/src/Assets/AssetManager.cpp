@@ -49,6 +49,24 @@ void AssetManager::Clear() {
 	s_AssetManagerData.unmanagedAssets.clear();
 }
 
+void AssetManager::InsertIdPath(const kb::UUID id, const std::filesystem::path& path) {
+	if (s_AssetManagerData.idToPath.contains(id))
+		throw std::runtime_error("[AssetManager::InsertIdPath] ID already exists");
+	if (s_AssetManagerData.pathToId.contains(path))
+		throw std::runtime_error("[AssetManager::InsertIdPath] Oath already exists");
+
+	s_AssetManagerData.idToPath[id] = path;
+	s_AssetManagerData.pathToId[path] = id;
+}
+
+void AssetManager::InsertAssetRegistryEntry(const kb::UUID id, const AssetRegistryEntry& entry) {
+	if (s_AssetManagerData.assets.contains(id))
+		throw std::runtime_error("[AssetManager::InsertAssetRegistryEntry] ID already exists");
+
+	s_AssetManagerData.assets[id] = entry;
+}
+
+
 void AssetManager::SaveAsset(kb::UUID id) {
 
 	if (s_AssetManagerData.assets.contains(id) == false) {
@@ -251,6 +269,10 @@ void AssetManager::AddFile(const std::filesystem::path& path) {
 
 	if (extensionStr == ".meta")
 		return;
+
+	if (s_AssetManagerData.pathToId.contains(path)) {
+		return;
+	}
 
 	auto assetType = ExtensionToAssetType(extensionStr);
 

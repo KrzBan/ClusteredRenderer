@@ -3,11 +3,6 @@
 #include <Core.hpp>
 #include <UUID.hpp>
 
-#include <magic_enum.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/types/optional.hpp>
-#include <cereal_optional_nvp.h>
-
 enum class AssetType {
 	UNKNOWN,
 	MATERIAL,

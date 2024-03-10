@@ -3,6 +3,7 @@
 #include <Core.hpp>
 #include <Renderer/Texture.hpp>
 #include <Assets/AssetManager.hpp>
+#include <Assets/Assets.hpp>
 
 #include "GuiWindow.hpp"
 
@@ -42,6 +43,19 @@ public:
 		if (m_DrawThis == false) return output;
 
 		if (ImGui::Begin(ICON_FA_FOLDER_OPEN " " CONTENT_BROWSER_NAME, &m_DrawThis)) {
+
+			if (ImGui::BeginPopupContextItem("ContentBrowserMenu")) {
+				if (ImGui::BeginMenu("Create")) {
+					if (ImGui::MenuItem("Material"))
+						AssetManager::CreateAsset<MaterialAsset>(m_CurrentDirectory, "New Material.mat");
+					if (ImGui::MenuItem("Shader"))
+						AssetManager::CreateAsset<ShaderAsset>(m_CurrentDirectory, "New Shader.shader");
+
+					ImGui::EndMenu();
+				}
+				ImGui::EndPopup();
+			}
+
 			if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory)) {
 				if (ImGui::Button("<-")) {
 					m_CurrentDirectory = m_CurrentDirectory.parent_path();
