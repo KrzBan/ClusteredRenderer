@@ -3,7 +3,9 @@
 #include <Core.hpp>
 
 struct ShaderRenderInfo{
-	uint32 programId = 0;
+	GLuint programId = 0;
+
+	ShaderRenderInfo() = default;
 
 	~ShaderRenderInfo() noexcept {
 		Destroy();
@@ -12,14 +14,15 @@ struct ShaderRenderInfo{
 	ShaderRenderInfo(const ShaderRenderInfo&) = delete;
 	ShaderRenderInfo& operator=(const ShaderRenderInfo&) = delete;
 
-	ShaderRenderInfo(ShaderRenderInfo&& other) {
+	ShaderRenderInfo(ShaderRenderInfo&& other) noexcept {
 		programId = other.programId;
 		other.programId = 0;
 	}
-	ShaderRenderInfo& operator=(ShaderRenderInfo&& other) {
+	ShaderRenderInfo& operator=(ShaderRenderInfo&& other) noexcept {
 		Destroy();
 		programId = other.programId;
 		other.programId = 0;
+		return *this;
 	}
 
 private:

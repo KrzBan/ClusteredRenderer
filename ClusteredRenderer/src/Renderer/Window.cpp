@@ -12,6 +12,7 @@ Window::Window(int width, int height, const char* title, OpenGLVersion openGLVer
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersion.major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGLVersion.minor);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);  
 
 	m_Window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 	if (m_Window == nullptr) {

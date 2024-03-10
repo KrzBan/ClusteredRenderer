@@ -23,8 +23,9 @@ private:
 public:
 	Framebuffer framebuffer{ 1, 1, 0 };
 
-	uint32_t uboCamera;
+	uint32_t uboMatricies;
 
 private:
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;
+	ShaderRenderInfo gridShaderRenderInfo;
 };

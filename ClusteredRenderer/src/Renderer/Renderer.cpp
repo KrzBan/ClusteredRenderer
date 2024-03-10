@@ -3,39 +3,70 @@
 Renderer::Renderer() {
 	glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
 
-	glGenBuffers(1, &uboCamera);
-	glBindBuffer(GL_UNIFORM_BUFFER, uboCamera);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Create Uniform Buffer Object for Camera Projection+View
+	glGenBuffers(1, &uboMatricies);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
 	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW); // allocate 152 bytes of memory
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4));
 
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboCamera, 0, 2 * sizeof(glm::mat4));
+	// Load Shader for Editor Grid
+	ShaderAsset gridShaderAsset{};
+	gridShaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
+	gridShaderAsset.vertex->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/grid.vert"));
+	gridShaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
+	gridShaderAsset.fragment->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/grid.frag"));
+
+	auto compileRes = CompileShader(gridShaderAsset);
+	if (compileRes.has_value()) {
+		gridShaderRenderInfo = std::move(compileRes.value());
+	}
+	else {
+		spdlog::error("[Renderrer::Renderrer: Couldn't compile grid shader");
+		spdlog::error("{}", compileRes.error());
+	}
 }
 
 void Renderer::RenderScene(const Scene& scene, const Camera& camera, const glm::mat4& transform) {
 	framebuffer.Bind();
+
+	// Clear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glBindBuffer(GL_UNIFORM_BUFFER, uboCamera);
+	// Set camera matricies
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	// Render Editor Grid
+	static unsigned int VAO{ 0 };
+	static unsigned int VBO{ 0 };
+	if (VAO == 0) {
+		glGenVertexArrays(1, &VAO); 
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	}
+		 
+	glUseProgram(gridShaderRenderInfo.programId);
+	glBindVertexArray(VAO); 
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+	glUseProgram(0);
 
 	framebuffer.Unbind();
 }
 
 std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(ShaderAsset& shader) {
-	return std::unexpected{ std::string{ "xd" } };
-}
-
-
-void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
 	std::string error = "";
-	
+
 	if (not CheckShaderValidity(shader)) {
-		shader.status =  "Invalid";
-		return;
+		return std::unexpected{ "Invalid" };
 	}
-		
+
 	if (shader.vertex == nullptr) {
 		error += "Vertex shader is mandatory.\n";
 	}
@@ -43,11 +74,12 @@ void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
 		error += "Fragment shader is mandatory.\n";
 	}
 	if (error != "") {
-		shader.status = error;
-		return;
+		return std::unexpected{ error };
 	}
 
 	const auto programId = glCreateProgram();
+	ShaderRenderInfo shaderRenderInfo{};
+	shaderRenderInfo.programId = programId;
 
 	const auto compileAndLink = [&error, &programId](int shaderType, ShaderSourceAsset& shaderSource) {
 		const auto shader = glCreateShader(shaderType);
@@ -66,7 +98,7 @@ void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
 		glAttachShader(programId, shader);
 		glDeleteShader(shader);
 	};
-
+	
 	compileAndLink(GL_VERTEX_SHADER, *shader.vertex);
 	if (shader.tesselation_control != nullptr)
 		compileAndLink(GL_TESS_CONTROL_SHADER, *shader.tesselation_control);
@@ -77,7 +109,7 @@ void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
 	compileAndLink(GL_FRAGMENT_SHADER, *shader.fragment);
 	if (shader.compute != nullptr)
 		compileAndLink(GL_COMPUTE_SHADER, *shader.compute);
-	
+
 	int success;
 	char infoLog[512];
 	glLinkProgram(programId);
@@ -88,12 +120,27 @@ void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
 		error += '\n';
 	}
 
-	glDeleteProgram(programId);
+	unsigned int matricesBlockIndex = glGetUniformBlockIndex(programId, "Matrices");
+	if (matricesBlockIndex == GL_INVALID_INDEX) {
+		spdlog::info("[Renderer::CompileShader] Shader does not contain Uniform Block Index: Matrices");
+	}
+	else {
+		glUniformBlockBinding(programId, matricesBlockIndex, 0);
+	}
 
 	if (error == "")
-		shader.status = "Compiled successfully!";
+		return shaderRenderInfo;
 	else
-		shader.status = error;
+		return std::unexpected{error};
+}
+
+
+void Renderer::CompileShaderOneTime(ShaderAsset& shader) {
+	const auto result = CompileShader(shader);
+
+	shader.status = result.has_value() ? 
+		"Compiled successfully" : 
+		result.error();
 }
 
 bool Renderer::CheckShaderValidity(const ShaderAsset& shader) {
