@@ -3,10 +3,11 @@
 #include <Core.hpp>
 
 #include <Scene.hpp>
-#include <Components.hpp>
+#include <Assets/AssetTypes/ShaderAsset.hpp>
 
 #include "Framebuffer.hpp"
 #include "OpenGL/ShaderRenderInfo.hpp"
+#include "UniformTypes.hpp"
 
 class Renderer {
 public:
@@ -17,8 +18,10 @@ public:
 	static void CompileShaderOneTime(ShaderAsset& shader);
 	static bool CheckShaderValidity(const ShaderAsset& shader);
 
+	static std::vector<Uniform> QueryShaderUniforms(const ShaderAsset& shader);
+
 private:
-	static std::expected<ShaderRenderInfo, std::string> CompileShader(ShaderAsset& shader);
+	static std::expected<ShaderRenderInfo, std::string> CompileShader(const ShaderAsset& shader);
 
 public:
 	Framebuffer framebuffer{ 1, 1, 0 };

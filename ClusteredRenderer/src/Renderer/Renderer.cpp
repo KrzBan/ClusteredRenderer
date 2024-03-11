@@ -1,4 +1,6 @@
-#include "Renderer.hpp"
+﻿#include "Renderer.hpp"
+
+#include <Components.hpp>
 
 Renderer::Renderer() {
 	glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
@@ -57,7 +59,7 @@ void Renderer::RenderScene(const Scene& scene, const Camera& camera, const glm::
 	framebuffer.Unbind();
 }
 
-std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(ShaderAsset& shader) {
+std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const ShaderAsset& shader) {
 	std::string error = "";
 
 	if (not CheckShaderValidity(shader)) {
@@ -166,4 +168,43 @@ bool Renderer::CheckShaderValidity(const ShaderAsset& shader) {
 	checkValid(shader.compute, ShaderSourceType::COMPUTE);
 
 	return isOk;
+}
+
+std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
+	
+	auto result = CompileShader(shader);
+	if (result.has_value() == false) {
+		spdlog::error("[Renderer::QueryShaderUniforms] Couldn't compile shader");
+		spdlog::error(result.error());
+		return {};
+	}
+
+	const auto shaderInfo = std::move(result.value());
+
+	std::vector<Uniform> uniforms;
+
+	GLint numActiveUniforms = 0;
+	glGetProgramInterfaceiv(shaderInfo.programId, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numActiveUniforms);
+
+	std::vector<GLchar> nameData(256);
+	std::vector<GLenum> properties;
+	properties.push_back(GL_NAME_LENGTH);
+	properties.push_back(GL_TYPE);
+	properties.push_back(GL_ARRAY_SIZE);
+	std::vector<GLint> values(properties.size());
+
+	for (int attrib = 0; attrib < numActiveUniforms; ++attrib) {
+		glGetProgramResourceiv(shaderInfo.programId, GL_UNIFORM, attrib, properties.size(),
+			&properties[0], values.size(), NULL, &values[0]);
+
+		nameData.resize(values[0]);
+		glGetProgramResourceName(shaderInfo.programId, GL_PROGRAM_INPUT, attrib, nameData.size(), NULL, &nameData[0]);
+		std::string name((char*)&nameData[0], nameData.size() - 1);
+
+		Uniform uniform;
+		uniform.name = name;
+		uniform.uniform = GlTypeToUniformVariant(values[1]);
+	}
+
+	return uniforms;
 }

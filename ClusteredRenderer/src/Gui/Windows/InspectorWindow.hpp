@@ -90,6 +90,11 @@ private:
 			DrawAssetShader(*shaderAsset);
 			break;
 		}	
+		case AssetType::MATERIAL: {
+			auto materialAsset = AssetManager::GetAsset<MaterialAsset>(assetId);
+			DrawAssetMaterial(*materialAsset);
+			break;
+		}	
 		default:
 
 			break;
@@ -132,6 +137,18 @@ private:
 
 		if (ImGui::Button("Build")) {
 			Renderer::CompileShaderOneTime(shaderAsset);
+		}
+	}
+	void DrawAssetMaterial(MaterialAsset& materialAsset) {
+		ImGui::Text("Shader");ImGui::SameLine();
+		DynamicAssetField(materialAsset.shaderAsset, 0);
+
+		for (auto& uniform : materialAsset.uniforms) {
+			std::visit(
+				overload(
+					[&](UniformVec3& vec3) { ControlUtils::DrawVec3(uniform.name, vec3.vec); },
+					[](UniformSampler2D sampler2D) {  }
+				), uniform.uniform);
 		}
 	}
 
