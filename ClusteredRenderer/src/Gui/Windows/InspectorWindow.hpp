@@ -146,8 +146,11 @@ private:
 		for (auto& uniform : materialAsset.uniforms) {
 			std::visit(
 				overload(
-					[&](UniformVec3& vec3) { ControlUtils::DrawVec3(uniform.name, vec3.vec); },
-					[](UniformSampler2D sampler2D) {  }
+					[&](UniformFloat& value) { ControlUtils::DrawFloat(uniform.name, value.value); },
+					[&](UniformFloatVec2& vec2) { ControlUtils::DrawVec2(uniform.name, vec2.vec); },
+					[&](UniformFloatVec3& vec3) { ControlUtils::DrawVec3(uniform.name, vec3.vec); },
+					[&](UniformFloatVec4& vec4) { ControlUtils::DrawVec4(uniform.name, vec4.vec); },
+					[](UniformSampler2D sampler2D) { ImGui::Text("Sampler..."); }
 				), uniform.uniform);
 		}
 	}

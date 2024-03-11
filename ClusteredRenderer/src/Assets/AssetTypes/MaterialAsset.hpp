@@ -29,7 +29,7 @@ struct MaterialAsset : public Asset {
 
 			for (const auto& uniform : loadedUniforms) {
 				auto find = 
-					std::ranges::find_if(uniforms, [](const Uniform& other) { return other.name == " lmao "; });
+					std::ranges::find_if(uniforms, [&](const Uniform& other) { return other.name == uniform.name; });
 				if (find == uniforms.end())
 					continue;
 

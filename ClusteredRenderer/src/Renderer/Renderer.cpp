@@ -198,12 +198,17 @@ std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
 			&properties[0], values.size(), NULL, &values[0]);
 
 		nameData.resize(values[0]);
-		glGetProgramResourceName(shaderInfo.programId, GL_PROGRAM_INPUT, attrib, nameData.size(), NULL, &nameData[0]);
+		glGetProgramResourceName(shaderInfo.programId, GL_UNIFORM, attrib, nameData.size(), NULL, &nameData[0]);
 		std::string name((char*)&nameData[0], nameData.size() - 1);
+
+		if (name == "model" || name == "projection" || name == "view") // implicit for all models
+			continue;
 
 		Uniform uniform;
 		uniform.name = name;
 		uniform.uniform = GlTypeToUniformVariant(values[1]);
+
+		uniforms.push_back(uniform);
 	}
 
 	return uniforms;
