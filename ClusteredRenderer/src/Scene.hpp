@@ -76,4 +76,5 @@ private:
 
 	friend class Entity;
 	friend class SceneWindow;
+	friend class Renderer;
 };

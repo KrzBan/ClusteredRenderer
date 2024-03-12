@@ -174,6 +174,7 @@ private:
 
 		if (ImGui::BeginPopup("AddComponent")) {
 			AddComponentEntry<CameraComponent>("Camera", entity);
+			AddComponentEntry<MeshRendererComponent>("MeshRenderer", entity);
 			// DisplayAddComponentEntry<ScriptComponent>("Script");
 			// DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			// DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
@@ -245,6 +246,15 @@ private:
 
 				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 			}
+		});
+
+		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [&](MeshRendererComponent& component) {
+			ImGui::Text("Mesh");
+			ImGui::SameLine();
+			DynamicAssetField(component.mesh, 0);
+			ImGui::Text("Material");
+			ImGui::SameLine();
+			DynamicAssetField(component.material, 0);
 		});
 
 	}

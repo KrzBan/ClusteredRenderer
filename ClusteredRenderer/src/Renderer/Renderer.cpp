@@ -33,7 +33,7 @@ Renderer::Renderer() {
 	}
 }
 
-void Renderer::RenderScene(const Scene& scene, const Camera& camera, const glm::mat4& transform) {
+void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
 	framebuffer.Bind();
 
 	// Clear
@@ -55,6 +55,18 @@ void Renderer::RenderScene(const Scene& scene, const Camera& camera, const glm::
 	glBindVertexArray(VAO); 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 	glUseProgram(0);
+
+
+	auto group = scene.m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+	for (auto entity : group) {
+		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+
+		// Prepare mesh buffers
+		// Prepare shader data
+		// Bind uniforms
+		// Render
+	}
+
 
 	framebuffer.Unbind();
 }

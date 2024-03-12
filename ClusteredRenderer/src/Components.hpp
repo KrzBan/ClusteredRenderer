@@ -44,14 +44,12 @@ struct TransformComponent {
 };
 
 struct MeshRendererComponent {
-	glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-	//Shared<Texture2D> Texture;
-	float TilingFactor = 1.0f;
+
+	Shared<MeshAsset> mesh;
+	Shared<MaterialAsset> material;
 
 	MeshRendererComponent() = default;
 	MeshRendererComponent(const MeshRendererComponent&) = default;
-	MeshRendererComponent(const glm::vec4& color)
-		: Color(color) {}
 };
 
 struct CameraComponent {
