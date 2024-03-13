@@ -45,30 +45,128 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	// Render Editor Grid
-	static unsigned int VAO{ 0 };
-	if (VAO == 0) {
-		glGenVertexArrays(1, &VAO); 
-	}
-		 
-	glUseProgram(gridShaderRenderInfo.programId);
-	glBindVertexArray(VAO); 
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-	glUseProgram(0);
-
-
 	auto group = scene.m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
 
-		// Prepare mesh buffers
-		// Prepare shader data
+		if (meshRenderer.mesh == nullptr)
+			continue;
+		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
+		if (meshResult == nullptr) {
+			continue;
+		}
+
+		if (meshRenderer.material == nullptr || meshRenderer.material->shaderAsset == nullptr)
+			continue;
+		const auto shaderResult = PrepareShader(*meshRenderer.material->shaderAsset);
+		if (shaderResult == nullptr) {
+			continue;
+		}
+
 		// Bind uniforms
+		glUseProgram(shaderResult->programId);
+		const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
+		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
+
+		for (const auto& uniform : meshRenderer.material->uniforms) {
+			BindUniform(shaderResult->programId, uniform);
+		}
+		
 		// Render
+		glBindVertexArray(meshResult->vao);
+		glDrawElements(GL_TRIANGLES, meshRenderer.mesh->indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 	}
 
+	// Render Editor Grid
+	static unsigned int VAO{ 0 };
+	if (VAO == 0) {
+		glGenVertexArrays(1, &VAO);
+	}
+
+	glUseProgram(gridShaderRenderInfo.programId);
+	glBindVertexArray(VAO);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+	glUseProgram(0);
 
 	framebuffer.Unbind();
+}
+
+void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform) {
+
+	int uniformLocation = glGetUniformLocation(shaderId, uniform.name.c_str());
+
+	std::visit(
+		overload(
+			[&](const UniformFloat& value) {	glUniform1f(uniformLocation, value.value); },
+			[&](const UniformFloatVec2& vec2) { glUniform2f(uniformLocation, vec2.vec.x, vec2.vec.y); },
+			[&](const UniformFloatVec3& vec3) { glUniform3f(uniformLocation, vec3.vec.x, vec3.vec.y, vec3.vec.z); },
+			[&](const UniformFloatVec4& vec4) { glUniform4f(uniformLocation, vec4.vec.x, vec4.vec.y, vec4.vec.z, vec4.vec.w); },
+			[](const UniformSampler2D sampler2D) { ; }),
+		uniform.uniform);
+}
+
+
+const MeshRenderInfo* Renderer::PrepareMesh(MeshAsset& mesh) {
+	if (mesh.isDirty) {
+		mesh.isDirty = false;
+		// Update
+		MeshRenderInfo meshRenderInfo;
+
+		glGenBuffers(1, &meshRenderInfo.vbo);  
+		glGenBuffers(1, &meshRenderInfo.ebo);  
+		glGenVertexArrays(1, &meshRenderInfo.vao);  
+
+		glBindVertexArray(meshRenderInfo.vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, meshRenderInfo.vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh.vertices.size(), mesh.vertices.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshRenderInfo.ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * mesh.indices.size(), mesh.indices.data(), GL_STATIC_DRAW);
+
+		// vertex positions
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+		// vertex normals
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+		// vertex texture coords
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+		glBindVertexArray(0);  
+
+		m_Meshes[mesh.assetId] = std::move(meshRenderInfo);
+	}
+
+	if (not m_Meshes.contains(mesh.assetId)) {
+		spdlog::error("[Renderer::PrepareMesh] Mesh id {} is missing.", mesh.assetId);
+		return nullptr;
+	}
+
+	return &m_Meshes[mesh.assetId];
+}
+
+const ShaderRenderInfo* Renderer::PrepareShader(ShaderAsset& shader) {
+	if (shader.isDirty) {
+		shader.isDirty = false;
+		
+		auto result = CompileShader(shader);
+		if (not result.has_value()) {
+			spdlog::error("[Renderer::PrepareShader] Error compiling shader.");
+			spdlog::error("{}", result.error());
+			return nullptr;
+		}
+		m_Shaders[shader.assetId] = std::move(result.value());
+	}
+
+	if (not m_Shaders.contains(shader.assetId)) {
+		spdlog::error("[Renderer::PrepareMesh] Mesh id {} is missing.", shader.assetId);
+		return nullptr;
+	}
+
+	return &m_Shaders[shader.assetId];
 }
 
 std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const ShaderAsset& shader) {

@@ -254,7 +254,7 @@ private:
 			DynamicAssetField(component.mesh, 0);
 			ImGui::Text("Material");
 			ImGui::SameLine();
-			DynamicAssetField(component.material, 0);
+			DynamicAssetField(component.material, 1);
 		});
 
 	}
@@ -320,7 +320,7 @@ void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
 		ImGui::Text(std::format("{}", asset->assetId).c_str());
 	}
 
-	if (ImGui::BeginPopupContextItem("Edit Asset")) {
+	if (ImGui::BeginPopupContextItem(std::format("Edit Asset##{}", id).c_str())) {
 		if (ImGui::MenuItem("Clear")) {
 			asset = nullptr;
 		}

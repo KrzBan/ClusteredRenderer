@@ -14,14 +14,17 @@ struct ShaderRenderInfo{
 	ShaderRenderInfo(const ShaderRenderInfo&) = delete;
 	ShaderRenderInfo& operator=(const ShaderRenderInfo&) = delete;
 
-	ShaderRenderInfo(ShaderRenderInfo&& other) noexcept {
+	void TakeOwnership(ShaderRenderInfo&& other) {
 		programId = other.programId;
 		other.programId = 0;
 	}
+
+	ShaderRenderInfo(ShaderRenderInfo&& other) noexcept {
+		TakeOwnership(std::move(other));
+	}
 	ShaderRenderInfo& operator=(ShaderRenderInfo&& other) noexcept {
 		Destroy();
-		programId = other.programId;
-		other.programId = 0;
+		TakeOwnership(std::move(other));
 		return *this;
 	}
 
