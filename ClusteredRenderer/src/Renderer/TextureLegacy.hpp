@@ -2,7 +2,7 @@
 
 #include <Core.hpp>
 
-class Texture {
+class TextureLegacy {
 private:
 	uint32 m_Handle;
 	uint32 m_Width = 0;
@@ -13,8 +13,8 @@ private:
 
 	std::string m_Path;
 public:
-	Texture(std::string_view filepath);
-	~Texture();
+	TextureLegacy(std::string_view filepath);
+	~TextureLegacy();
 
 	void Bind(uint32 slot = 0);
 	void Unbind();

@@ -103,7 +103,9 @@ void AssetManager::CreateAsset(const std::filesystem::path& path, const std::str
 
 	uint32 nameId = 1;
 	while (std::filesystem::exists(filePath)) {
-		const auto newName = std::format("{} ({})", name, nameId++);
+		const auto nameBase = name.substr(0, name.find_last_of('.'));
+		const auto extension = name.substr(name.find_last_of('.'));
+		const auto newName = std::format("{} ({}){}", nameBase, nameId++, extension);
 		filePath = path / newName;
 	}
 

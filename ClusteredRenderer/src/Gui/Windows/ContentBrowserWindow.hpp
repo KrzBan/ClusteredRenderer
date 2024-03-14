@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core.hpp>
-#include <Renderer/Texture.hpp>
+#include <Renderer/TextureLegacy.hpp>
 #include <Assets/AssetManager.hpp>
 #include <Assets/Assets.hpp>
 
@@ -23,8 +23,8 @@ private:
 	std::filesystem::path m_BaseDirectory;
 	std::filesystem::path m_CurrentDirectory;
 
-	Shared<Texture> m_DirectoryIcon = std::make_shared<Texture>(RESOURCES_DIR "icons/contentBrowser/DirectoryIcon.png");
-	Shared<Texture> m_FileIcon = std::make_shared<Texture>(RESOURCES_DIR "icons/contentBrowser/FileIcon.png");
+	Shared<TextureLegacy> m_DirectoryIcon = std::make_shared<TextureLegacy>(RESOURCES_DIR "icons/contentBrowser/DirectoryIcon.png");
+	Shared<TextureLegacy> m_FileIcon = std::make_shared<TextureLegacy>(RESOURCES_DIR "icons/contentBrowser/FileIcon.png");
 
 public:
 	ContentBrowserWindow()
@@ -87,7 +87,7 @@ public:
 				const auto filenameCStr = filenameString.c_str();
 				ImGui::PushID(filenameCStr);
 
-				Shared<Texture> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+				Shared<TextureLegacy> icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
 				if (m_HighlightedFile != path) {
 					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ColorFromInt(109, 108, 112, 255)));
 				}

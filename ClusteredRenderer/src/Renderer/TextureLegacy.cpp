@@ -1,6 +1,6 @@
-#include "Texture.hpp"
+#include "TextureLegacy.hpp"
 
-Texture::Texture(std::string_view filepath)
+TextureLegacy::TextureLegacy(std::string_view filepath)
     : m_Path{ filepath }
 {
     glGenTextures(1, &m_Handle);
@@ -44,25 +44,25 @@ Texture::Texture(std::string_view filepath)
     stbi_image_free(data);
 }
 
-Texture::~Texture() {
+TextureLegacy::~TextureLegacy() {
     glDeleteTextures(1, &m_Handle);
 }
 
-void Texture::Bind(uint32 slot) {
+void TextureLegacy::Bind(uint32 slot) {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, m_Handle);
 }
-void Texture::Unbind() {
+void TextureLegacy::Unbind() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-uint32_t Texture::GetHandle() const {
+uint32_t TextureLegacy::GetHandle() const {
     return m_Handle;
 }
 
-int Texture::GetWidth() const {
+int TextureLegacy::GetWidth() const {
     return m_Width;
 }
-int Texture::GetHeight() const {
+int TextureLegacy::GetHeight() const {
     return m_Height;
 }

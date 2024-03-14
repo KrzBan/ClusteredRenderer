@@ -54,7 +54,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Renderer/Renderer.hpp" "Renderer/Renderer.cpp"
 	"Renderer/Shader.hpp" "Renderer/Shader.cpp" 
 	"Renderer/ShaderProgram.hpp" "Renderer/ShaderProgram.cpp" 
-	"Renderer/Texture.hpp" "Renderer/Texture.cpp"
+	"Renderer/TextureLegacy.hpp" "Renderer/TextureLegacy.cpp"
 	"Renderer/Window.hpp" "Renderer/Window.cpp"    
 	
 	"UUID.hpp" "UUID.cpp")

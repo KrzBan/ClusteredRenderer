@@ -115,7 +115,6 @@ void AssetManager::ReloadAsset(kb::UUID id) {
 	catch (std::exception& e) {
 		spdlog::error("[LoadAsset] {}", e.what());
 	}
-	
 
 	auto metaPath = assetPath;
 	metaPath += ".meta";
