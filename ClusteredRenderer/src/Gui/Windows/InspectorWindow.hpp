@@ -148,6 +148,8 @@ private:
 		ImGui::Text("Shader");ImGui::SameLine();
 		DynamicAssetField(materialAsset.shaderAsset, 0);
 
+		ImGui::SeparatorText("Uniforms");
+
 		for (auto& uniform : materialAsset.uniforms) {
 			std::visit(
 				overload(
@@ -155,7 +157,11 @@ private:
 					[&](UniformFloatVec2& vec2) { ControlUtils::DrawVec2(uniform.name, vec2.vec); },
 					[&](UniformFloatVec3& vec3) { ControlUtils::DrawVec3(uniform.name, vec3.vec); },
 					[&](UniformFloatVec4& vec4) { ControlUtils::DrawVec4(uniform.name, vec4.vec); },
-					[&](UniformSampler2D& sampler2D) { DynamicAssetField(sampler2D.textureAsset, 0); }
+					[&](UniformSampler2D& sampler2D) { 
+						ImGui::Text(uniform.name.c_str());
+						ImGui::SameLine();
+						DynamicAssetField(sampler2D.textureAsset, 0); 
+					}
 				), uniform.uniform);
 		}
 	}
