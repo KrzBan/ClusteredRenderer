@@ -54,6 +54,7 @@
 #include <magic_enum.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/optional.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 

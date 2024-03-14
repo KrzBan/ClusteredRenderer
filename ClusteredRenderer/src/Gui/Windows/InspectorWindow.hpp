@@ -95,6 +95,11 @@ private:
 			DrawAssetMaterial(*materialAsset);
 			break;
 		}	
+		case AssetType::TEXTURE_2D: {
+			auto textureAsset = AssetManager::GetAsset<Texture2DAsset>(assetId);
+			DrawAssetTexture2D(*textureAsset);
+			break;
+		}	
 		default:
 
 			break;
@@ -150,8 +155,43 @@ private:
 					[&](UniformFloatVec2& vec2) { ControlUtils::DrawVec2(uniform.name, vec2.vec); },
 					[&](UniformFloatVec3& vec3) { ControlUtils::DrawVec3(uniform.name, vec3.vec); },
 					[&](UniformFloatVec4& vec4) { ControlUtils::DrawVec4(uniform.name, vec4.vec); },
-					[](UniformSampler2D sampler2D) { ImGui::Text("Sampler..."); }
+					[&](UniformSampler2D& sampler2D) { DynamicAssetField(sampler2D.textureAsset, 0); }
 				), uniform.uniform);
+		}
+	}
+	void DrawAssetTexture2D(Texture2DAsset& textureAsset) {
+		if (ImGui::BeginTable("Table", 2)) {
+
+			ImGui::TableNextColumn();
+			ImGui::Text("Dimensions");
+			ImGui::TableNextColumn();
+			ImGui::Text("%dx%dx%d", textureAsset.GetWidth(), textureAsset.GetWidth(), textureAsset.GetChannels());
+
+			ImGui::TableNextColumn();
+			ImGui::Text("Wrap Mode");
+			ImGui::TableNextColumn();
+
+			const auto wrapModeNames = magic_enum::enum_names<Texture2DWrapMode>();
+			const auto currentWrapModeId = magic_enum::enum_index(textureAsset.wrapMode);
+
+			if (ImGui::BeginCombo("##Wrap", wrapModeNames[currentWrapModeId.value()].data())) {
+				for (int n = 0; n < wrapModeNames.size(); n++) {
+					const bool is_selected = (currentWrapModeId == n);
+					if (ImGui::Selectable(wrapModeNames[n].data(), is_selected))
+						textureAsset.wrapMode = magic_enum::enum_cast<Texture2DWrapMode>(n).value();
+
+					if (is_selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			ImGui::TableNextColumn();
+			ImGui::Text("Flip UVs");
+			ImGui::TableNextColumn();
+			ImGui::Checkbox("##FlipUVs", &textureAsset.flipVertically);
+
+			ImGui::EndTable();
 		}
 	}
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core.hpp>
+#include <Assets/AssetTypes/Texture2DAsset.hpp>
 
 struct UniformFloat {
 	float value;
@@ -31,10 +32,18 @@ struct UniformFloatVec4 {
 	}
 };
 struct UniformSampler2D {
-	int id;
+	Shared<Texture2DAsset> textureAsset;
+	
 	template <typename T>
-	void serialize(T& archive) {
-		archive(id);
+	void load(T& archive) {
+		kb::UUID textureId{};
+		if (cereal::make_optional_nvp(archive, "textureId", textureId)) {
+			textureAsset = AssetManager::GetAsset<Texture2DAsset>(textureId);
+		}
+	}
+	template <typename T>
+	void save(T& archive) const {
+		archive(textureAsset->assetId);
 	}
 };
 

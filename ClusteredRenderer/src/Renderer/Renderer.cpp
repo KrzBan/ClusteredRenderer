@@ -68,8 +68,9 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 		const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
 		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
 
+		uint32 textureSlot = 0;
 		for (const auto& uniform : meshRenderer.material->uniforms) {
-			BindUniform(shaderResult->programId, uniform);
+			BindUniform(shaderResult->programId, uniform, textureSlot);
 		}
 		
 		// Render
@@ -92,7 +93,7 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	framebuffer.Unbind();
 }
 
-void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform) {
+void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot) {
 
 	int uniformLocation = glGetUniformLocation(shaderId, uniform.name.c_str());
 
@@ -102,7 +103,20 @@ void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform) {
 			[&](const UniformFloatVec2& vec2) { glUniform2f(uniformLocation, vec2.vec.x, vec2.vec.y); },
 			[&](const UniformFloatVec3& vec3) { glUniform3f(uniformLocation, vec3.vec.x, vec3.vec.y, vec3.vec.z); },
 			[&](const UniformFloatVec4& vec4) { glUniform4f(uniformLocation, vec4.vec.x, vec4.vec.y, vec4.vec.z, vec4.vec.w); },
-			[](const UniformSampler2D sampler2D) { ; }),
+			[&](const UniformSampler2D& sampler2D) { 
+				if (sampler2D.textureAsset == nullptr)
+					return;
+				const auto textureResult = PrepareTexture2D(*sampler2D.textureAsset);
+				if (textureResult == nullptr) {
+					return;
+				}
+
+				glActiveTexture(GL_TEXTURE0 + textureSlot);
+				glBindTexture(GL_TEXTURE_2D, textureResult->textureId);
+
+				glUniform1i(uniformLocation, textureSlot);
+				++textureSlot;
+			}),
 		uniform.uniform);
 }
 
@@ -167,6 +181,51 @@ const ShaderRenderInfo* Renderer::PrepareShader(ShaderAsset& shader) {
 	}
 
 	return &m_Shaders[shader.assetId];
+}
+
+const Texture2DRenderInfo* Renderer::PrepareTexture2D(Texture2DAsset& texture) {
+	if (texture.isDirty) {
+		texture.isDirty = false;
+
+		Texture2DRenderInfo renderInfo{};
+
+		glGenTextures(1, &renderInfo.textureId);
+		glBindTexture(GL_TEXTURE_2D, renderInfo.textureId);  
+
+		GLuint wrapMode = [&]() {
+			switch (texture.wrapMode) {
+			case Texture2DWrapMode::CLAMP_EDGE:
+				return GL_CLAMP_TO_EDGE;
+			case Texture2DWrapMode::CLAMP_BORDER:
+				return GL_CLAMP_TO_BORDER;
+			case Texture2DWrapMode::MIRRORED_REPEAT:
+				return GL_MIRRORED_REPEAT;
+			case Texture2DWrapMode::REPEAT:
+				return GL_REPEAT;
+			case Texture2DWrapMode::MIRRORED_CLAMP_EDGE:
+				return GL_MIRROR_CLAMP_TO_EDGE;
+			}
+			throw std::runtime_error("[Renderer::PrepareTexture2D] Unknown wrapMode");
+		}();
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, texture.m_InternalFormat, 
+			texture.GetWidth(), texture.GetHeight(), 0, texture.m_DataFormat, GL_UNSIGNED_BYTE, texture.m_Data.data());
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		m_Textures[texture.assetId] = std::move(renderInfo);
+	}
+
+	if (not m_Textures.contains(texture.assetId)) {
+		spdlog::error("[Renderer::PrepareTexture2D] Texture id {} is missing.", texture.assetId);
+		return nullptr;
+	}
+
+	return &m_Textures[texture.assetId];
 }
 
 std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const ShaderAsset& shader) {

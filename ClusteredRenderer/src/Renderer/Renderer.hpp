@@ -9,6 +9,8 @@
 #include "Framebuffer.hpp"
 #include "OpenGL/MeshRenderInfo.hpp"
 #include "OpenGL/ShaderRenderInfo.hpp"
+#include "OpenGL/Texture2DRenderInfo.hpp"
+
 #include "UniformTypes.hpp"
 
 class Renderer {
@@ -27,8 +29,9 @@ private:
 
 	const MeshRenderInfo*	PrepareMesh(MeshAsset& mesh);
 	const ShaderRenderInfo* PrepareShader(ShaderAsset& shader);
+	const Texture2DRenderInfo* PrepareTexture2D(Texture2DAsset& texture);
 
-	void BindUniform(GLuint shaderId, const Uniform& uniform);
+	void BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot);
 
 public:
 	Framebuffer framebuffer{ 1, 1, 0 };
@@ -38,6 +41,8 @@ public:
 private:
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;
+	std::unordered_map<kb::UUID, Texture2DRenderInfo> m_Textures;
+
 
 	ShaderRenderInfo gridShaderRenderInfo;
 };

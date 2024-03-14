@@ -43,7 +43,10 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	if (ext == ".txt") {
 		return AssetType::TEXT;
 	}
-	if (ext == ".png") {
+	if (std::set<std::string>{ ".shader" }.contains(ext)) {
+		return AssetType::SHADER;
+	}
+	if (std::set<std::string>{ ".png", ".jpg", ".jpeg" }.contains(ext)) {
 		return AssetType::TEXTURE_2D;
 	}
 	if (std::set<std::string>{ ".obj", ".fbx" }.contains(ext)) {

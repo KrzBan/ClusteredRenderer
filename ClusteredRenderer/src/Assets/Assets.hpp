@@ -7,3 +7,4 @@
 #include "AssetTypes/MeshAsset.hpp"
 #include "AssetTypes/ShaderSourceAsset.hpp"
 #include "AssetTypes/ShaderAsset.hpp"
+#include "AssetTypes/Texture2DAsset.hpp"
