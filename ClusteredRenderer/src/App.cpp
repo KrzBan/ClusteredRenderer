@@ -83,7 +83,7 @@ int App::Run() {
 		gui.NewFrame(); 
 
 		// Draw Editor Windows
-		menuBar.Draw(pWindows);
+		menuBar.Draw(pWindows, scene);
 		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
 		if (contentBrowserWindowOutput.selectionChanged)
 			sceneWindow.ResetSelection();

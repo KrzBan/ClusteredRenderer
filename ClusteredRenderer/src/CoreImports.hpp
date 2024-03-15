@@ -60,5 +60,7 @@
 
 #include <cereal_optional_nvp.h>
 
+#include <tinyfiledialogs/tinyfiledialogs.h>
+
 // Icons
 #include <Gui/Definitions/IconsFontAwesome6.h>

@@ -15,7 +15,8 @@ public:
 	Scene();
 	~Scene();
 
-	static Shared<Scene> Copy(Shared<Scene> other);
+	Scene(const Scene& other);
+	Scene& operator=(const Scene& other);
 
 	Entity CreateEntity(const std::string& name = std::string());
 	Entity CreateEntityWithUUID(kb::UUID uuid, const std::string& name = std::string());
@@ -39,6 +40,8 @@ public:
 
 	Entity FindEntityByName(std::string_view name);
 	Entity GetEntityByUUID(kb::UUID uuid);
+
+	bool CheckEntityExists(Entity entity);
 
 	Entity GetPrimaryCameraEntity();
 
@@ -77,4 +80,5 @@ private:
 	friend class Entity;
 	friend class SceneWindow;
 	friend class Renderer;
+	friend class SceneSerializer;
 };

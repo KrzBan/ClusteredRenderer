@@ -10,6 +10,7 @@ struct OpenGLVersion {
 };
 
 #define ASSETS_DIR "F:/dev/ClusteredRendererWorkspace"
+#define ASSETS_DIR_L "F:\\dev\\ClusteredRendererWorkspace"
 #define RESOURCES_DIR "./resources/"
 
 namespace config {

@@ -17,7 +17,7 @@ Scene::~Scene()
 }
 
 template<typename... Component>
-static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
+static void CopyComponent(entt::registry& dst, const entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
 {
 	([&]()
 		{
@@ -33,7 +33,7 @@ static void CopyComponent(entt::registry& dst, entt::registry& src, const std::u
 }
 
 template<typename... Component>
-static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
+static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, const entt::registry& src, const std::unordered_map<kb::UUID, entt::entity>& enttMap)
 {
 	CopyComponent<Component...>(dst, src, enttMap);
 }
@@ -54,32 +54,48 @@ static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Enti
 	CopyComponentIfExists<Component...>(dst, src);
 }
 
-Shared<Scene> Scene::Copy(Shared<Scene> other)
-{
-	Shared<Scene> newScene = std::make_shared<Scene>();
+Scene::Scene(const Scene& other) {
+	m_ViewportWidth = other.m_ViewportWidth;
+	m_ViewportHeight = other.m_ViewportHeight;
 
-	newScene->m_ViewportWidth = other->m_ViewportWidth;
-	newScene->m_ViewportHeight = other->m_ViewportHeight;
-	
-	auto& srcSceneRegistry = other->m_Registry;
-	auto& dstSceneRegistry = newScene->m_Registry;
+	auto& srcSceneRegistry = other.m_Registry;
+	auto& dstSceneRegistry = m_Registry;
+
 	std::unordered_map<kb::UUID, entt::entity> enttMap;
 
-	// Create entities in new scene
 	auto idView = srcSceneRegistry.view<IDComponent>();
-	for (auto e : idView)
-	{
+	for (auto e : idView) {
 		kb::UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
 		const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
-		Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+		Entity newEntity = CreateEntityWithUUID(uuid, name);
 		enttMap[uuid] = (entt::entity)newEntity;
 	}
 
-	// Copy components (except IDComponent and TagComponent)
+	CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
+}
+Scene& Scene::operator=(const Scene& other) {
+	m_Registry.clear();
+	m_ViewportWidth = other.m_ViewportWidth;
+	m_ViewportHeight = other.m_ViewportHeight;
+
+	auto& srcSceneRegistry = other.m_Registry;
+	auto& dstSceneRegistry = m_Registry;
+
+	std::unordered_map<kb::UUID, entt::entity> enttMap;
+
+	auto idView = srcSceneRegistry.view<IDComponent>();
+	for (auto e : idView) {
+		kb::UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+		const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+		Entity newEntity = CreateEntityWithUUID(uuid, name);
+		enttMap[uuid] = (entt::entity)newEntity;
+	}
+
 	CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
 
-	return newScene;
+	return *this;
 }
+
 
 Entity Scene::CreateEntity(const std::string& name)
 {
@@ -247,6 +263,11 @@ Entity Scene::GetEntityByUUID(kb::UUID uuid) {
 
 	return {};
 }
+
+bool Scene::CheckEntityExists(Entity entity) {
+	return m_Registry.valid(entity);
+}
+
 
 void Scene::OnPhysics2DStart()
 {

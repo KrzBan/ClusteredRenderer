@@ -56,6 +56,10 @@ public:
 		}
 		ImGui::End();
 
+		if (m_SelectedEntity != Entity {} && scene.CheckEntityExists(m_SelectedEntity) == false) {
+			m_SelectedEntity = {};
+		}
+		
 		output.selectedEntity = m_SelectedEntity;
 		return output;
 	}
