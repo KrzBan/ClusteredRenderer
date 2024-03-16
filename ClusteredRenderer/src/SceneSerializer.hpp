@@ -123,5 +123,7 @@ void load(Archive& archive, MeshRendererComponent& meshRenderer) {
 }
 template <class Archive>
 void serialize(Archive& archive, LightComponent& light) {
-	archive(light.color, light.intensity, light.range);
+	archive(light.ambient, light.diffuse, light.specular);
+	archive(light.ambientStrength, light.diffuseStrength, light.specularStrength);
+	archive(light.range);
 }

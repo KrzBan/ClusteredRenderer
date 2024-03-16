@@ -308,8 +308,12 @@ private:
 		});
 
 		DrawComponent<LightComponent>("Light", entity, [&](LightComponent& light) {
-			ControlUtils::DrawVec3("Color", light.color);
-			ControlUtils::DrawFloat("Intensity", light.intensity);
+			ImGui::ColorEdit3("Ambient", (float*)&light.ambient);
+			ControlUtils::DrawFloat("Ambient Intensity", light.ambientStrength);
+			ImGui::ColorEdit3("Diffuse", (float*)&light.diffuse);
+			ControlUtils::DrawFloat("Diffuse Intensity", light.diffuseStrength);
+			ImGui::ColorEdit3("Specular", (float*)&light.specular);
+			ControlUtils::DrawFloat("Specular Intensity", light.specularStrength);
 			ControlUtils::DrawFloat("Range", light.range);
 		});
 

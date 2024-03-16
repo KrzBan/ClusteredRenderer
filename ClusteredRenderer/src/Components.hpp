@@ -78,8 +78,13 @@ struct NativeScriptComponent {
 };
 
 struct LightComponent {
-	glm::vec3 color{1.0f, 1.0f, 1.0f};
-	float intensity = 1.0f;
+	glm::vec3 ambient{ 1.0f, 1.0f, 1.0f };
+	glm::vec3 diffuse{1.0f, 1.0f, 1.0f};
+	glm::vec3 specular{ 1.0f, 1.0f, 1.0f };
+	float ambientStrength = 1.0f;
+	float diffuseStrength = 1.0f;
+	float specularStrength = 1.0f;
+
 	float range = 10.0f;
 
 	LightComponent() = default;

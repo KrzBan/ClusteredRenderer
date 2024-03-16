@@ -35,7 +35,7 @@ void ControlUtils::DrawFloat(const std::string& label, float& value, float reset
 	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-	DrawFloat_Helper("Value", value, resetValue, buttonSize);
+	DrawFloat_Helper("X", value, resetValue, buttonSize);
 
 	ImGui::PopStyleVar();
 	ImGui::Columns(1);
