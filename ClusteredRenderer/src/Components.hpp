@@ -128,12 +128,41 @@ struct NativeScriptComponent {
 // 	CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
 // };
 
+template<typename T>
+inline std::string ComponentToString() {
+	throw std::runtime_error("[ComponentToString] Unknown type.");
+}
+template <>
+inline std::string ComponentToString<IDComponent>() {
+	return "IDComponent";
+}
+template <>
+inline std::string ComponentToString<TagComponent>() {
+	return "TagComponent";
+}
+template <>
+inline std::string ComponentToString<TransformComponent>() {
+	return "TransformComponent";
+}
+template <>
+inline std::string ComponentToString<CameraComponent>() {
+	return "CameraComponent";
+}
+template <>
+inline std::string ComponentToString<MeshRendererComponent>() {
+	return "MeshRendererComponent";
+}
+template <>
+inline std::string ComponentToString<NativeScriptComponent>() {
+	return "NativeScriptComponent";
+}
+
 template<typename... Component>
 struct ComponentGroup {};
 
 using AllComponents =
 ComponentGroup<
+	TransformComponent,
 	CameraComponent, 
 	MeshRendererComponent,
-	NativeScriptComponent,
-	TransformComponent>;
+	NativeScriptComponent>;

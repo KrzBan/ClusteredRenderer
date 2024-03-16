@@ -50,6 +50,8 @@ private:
 
 template <typename T>
 std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
+	if (id == 0)
+		return nullptr;
 
 	if (AssetManaged(id) == false) {
 		spdlog::error("Asset ID: {} unmanaged", id);

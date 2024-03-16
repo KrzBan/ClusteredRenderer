@@ -36,9 +36,14 @@ public:
 		assert(HasComponent<T>() && "Entity does not have component!");
 		return m_Scene->m_Registry.get<T>(m_EntityHandle);
 	}
+	template <typename T>
+	const T& GetComponent() const {
+		assert(HasComponent<T>() && "Entity does not have component!");
+		return m_Scene->m_Registry.get<T>(m_EntityHandle);
+	}
 
 	template<typename T>
-	bool HasComponent()
+	bool HasComponent() const
 	{
 		return m_Scene->m_Registry.all_of<T>(m_EntityHandle);
 	}
