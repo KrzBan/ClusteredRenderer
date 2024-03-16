@@ -37,6 +37,7 @@ public:
 	Framebuffer framebuffer{ 1, 1, 0 };
 
 	uint32_t uboMatricies;
+	uint32_t ssboLights;
 
 private:
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;

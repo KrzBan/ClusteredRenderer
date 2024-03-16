@@ -1,6 +1,7 @@
 ﻿#include "Renderer.hpp"
 
 #include <Components.hpp>
+#include <Entity.hpp>
 
 Renderer::Renderer() {
 	glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
@@ -12,9 +13,16 @@ Renderer::Renderer() {
 	// Create Uniform Buffer Object for Camera Projection+View
 	glGenBuffers(1, &uboMatricies);
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW); // allocate 152 bytes of memory
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW); // allocate 152 bytes of memory
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4));
+
+	// Create SSBO for lights
+	glGenBuffers(1, &ssboLights);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
+	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(data), data​, GLenum usage); // sizeof(data) only works for statically sized C/C++ arrays.
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // unbind
 
 	// Load Shader for Editor Grid
 	ShaderAsset gridShaderAsset{};
@@ -44,6 +52,18 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	// Set lights
+	std::vector<LightComponent> lights;
+	auto view = scene.m_Registry.view<LightComponent>();
+	for (auto e : view) {
+		Entity entity{ e, &scene };
+		lights.push_back(entity.GetComponent<LightComponent>());
+	}
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightComponent) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // unbind
 
 	auto group = scene.m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 	for (auto entity : group) {
