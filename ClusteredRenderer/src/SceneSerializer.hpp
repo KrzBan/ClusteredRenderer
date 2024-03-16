@@ -121,3 +121,7 @@ void load(Archive& archive, MeshRendererComponent& meshRenderer) {
 		meshRenderer.material = AssetManager::GetAsset<MaterialAsset>(materialAssetID);
 	}
 }
+template <class Archive>
+void serialize(Archive& archive, LightComponent& light) {
+	archive(light.color, light.intensity, light.range);
+}

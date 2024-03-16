@@ -98,7 +98,10 @@ void PrintVersionInfo() {
     glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVertices);
     spdlog::info("Max patch vertices: {}", maxPatchVertices);
 
-    //int maxEvalOrder = 0;
+    int maxShaderStorageBlockSize = 0;
+	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxShaderStorageBlockSize);
+	spdlog::info("Max Shader Storage Block Size: {}", maxShaderStorageBlockSize);
+	// int maxEvalOrder = 0;
     //glGetIntegerv(GL_MAX_EVAL_ORDER, &maxEvalOrder);
     //spdlog::info("Max eval order: {}", maxEvalOrder);
 

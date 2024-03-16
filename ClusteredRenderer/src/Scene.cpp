@@ -397,3 +397,6 @@ template<>
 void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
 {
 }
+template <>
+void Scene::OnComponentAdded<LightComponent>(Entity entity, LightComponent& component) {
+}

@@ -115,7 +115,9 @@ private:
 	}
 	void DrawAssetShaderSource(ShaderSourceAsset& shaderSourceAsset) {
 		ImGui::Text(std::format("Type: {}", magic_enum::enum_name(shaderSourceAsset.type)).c_str());
-		ImGui::InputTextMultiline("##Contents", &shaderSourceAsset.source);
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+		ImGui::InputTextMultiline("##Contents", &shaderSourceAsset.source, {0.0f, 400.0f});
+		ImGui::PopItemWidth();
 	}
 
 	void DrawAssetShader(ShaderAsset& shaderAsset) {
@@ -221,6 +223,8 @@ private:
 		if (ImGui::BeginPopup("AddComponent")) {
 			AddComponentEntry<CameraComponent>("Camera", entity);
 			AddComponentEntry<MeshRendererComponent>("MeshRenderer", entity);
+			AddComponentEntry<LightComponent>("Light", entity);
+
 			// DisplayAddComponentEntry<ScriptComponent>("Script");
 			// DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			// DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
@@ -301,6 +305,12 @@ private:
 			ImGui::Text("Material");
 			ImGui::SameLine();
 			DynamicAssetField(component.material, 1);
+		});
+
+		DrawComponent<LightComponent>("Light", entity, [&](LightComponent& light) {
+			ControlUtils::DrawVec3("Color", light.color);
+			ControlUtils::DrawFloat("Intensity", light.intensity);
+			ControlUtils::DrawFloat("Range", light.range);
 		});
 
 	}

@@ -52,6 +52,7 @@
 #include <stb_image.h>
 
 #include <magic_enum.hpp>
+
 #include <cereal/archives/json.hpp>
 #include <cereal/types/optional.hpp>
 #include <cereal/types/string.hpp>

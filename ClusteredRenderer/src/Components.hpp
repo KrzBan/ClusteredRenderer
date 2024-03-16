@@ -77,6 +77,15 @@ struct NativeScriptComponent {
 	}
 };
 
+struct LightComponent {
+	glm::vec3 color{1.0f, 1.0f, 1.0f};
+	float intensity = 1.0f;
+	float range = 10.0f;
+
+	LightComponent() = default;
+	LightComponent(const LightComponent&) = default;
+};
+
 // Physics
 
 // struct Rigidbody2DComponent
@@ -156,6 +165,10 @@ template <>
 inline std::string ComponentToString<NativeScriptComponent>() {
 	return "NativeScriptComponent";
 }
+template <>
+inline std::string ComponentToString<LightComponent>() {
+	return "LightComponent";
+}
 
 template<typename... Component>
 struct ComponentGroup {};
@@ -165,4 +178,5 @@ ComponentGroup<
 	TransformComponent,
 	CameraComponent, 
 	MeshRendererComponent,
-	NativeScriptComponent>;
+	NativeScriptComponent,
+	LightComponent>;

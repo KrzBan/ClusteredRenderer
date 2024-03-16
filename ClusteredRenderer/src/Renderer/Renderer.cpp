@@ -288,12 +288,20 @@ std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const Shade
 		error += '\n';
 	}
 
-	unsigned int matricesBlockIndex = glGetUniformBlockIndex(programId, "Matrices");
+	unsigned int matricesBlockIndex = glGetUniformBlockIndex(programId, "s_Camera");
 	if (matricesBlockIndex == GL_INVALID_INDEX) {
-		spdlog::info("[Renderer::CompileShader] Shader does not contain Uniform Block Index: Matrices");
+		spdlog::info("[Renderer::CompileShader] Shader does not contain Uniform Block Index: s_Camera");
 	}
 	else {
 		glUniformBlockBinding(programId, matricesBlockIndex, 0);
+	}
+
+	GLuint lightsShaderStorageBlockIndex = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, "s_Lights");
+	if (lightsShaderStorageBlockIndex == GL_INVALID_INDEX) {
+		spdlog::info("[Renderer::CompileShader] Shader does not contain Shader Storage Block Index: s_Lights");
+	}
+	else {
+		glShaderStorageBlockBinding(programId, lightsShaderStorageBlockIndex, 0);
 	}
 
 	if (error == "")
