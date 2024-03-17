@@ -3,6 +3,7 @@
 #include <Core.hpp>
 #include <Scene.hpp>
 #include <Entity.hpp>
+#include <Core/Input.hpp>
 
 #include "GuiWindow.hpp"
 
@@ -30,11 +31,13 @@ public:
 
 	SceneWindowOutput Draw(Scene& scene) {
 		SceneWindowOutput output{};
-
+		bool windowFocused = false;
 		if (m_DrawThis == false) return output;
 
 		if (ImGui::Begin(ICON_FA_SITEMAP " " SCENE_NAME, &m_DrawThis)) {
 			
+			windowFocused = ImGui::IsWindowFocused();
+
 			scene.m_Registry.each([&](auto entityID) {
 				Entity entity{ entityID, &scene };
 				if (DrawEntity(entity, scene)) {
@@ -56,10 +59,14 @@ public:
 		}
 		ImGui::End();
 
-		if (m_SelectedEntity != Entity {} && scene.CheckEntityExists(m_SelectedEntity) == false) {
+		if (m_SelectedEntity != Entity{} && scene.CheckEntityExists(m_SelectedEntity) == false) {
 			m_SelectedEntity = {};
 		}
-		
+
+		if (m_SelectedEntity != Entity{} && Input::GetKeyDown(KB_D) && Input::GetKey(KB_LEFT_CONTROL)) {
+			m_SelectedEntity = scene.DuplicateEntity(m_SelectedEntity);
+		}
+
 		output.selectedEntity = m_SelectedEntity;
 		return output;
 	}

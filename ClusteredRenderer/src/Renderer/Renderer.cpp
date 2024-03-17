@@ -74,6 +74,8 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
+	glEnable(GL_FRAMEBUFFER_SRGB); 
+
 	{
 		auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
 		for (auto entity : group) {
@@ -120,6 +122,8 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBindVertexArray(VAO);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 	glUseProgram(0);
+
+	glDisable(GL_FRAMEBUFFER_SRGB); 
 
 	framebuffer.Unbind();
 }
