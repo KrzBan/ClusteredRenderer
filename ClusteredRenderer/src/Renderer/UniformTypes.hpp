@@ -43,7 +43,9 @@ struct UniformSampler2D {
 	}
 	template <typename T>
 	void save(T& archive) const {
-		archive(cereal::make_nvp("textureId", textureAsset->assetId));
+		if (textureAsset) {
+			archive(cereal::make_nvp("textureId", textureAsset->assetId));
+		}
 	}
 };
 

@@ -15,7 +15,7 @@ struct OpenGLVersion {
 
 namespace config {
 	constexpr char const* windowTitle = "Program";
-	constexpr char const* glslVersion = "#version 400";
+	constexpr char const* glslVersion = "#version 430";
 	constexpr OpenGLVersion openGLVersion{ 4, 3 };
 
 	constexpr char const* assetDirectory = ASSETS_DIR;

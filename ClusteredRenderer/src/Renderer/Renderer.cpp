@@ -3,6 +3,11 @@
 #include <Components.hpp>
 #include <Entity.hpp>
 
+struct LightSSBO {
+	glm::vec3 position;
+	LightComponent lightData;
+};
+
 Renderer::Renderer() {
 	glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
 
@@ -20,7 +25,7 @@ Renderer::Renderer() {
 	// Create SSBO for lights
 	glGenBuffers(1, &ssboLights);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
-	//glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(data), data​, GLenum usage); // sizeof(data) only works for statically sized C/C++ arrays.
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 200, nullptr, GL_DYNAMIC_DRAW); // sizeof(data) only works for statically sized C/C++ arrays.
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // unbind
 
@@ -53,52 +58,58 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	// Set lights
-	std::vector<LightComponent> lights;
-	auto view = scene.m_Registry.view<LightComponent>();
-	for (auto e : view) {
-		Entity entity{ e, &scene };
-		lights.push_back(entity.GetComponent<LightComponent>());
-	}
+	{
+		// Set lights
+		std::vector<LightSSBO> lights;
+		auto transLight = scene.m_Registry.group(entt::get<TransformComponent, LightComponent>);
+		for (auto entity : transLight) {
+			auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
 
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightComponent) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // unbind
-
-	auto group = scene.m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-	for (auto entity : group) {
-		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
-
-		if (meshRenderer.mesh == nullptr)
-			continue;
-		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
-		if (meshResult == nullptr) {
-			continue;
-		}
-
-		if (meshRenderer.material == nullptr || meshRenderer.material->shaderAsset == nullptr)
-			continue;
-		const auto shaderResult = PrepareShader(*meshRenderer.material->shaderAsset);
-		if (shaderResult == nullptr) {
-			continue;
-		}
-
-		// Bind uniforms
-		glUseProgram(shaderResult->programId);
-		const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
-		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
-
-		uint32 textureSlot = 0;
-		for (const auto& uniform : meshRenderer.material->uniforms) {
-			BindUniform(shaderResult->programId, uniform, textureSlot);
+			lights.push_back({ transform.Translation, light });
 		}
 		
-		// Render
-		glBindVertexArray(meshResult->vao);
-		glDrawElements(GL_TRIANGLES, meshRenderer.mesh->indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * lights.size(), lights.data());
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
+	{
+		auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
+		for (auto entity : group) {
+			auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+
+			if (meshRenderer.mesh == nullptr)
+				continue;
+			const auto meshResult = PrepareMesh(*meshRenderer.mesh);
+			if (meshResult == nullptr) {
+				continue;
+			}
+
+			if (meshRenderer.material == nullptr || meshRenderer.material->shaderAsset == nullptr)
+				continue;
+			const auto shaderResult = PrepareShader(*meshRenderer.material->shaderAsset);
+			if (shaderResult == nullptr) {
+				continue;
+			}
+
+			// Bind uniforms
+			glUseProgram(shaderResult->programId);
+			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
+			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
+
+			uint32 textureSlot = 0;
+			for (const auto& uniform : meshRenderer.material->uniforms) {
+				BindUniform(shaderResult->programId, uniform, textureSlot);
+			}
+
+			// Render
+			glBindVertexArray(meshResult->vao);
+			glDrawElements(GL_TRIANGLES, meshRenderer.mesh->indices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
+	}
+	
 	// Render Editor Grid
 	static unsigned int VAO{ 0 };
 	if (VAO == 0) {
