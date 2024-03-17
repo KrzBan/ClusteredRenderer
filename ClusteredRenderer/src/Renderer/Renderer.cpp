@@ -4,7 +4,7 @@
 #include <Entity.hpp>
 
 struct LightSSBO {
-	glm::vec3 position;
+	glm::vec4 position;
 	LightComponent lightData;
 };
 
@@ -18,16 +18,16 @@ Renderer::Renderer() {
 	// Create Uniform Buffer Object for Camera Projection+View
 	glGenBuffers(1, &uboMatricies);
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW); // allocate 152 bytes of memory
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4));
 
 	// Create SSBO for lights
 	glGenBuffers(1, &ssboLights);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 200, nullptr, GL_DYNAMIC_DRAW); // sizeof(data) only works for statically sized C/C++ arrays.
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); // unbind
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 200, nullptr, GL_DYNAMIC_DRAW);
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// Load Shader for Editor Grid
 	ShaderAsset gridShaderAsset{};
@@ -65,13 +65,13 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 		for (auto entity : transLight) {
 			auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
 
-			lights.push_back({ transform.Translation, light });
+			lights.push_back({ glm::vec4(transform.Translation, 1.0f), light });
 		}
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(LightSSBO) * lights.size(), lights.data());
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	{

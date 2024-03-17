@@ -78,9 +78,9 @@ struct NativeScriptComponent {
 };
 
 struct LightComponent {
-	glm::vec3 ambient{ 1.0f, 1.0f, 1.0f };
-	glm::vec3 diffuse{1.0f, 1.0f, 1.0f};
-	glm::vec3 specular{ 1.0f, 1.0f, 1.0f };
+	glm::vec4 ambient{ 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec4 diffuse{1.0f, 1.0f, 1.0f, 1.0f};
+	glm::vec4 specular{ 1.0f, 1.0f, 1.0f, 1.0f };
 	float ambientStrength = 1.0f;
 	float diffuseStrength = 1.0f;
 	float specularStrength = 1.0f;
