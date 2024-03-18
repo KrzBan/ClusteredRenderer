@@ -83,6 +83,8 @@ std::shared_ptr<T> AssetManager::GetAsset(kb::UUID id) {
 
 	std::ifstream input(metaPath);
 	cereal::JSONInputArchive archive(input);
+	CommonMetaData cmd{};
+	archive(cmd);
 
 	(*sharedAsset).LoadMeta(archive);
 	try {
