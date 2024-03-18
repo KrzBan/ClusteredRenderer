@@ -36,17 +36,18 @@ int App::Run() {
 	AssetManagerWindow assetManagerWindow{};
 	ContentBrowserWindow contentBrowserWindow{};
 	InspectorWindow inspectorWindow{};
+	SettingsWindow settingsWindow{};
 	SceneWindow sceneWindow{};
 	ViewportWindow viewportWindow{};
 	const std::vector<GuiWindow*> pWindows = { &assetManagerWindow, &contentBrowserWindow,
-		&inspectorWindow, &sceneWindow, &viewportWindow };
-
+		&inspectorWindow, &settingsWindow, &sceneWindow, &viewportWindow };
 	MenuBar menuBar;
 
 	Renderer renderer{};
 
 	bool runtime = false;
 	Timestep physicsAccumulator{ 0.0 };
+	std::chrono::nanoseconds renderTimeNs{};
 
 	while (window.ShouldClose() == false) {
 		Time::UpdateTime(glfwGetTime());
@@ -68,6 +69,8 @@ int App::Run() {
 			scene.OnUpdateEditor(Time::DeltaTime());
 		}
 		
+		std::chrono::steady_clock::time_point renderTsBegin = std::chrono::steady_clock::now();
+
 		// Render
 		if (runtime) {
 			auto cameraEntity = scene.GetPrimaryCameraEntity();
@@ -102,6 +105,7 @@ int App::Run() {
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(renderer.framebuffer.GetColorAttachmentTextureID());
 		auto assetManagerWindowOutput = assetManagerWindow.Draw();
+		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs);
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
@@ -118,11 +122,14 @@ int App::Run() {
 			editorCamera.OnUpdate(Time::DeltaTime());
 		}
 
-		// Update asset changes
-		AssetManager::HandleFileChanges(listener->FlushQueue());
-
 		// Show frame
 		window.SwapBuffers();
+
+		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
+		renderTimeNs = renderTsEnd - renderTsBegin;
+
+		// Update asset changes
+		AssetManager::HandleFileChanges(listener->FlushQueue());
 	}
 
 	AssetManager::Clear();

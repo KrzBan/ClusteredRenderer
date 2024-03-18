@@ -7,6 +7,7 @@
 #include "Gui/Windows/AssetManagerWindow.hpp"
 #include "Gui/Windows/ContentBrowserWindow.hpp"
 #include "Gui/Windows/InspectorWindow.hpp"
+#include "Gui/Windows/SettingsWindow.hpp"
 #include "Gui/Windows/SceneWindow.hpp"
 #include "Gui/Windows/ViewportWindow.hpp"
 
