@@ -345,11 +345,6 @@ std::optional<CommonMetaData> AssetManager::FetchFileCommonMetaData(std::filesys
 	CommonMetaData loadedMetaData = CommonMetaData::ReadMetaFile(metaPath);
 	if (loadedMetaData.lastModified != std::filesystem::last_write_time(path)) {
 		spdlog::error("LastModified timestamp mismatch when loading existing .meta file for {}", path);
-
-		spdlog::info("Removing {}", metaPath);
-		std::filesystem::remove(metaPath);
-
-		return {};
 	}
 
 	return loadedMetaData;
