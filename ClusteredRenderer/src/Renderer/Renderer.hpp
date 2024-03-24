@@ -46,4 +46,5 @@ private:
 
 
 	ShaderRenderInfo gridShaderRenderInfo;
+	Texture2DRenderInfo defaultTextureRenderInfo;
 };

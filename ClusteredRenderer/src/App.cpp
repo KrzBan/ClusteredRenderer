@@ -15,7 +15,6 @@
 #include "Renderer/EditorCamera.hpp"
 
 int App::Run() {
-	
 	spdlog::set_level(spdlog::level::trace);
 	Window window(1920, 1080, config::windowTitle, config::openGLVersion);
 
@@ -44,6 +43,7 @@ int App::Run() {
 	MenuBar menuBar;
 
 	Renderer renderer{};
+	GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
 	bool runtime = false;
 	Timestep physicsAccumulator{ 0.0 };
@@ -81,6 +81,13 @@ int App::Run() {
 		else {
 			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
 		}
+
+		while (glClientWaitSync(fence, 0, 0) != GL_ALREADY_SIGNALED) {
+			// Draw call finished
+		}
+
+		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
+		renderTimeNs = renderTsEnd - renderTsBegin;
 
 		// Prepare GUI
 		gui.NewFrame(); 
@@ -124,9 +131,6 @@ int App::Run() {
 
 		// Show frame
 		window.SwapBuffers();
-
-		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
-		renderTimeNs = renderTsEnd - renderTsBegin;
 
 		// Update asset changes
 		AssetManager::HandleFileChanges(listener->FlushQueue());

@@ -26,7 +26,7 @@ Renderer::Renderer() {
 	glGenBuffers(1, &ssboLights);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 200, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 1000, nullptr, GL_DYNAMIC_DRAW);
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// Load Shader for Editor Grid
@@ -44,6 +44,13 @@ Renderer::Renderer() {
 		spdlog::error("[Renderrer::Renderrer: Couldn't compile grid shader");
 		spdlog::error("{}", compileRes.error());
 	}
+
+	const char whiteTexData[] = { 255, 255, 255, 255 };
+	glGenTextures(1, &defaultTextureRenderInfo.textureId);
+	glBindTexture(GL_TEXTURE_2D, defaultTextureRenderInfo.textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whiteTexData);
 }
 
 void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
@@ -139,9 +146,11 @@ void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform, uint32& text
 			[&](const UniformFloatVec3& vec3) { glUniform3f(uniformLocation, vec3.vec.x, vec3.vec.y, vec3.vec.z); },
 			[&](const UniformFloatVec4& vec4) { glUniform4f(uniformLocation, vec4.vec.x, vec4.vec.y, vec4.vec.z, vec4.vec.w); },
 			[&](const UniformSampler2D& sampler2D) { 
-				if (sampler2D.textureAsset == nullptr)
-					return;
-				const auto textureResult = PrepareTexture2D(*sampler2D.textureAsset);
+	
+				const auto textureResult = sampler2D.textureAsset != nullptr ?
+					PrepareTexture2D(*sampler2D.textureAsset) : 
+					&defaultTextureRenderInfo;
+
 				if (textureResult == nullptr) {
 					return;
 				}

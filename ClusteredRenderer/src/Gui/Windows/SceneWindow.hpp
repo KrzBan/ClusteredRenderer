@@ -38,12 +38,12 @@ public:
 			
 			windowFocused = ImGui::IsWindowFocused();
 
-			scene.m_Registry.each([&](auto entityID) {
+			for (auto entityID : scene.m_Registry.view<entt::entity>()) {
 				Entity entity{ entityID, &scene };
 				if (DrawEntity(entity, scene)) {
 					output.selectionChanged = true;
 				}
-			});
+			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 				m_SelectedEntity = {};

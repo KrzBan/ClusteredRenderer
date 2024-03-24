@@ -148,7 +148,8 @@ private:
 	}
 	void DrawAssetMaterial(MaterialAsset& materialAsset) {
 		ImGui::Text("Shader");ImGui::SameLine();
-		DynamicAssetField(materialAsset.shaderAsset, 0);
+		int dynamicFieldId = 0;
+		DynamicAssetField(materialAsset.shaderAsset, dynamicFieldId++);
 
 		ImGui::SeparatorText("Uniforms");
 
@@ -162,7 +163,7 @@ private:
 					[&](UniformSampler2D& sampler2D) { 
 						ImGui::Text(uniform.name.c_str());
 						ImGui::SameLine();
-						DynamicAssetField(sampler2D.textureAsset, 0); 
+						DynamicAssetField(sampler2D.textureAsset, dynamicFieldId++); 
 					}
 				), uniform.uniform);
 		}

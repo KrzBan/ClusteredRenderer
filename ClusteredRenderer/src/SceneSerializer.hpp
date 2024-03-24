@@ -27,16 +27,18 @@ public:
 		std::ofstream output{ path };
 		cereal::JSONOutputArchive archive{ output };
 		
-		cereal::size_type entityCount = scene.m_Registry.size();
+		const auto entityGroup = scene.m_Registry.group<entt::entity>();
+		
+		cereal::size_type entityCount = entityGroup.size();
 		archive(cereal::make_size_tag(entityCount));
 
-		scene.m_Registry.each([&](auto entityID) {
+		for (auto entityID : entityGroup) {
 			Entity entity{ entityID, &scene };
 			if (!entity)
 				return;
 
 			archive(entity);
-		});
+		}
 	}
 
 };
