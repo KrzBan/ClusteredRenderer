@@ -29,6 +29,24 @@ Renderer::Renderer() {
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 1000, nullptr, GL_DYNAMIC_DRAW);
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+	// Load Postprocess
+	ShaderAsset postprocessShaderAsset{};
+	postprocessShaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
+	postprocessShaderAsset.vertex->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/postprocess.vert"));
+	postprocessShaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
+	postprocessShaderAsset.fragment->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/postprocess.frag"));
+	{
+		auto compileRes = CompileShader(postprocessShaderAsset);
+		if (compileRes.has_value()) {
+			postprocessShaderRenderInfo = std::move(compileRes.value());
+		}
+		else {
+			spdlog::error("[Renderrer::Renderrer: Couldn't compile postprocess shader");
+			spdlog::error("{}", compileRes.error());
+		}
+	}
+	
+
 	// Load Shader for Editor Grid
 	ShaderAsset gridShaderAsset{};
 	gridShaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
@@ -36,15 +54,17 @@ Renderer::Renderer() {
 	gridShaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
 	gridShaderAsset.fragment->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/grid.frag"));
 
-	auto compileRes = CompileShader(gridShaderAsset);
-	if (compileRes.has_value()) {
-		gridShaderRenderInfo = std::move(compileRes.value());
+	{
+		auto compileRes = CompileShader(gridShaderAsset);
+		if (compileRes.has_value()) {
+			gridShaderRenderInfo = std::move(compileRes.value());
+		}
+		else {
+			spdlog::error("[Renderrer::Renderrer: Couldn't compile grid shader");
+			spdlog::error("{}", compileRes.error());
+		}
 	}
-	else {
-		spdlog::error("[Renderrer::Renderrer: Couldn't compile grid shader");
-		spdlog::error("{}", compileRes.error());
-	}
-
+	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
 	glBindTexture(GL_TEXTURE_2D, defaultTextureRenderInfo.textureId);
@@ -54,7 +74,7 @@ Renderer::Renderer() {
 }
 
 void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
-	framebuffer.Bind();
+	hdrFbo.Bind();
 
 	// Clear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -80,8 +100,6 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
-
-	glEnable(GL_FRAMEBUFFER_SRGB); 
 
 	{
 		auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
@@ -126,13 +144,24 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	}
 
 	glUseProgram(gridShaderRenderInfo.programId);
+
 	glBindVertexArray(VAO);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 	glUseProgram(0);
 
-	glDisable(GL_FRAMEBUFFER_SRGB); 
+	// Postprocess
+	postprocessFbo.Bind();
+	glUseProgram(postprocessShaderRenderInfo.programId);
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, hdrFbo.GetColorAttachmentTextureID());
+	const auto loc = glGetUniformLocation(postprocessShaderRenderInfo.programId, "hdrBuffer");
+	glUniform1i(loc, 0);
 
-	framebuffer.Unbind();
+	glDisable(GL_DEPTH_TEST);
+	DrawScreenQuad();
+	glEnable(GL_DEPTH_TEST);
+
+	postprocessFbo.Unbind();
 }
 
 void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot) {
@@ -433,4 +462,31 @@ std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
 	}
 
 	return uniforms;
+}
+
+void Renderer::DrawScreenQuad() {
+	static uint32 quadVAO = 0;
+	static uint32 quadVBO = 0;
+	if (quadVAO == 0) {
+		float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }

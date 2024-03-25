@@ -32,9 +32,11 @@ private:
 	const Texture2DRenderInfo* PrepareTexture2D(Texture2DAsset& texture);
 
 	void BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot);
+	void DrawScreenQuad();
 
 public:
-	Framebuffer framebuffer{ 1, 1, 0 };
+	Framebuffer hdrFbo{ 1, 1, true };
+	Framebuffer postprocessFbo{ 1, 1, false };
 
 	uint32_t uboMatricies;
 	uint32_t ssboLights;
@@ -44,7 +46,8 @@ private:
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;
 	std::unordered_map<kb::UUID, Texture2DRenderInfo> m_Textures;
 
-
 	ShaderRenderInfo gridShaderRenderInfo;
+	ShaderRenderInfo postprocessShaderRenderInfo;
+
 	Texture2DRenderInfo defaultTextureRenderInfo;
 };

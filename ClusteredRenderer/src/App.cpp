@@ -110,14 +110,15 @@ int App::Run() {
 		} 
 
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
-		auto viewportWindowOutput = viewportWindow.Draw(renderer.framebuffer.GetColorAttachmentTextureID());
+		auto viewportWindowOutput = viewportWindow.Draw(renderer.postprocessFbo.GetColorAttachmentTextureID());
 		auto assetManagerWindowOutput = assetManagerWindow.Draw();
 		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs);
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
 		if (viewportWindowOutput.windowWidth != 0 && viewportWindowOutput.windowHeight != 0) {
-			renderer.framebuffer.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			renderer.hdrFbo.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
+			renderer.postprocessFbo.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			if (runtime) {
 				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);

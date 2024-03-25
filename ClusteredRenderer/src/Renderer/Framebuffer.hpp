@@ -4,7 +4,7 @@
 
 class Framebuffer {
 public:
-	Framebuffer(uint32 width, uint32 height, uint32 samples);
+	Framebuffer(uint32 width, uint32 height, bool hdr = false);
 	~Framebuffer() noexcept;
 
 	void Resize(uint32 width, uint32 height);
@@ -24,9 +24,10 @@ private:
 private:
 	uint32 m_Width = 0;
 	uint32 m_Height = 0;
-	uint32 m_Samples = 0;
 
 	uint32 m_FboID = 0;
 	uint32 m_ColTexID = 0;
 	uint32 m_RboID = 0;
+
+	bool m_Hdr = false;
 };
