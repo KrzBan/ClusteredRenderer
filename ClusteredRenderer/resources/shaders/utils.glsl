@@ -1,5 +1,7 @@
 #version 440 core
 
+const float PI = 3.14159265359;
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
