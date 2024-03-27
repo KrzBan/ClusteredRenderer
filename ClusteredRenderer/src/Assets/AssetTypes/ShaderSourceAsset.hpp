@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Core.hpp>
+#include <Utils/FileUtils.hpp>
+
 #include "AssetType.hpp"
 
 enum class ShaderSourceType{
@@ -34,10 +36,7 @@ struct ShaderSourceAsset : public Asset {
 	virtual constexpr AssetType GetType() const override { return AssetType::SHADER_SOURCE; };
 
 	virtual void LoadAsset(const std::filesystem::path& path) override {
-		std::ifstream input(path);
-		const auto size = std::filesystem::file_size(path);
-		source.resize(size);
-		input.read(source.data(), size);
+		source = LoadFileText(path);
 
 		type = FileExtToShaderSourceType(path.extension().string());
 	}

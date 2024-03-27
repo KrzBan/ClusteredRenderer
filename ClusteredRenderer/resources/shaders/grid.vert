@@ -1,5 +1,3 @@
-#version 400 core
-
 layout (std140) uniform Matrices
 {
     mat4 projection;

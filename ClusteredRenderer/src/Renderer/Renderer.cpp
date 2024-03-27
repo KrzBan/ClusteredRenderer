@@ -2,6 +2,7 @@
 
 #include <Components.hpp>
 #include <Entity.hpp>
+#include <Utils/FileUtils.hpp>
 
 struct LightSSBO {
 	glm::vec4 position;
@@ -324,8 +325,13 @@ std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const Shade
 
 	const auto compileAndLink = [&error, &programId](int shaderType, ShaderSourceAsset& shaderSource) {
 		const auto shader = glCreateShader(shaderType);
-		const char* ptr = shaderSource.source.c_str();
-		glShaderSource(shader, 1, &ptr, NULL);
+
+		static const std::string utilsStr = LoadFileText(RESOURCES_DIR "shaders/utils.glsl");
+		const char* ptr[] = {
+			utilsStr.c_str(),
+			shaderSource.source.c_str()
+		};
+		glShaderSource(shader, 2, ptr, NULL);
 		glCompileShader(shader);
 
 		int success;

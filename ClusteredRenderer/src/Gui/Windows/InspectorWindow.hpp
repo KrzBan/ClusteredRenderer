@@ -121,30 +121,56 @@ private:
 	}
 
 	void DrawAssetShader(ShaderAsset& shaderAsset) {
-		ImGui::Text("Vertex"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.vertex, 0);
+		if (ImGui::BeginTable("DrawAssetShaderTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+			ImGui::TableNextColumn();
+			ImGui::Text("Vertex");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.vertex, 0);
 
-		ImGui::Text("Tesselation Control"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.tesselation_control, 1);
+			ImGui::TableNextColumn();
+			ImGui::Text("Tesselation Control");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.tesselation_control, 1);
 
-		ImGui::Text("Tesselation Evaluation"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.tesselation_evaluation, 2);
+			ImGui::TableNextColumn();
+			ImGui::Text("Tesselation Evaluation");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.tesselation_evaluation, 2);
 
-		ImGui::Text("Geometry"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.geometry, 3);
+			ImGui::TableNextColumn();
+			ImGui::Text("Geometry");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.geometry, 3);
 
-		ImGui::Text("Fragment"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.fragment, 4);
+			ImGui::TableNextColumn();
+			ImGui::Text("Fragment");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.fragment, 4);
 
-		ImGui::Text("Compute"); ImGui::SameLine();
-		DynamicAssetField(shaderAsset.compute, 5);
+			ImGui::TableNextColumn();
+			ImGui::Text("Compute");
+			ImGui::TableNextColumn();
+			DynamicAssetField(shaderAsset.compute, 5);
 
-		ImGui::Text("Status:"); ImGui::SameLine();
-		ImGui::TextWrapped(shaderAsset.status.c_str());
+			ImGui::TableNextColumn();
+			ImGui::Separator();
+			ImGui::TableNextColumn();
+			ImGui::Separator();
 
-		if (ImGui::Button("Build")) {
-			Renderer::CompileShaderOneTime(shaderAsset);
+			ImGui::TableNextColumn();
+			ImGui::Text("Status:");
+			ImGui::TableNextColumn();
+			ImGui::TextWrapped(shaderAsset.status.c_str());
+
+			ImGui::TableNextColumn();
+			if (ImGui::Button("Build")) {
+				Renderer::CompileShaderOneTime(shaderAsset);
+			}
+
+			ImGui::EndTable();
 		}
+
+		
 	}
 	void DrawAssetMaterial(MaterialAsset& materialAsset) {
 		ImGui::Text("Shader");ImGui::SameLine();
@@ -378,7 +404,9 @@ void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
 		ImGui::Text("Empty");
 	}
 	else {
-		ImGui::Text(std::format("{}", asset->assetId).c_str());
+		ImGui::Text(
+			AssetManager::IdToPath(asset->assetId).value_or("ERROR").filename().string().c_str()
+		);
 	}
 
 	if (ImGui::BeginPopupContextItem(std::format("Edit Asset##{}", id).c_str())) {
