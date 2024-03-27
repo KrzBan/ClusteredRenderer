@@ -6,6 +6,8 @@
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
+	glm::vec3 tangent;
+	glm::vec3 biTangent;
 	glm::vec2 texCoords;
 };
 
@@ -70,8 +72,11 @@ inline void MeshAsset::ProcessNode(aiNode& node, const aiScene& scene) {
 inline void MeshAsset::ProcessMesh(aiMesh& mesh, const aiScene& scene) {
 	for (unsigned int i = 0; i < mesh.mNumVertices; i++) {
 		Vertex vertex{};
-		vertex.position =	{ mesh.mVertices[i].x,	mesh.mVertices[i].y,	mesh.mVertices[i].z };
-		vertex.normal =		{ mesh.mNormals[i].x,	mesh.mNormals[i].y,		mesh.mNormals[i].z }; 
+		vertex.position		= { mesh.mVertices[i].x,	mesh.mVertices[i].y,	mesh.mVertices[i].z };
+		vertex.normal		= { mesh.mNormals[i].x,		mesh.mNormals[i].y,		mesh.mNormals[i].z }; 
+		vertex.tangent		= { mesh.mTangents[i].x,	mesh.mTangents[i].y,	mesh.mTangents[i].z };
+		vertex.biTangent	= { mesh.mBitangents[i].x,	mesh.mBitangents[i].y,	mesh.mBitangents[i].z };
+
 		if (mesh.mTextureCoords[0]){
 			vertex.texCoords = { mesh.mTextureCoords[0][i].x, mesh.mTextureCoords[0][i].y };
 		}
