@@ -432,6 +432,11 @@ void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
 		ImGui::EndPopup();
 	}
 
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+		if (asset != nullptr)
+			ImGui::SetDragDropPayload("CONTENT_BROWSER_ASSET_ID", &asset->assetId, sizeof(asset->assetId));
+		ImGui::EndDragDropSource();
+	}
 	if (ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
 			IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
@@ -440,5 +445,6 @@ void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
 		}
 		ImGui::EndDragDropTarget();
 	}
+
 	ImGui::PopID();
 }

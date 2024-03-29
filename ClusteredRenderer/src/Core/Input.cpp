@@ -71,6 +71,8 @@ void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int 
 }
 
 void Input::MousePosCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
+	inputData.MouseDeltaX = xpos - inputData.MousePosX;
+	inputData.MouseDeltaY = ypos - inputData.MousePosY;
 	inputData.MousePosX = xpos;
 	inputData.MousePosY = ypos;
 }

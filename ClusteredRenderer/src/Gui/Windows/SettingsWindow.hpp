@@ -19,7 +19,7 @@ public:
 		return SETTINGS_NAME;
 	};
 
-	SettingsWindowOutput Draw(std::chrono::nanoseconds renderTimeNs) {
+	SettingsWindowOutput Draw(std::chrono::nanoseconds renderTimeNs, Renderer& renderer) {
 		SettingsWindowOutput output{};
 		
 		using namespace std::chrono_literals;
@@ -37,6 +37,26 @@ public:
 				ImGui::Text("Frame Time");
 				ImGui::TableNextColumn();
 				ImGui::Text(std::format("{:.2f} ms", Time::DeltaTime()*1000.0f).c_str());
+
+				ImGui::TableNextColumn();
+				ImGui::Separator();
+				ImGui::TableNextColumn();
+				ImGui::Separator();
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Render Grid");
+				ImGui::TableNextColumn();
+				ImGui::Checkbox("##RenderGrid", &renderer.renderGrid);
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Exposure");
+				ImGui::TableNextColumn();
+				ImGui::DragFloat("##Exposure", &renderer.exposure, 0.005f, -1.0f, 10.0f);
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Gamma");
+				ImGui::TableNextColumn();
+				ImGui::DragFloat("##Gamma", &renderer.gamma, 0.005f, -1.0f, 10.0f);
 
 				ImGui::EndTable();
 			}

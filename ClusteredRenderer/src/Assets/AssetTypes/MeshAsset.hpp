@@ -32,7 +32,9 @@ struct MeshAsset : public Asset {
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
 			aiProcess_SortByPType |
-			aiProcess_FlipUVs);
+			aiProcess_FlipUVs |
+			aiProcess_PreTransformVertices |
+			aiProcess_GenSmoothNormals);
 
 		if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
 			spdlog::error("[MeshAsset::LoadAsset(): {}", importer.GetErrorString());

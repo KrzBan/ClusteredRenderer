@@ -38,10 +38,14 @@ public:
 	Framebuffer hdrFbo{ 1, 1, true };
 	Framebuffer postprocessFbo{ 1, 1, false };
 
+	bool renderGrid = true;
+	float exposure = 1.0f;
+	float gamma = 2.2f;
+
+private:
 	uint32_t uboMatricies;
 	uint32_t ssboLights;
 
-private:
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;
 	std::unordered_map<kb::UUID, Texture2DRenderInfo> m_Textures;

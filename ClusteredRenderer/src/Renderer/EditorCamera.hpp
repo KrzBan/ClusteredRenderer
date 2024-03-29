@@ -38,12 +38,15 @@ private:
 	void MousePan(const glm::vec2& delta);
 	void MouseRotate(const glm::vec2& delta);
 	void MouseZoom(float delta);
+	void Move(const glm::vec3& dir, bool quick = false);
 
 	glm::vec3 CalculatePosition() const;
 
 	std::pair<float, float> PanSpeed() const;
 	float RotationSpeed() const;
 	float ZoomSpeed() const;
+	float MoveSpeed() const;
+
 private:
 	float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 1000.0f;
 

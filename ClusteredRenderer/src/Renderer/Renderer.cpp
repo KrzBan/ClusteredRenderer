@@ -98,7 +98,15 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 		
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
+		if (lights.size())
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
+		else {
+			// Absolutely insane, when setting SSBO data to nothing, size = 0, the length of dynamic array is set to max
+			// As a workaround, we have to set buffer's data to something larger than 0, but smaller then sizeof(LightSSBO)
+			int invalid = 0xBADBAD;
+			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &invalid, GL_DYNAMIC_DRAW);
+		}
+			
 		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
@@ -146,24 +154,29 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	}
 	
 	// Render Editor Grid
-	static unsigned int VAO{ 0 };
-	if (VAO == 0) {
-		glGenVertexArrays(1, &VAO);
+	if (renderGrid) {
+		static unsigned int VAO{ 0 };
+		if (VAO == 0) {
+			glGenVertexArrays(1, &VAO);
+		}
+
+		glUseProgram(gridShaderRenderInfo.programId);
+
+		glBindVertexArray(VAO);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+		glUseProgram(0);
 	}
-
-	glUseProgram(gridShaderRenderInfo.programId);
-
-	glBindVertexArray(VAO);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-	glUseProgram(0);
-
+	
 	// Postprocess
 	postprocessFbo.Bind();
 	glUseProgram(postprocessShaderRenderInfo.programId);
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, hdrFbo.GetColorAttachmentTextureID());
-	const auto loc = glGetUniformLocation(postprocessShaderRenderInfo.programId, "hdrBuffer");
-	glUniform1i(loc, 0);
+
+	glUniform1i(glGetUniformLocation(postprocessShaderRenderInfo.programId, "hdrBuffer"), 0);
+
+	glUniform1f(glGetUniformLocation(postprocessShaderRenderInfo.programId, "uGamma"), gamma);
+	glUniform1f(glGetUniformLocation(postprocessShaderRenderInfo.programId, "uExposure"), exposure);
 
 	glDisable(GL_DEPTH_TEST);
 	DrawScreenQuad();

@@ -49,26 +49,49 @@ float EditorCamera::ZoomSpeed() const
 	return speed;
 }
 
-void EditorCamera::OnUpdate(Timestep ts)
-{
-	if (Input::GetKey(KB_LEFT_ALT)) {
-		const glm::vec2& mouse{ Input::GetMousePosX(), Input::GetMousePosY() };
-		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-		m_InitialMousePosition = mouse;
+float EditorCamera::MoveSpeed() const {
+	return 1.0f;
+}
 
+
+void EditorCamera::OnUpdate(Timestep ts) {
+
+	const glm::vec2& delta = glm::vec2{ Input::GetMouseDeltaX(), Input::GetMouseDeltaY() } * 0.003f;
+
+	if (Input::GetKey(MOUSE_BUTTON_RIGHT)) {
+		MouseRotate(delta);
+
+		const auto horizontalMove = Input::GetKey(KB_A) * -1.0f + Input::GetKey(KB_D) * 1.0f;
+		const auto forwardMove = Input::GetKey(KB_S) * -1.0f + Input::GetKey(KB_W) * 1.0f;
+		const auto upMove = Input::GetKey(KB_Q) * -1.0f + Input::GetKey(KB_E) * 1.0f;
+		Move({ horizontalMove, forwardMove, upMove }, Input::GetKey(KB_LEFT_SHIFT));
+	}
+	else if (Input::GetKey(KB_LEFT_ALT)) {
 		if (Input::GetKey(MOUSE_BUTTON_MIDDLE)) {
 			MousePan(delta);
 		}
 		else if (Input::GetKey(MOUSE_BUTTON_LEFT)) {
 			MouseRotate(delta);
 		}
-		else if (Input::GetKey(MOUSE_BUTTON_RIGHT)) {
-			MouseZoom(delta.y);
-		}
+		// else if (Input::GetKey(MOUSE_BUTTON_RIGHT)) {
+		// 	MouseZoom(delta.y);
+		// }
 	}
 
 	UpdateView();
 }
+
+void EditorCamera::Move(const glm::vec3& dir, bool quick) {
+	auto speed = MoveSpeed();
+	if (quick)
+		speed *= 5.0f;
+	const auto norm = glm::normalize(dir) * speed;
+
+	m_FocalPoint += GetRightDirection() * dir.x * speed;
+	m_FocalPoint += GetForwardDirection() * dir.y * speed;
+	m_FocalPoint += GetUpDirection() * dir.z * speed;
+}
+
 
 void EditorCamera::MousePan(const glm::vec2& delta)
 {

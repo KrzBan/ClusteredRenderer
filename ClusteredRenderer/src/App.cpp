@@ -112,7 +112,7 @@ int App::Run() {
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(renderer.postprocessFbo.GetColorAttachmentTextureID());
 		auto assetManagerWindowOutput = assetManagerWindow.Draw();
-		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs);
+		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs, renderer);
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
