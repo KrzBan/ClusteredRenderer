@@ -49,7 +49,7 @@ constexpr AssetType ExtensionToAssetType(const std::string& ext) {
 	if (std::set<std::string>{ ".png", ".jpg", ".jpeg" }.contains(ext)) {
 		return AssetType::TEXTURE_2D;
 	}
-	if (std::set<std::string>{ ".obj", ".fbx" }.contains(ext)) {
+	if (std::set<std::string>{ ".obj", ".fbx", ".gltf", ".usda" }.contains(ext)) {
 		return AssetType::MESH;
 	}
 	if (std::set<std::string>{ ".vert", ".tesc", ".tese", ".geom", ".frag", ".comp" }.contains(ext)) {
