@@ -136,7 +136,6 @@ void load(Archive& archive, MeshRendererComponent& meshRenderer) {
 			for (const auto& submesh : meshRenderer.mesh->submeshes) {
 				if (submesh.name == name) {
 					meshRenderer.materials[submesh.submeshId] = AssetManager::GetAsset<MaterialAsset>(materialId);
-					break;
 				}
 			}
 		}
