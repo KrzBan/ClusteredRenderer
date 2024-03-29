@@ -9,6 +9,14 @@ CommonMetaData CommonMetaData::ReadMetaFile(const std::filesystem::path& path) {
 
 	return meta;
 }
+
+void CommonMetaData::WriteMetaFile(const std::filesystem::path& path, const CommonMetaData& metaData) {
+	std::ofstream f(path);
+	cereal::JSONOutputArchive oarchive(f);
+
+	WriteMetaFile(oarchive, metaData);
+}
+
 void CommonMetaData::WriteMetaFile(cereal::JSONOutputArchive& oarchive, const CommonMetaData& metaData) {
 	oarchive(cereal::make_nvp("meta", metaData));
 }

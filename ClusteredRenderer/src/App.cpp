@@ -82,10 +82,10 @@ int App::Run() {
 			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
 		}
 
-		while (glClientWaitSync(fence, 0, 0) != GL_ALREADY_SIGNALED) {
-			// Draw call finished
-		}
-
+		// while (glClientWaitSync(fence, 0, 0) != GL_ALREADY_SIGNALED) {
+		// 	// Draw call finished
+		// }
+		
 		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
 		renderTimeNs = renderTsEnd - renderTsBegin;
 

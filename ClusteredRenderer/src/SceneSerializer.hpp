@@ -108,7 +108,19 @@ void serialize(Archive& archive, NativeScriptComponent& nativeScript) {
 template <class Archive>
 void save(Archive& archive, const MeshRendererComponent& meshRenderer) {
 	archive(cereal::make_nvp("meshID", meshRenderer.mesh ? meshRenderer.mesh->assetId : kb::UUID{ 0 }));
-	archive(cereal::make_nvp("materialID", meshRenderer.material ? meshRenderer.material->assetId : kb::UUID{ 0 }));
+	std::unordered_map<std::string, kb::UUID> materialMap;
+	if (meshRenderer.mesh != nullptr) {
+		for (const auto& submesh : meshRenderer.mesh->submeshes) {
+			if (not meshRenderer.materials.contains(submesh.submeshId))
+				continue;
+			const auto& materialPtr = meshRenderer.materials.at(submesh.submeshId);
+			if (materialPtr != nullptr) {
+				materialMap[submesh.name] = materialPtr->assetId;
+			}
+		}
+	}
+	
+	archive(cereal::make_nvp("materials", materialMap));
 }
 template <class Archive>
 void load(Archive& archive, MeshRendererComponent& meshRenderer) {
@@ -117,10 +129,17 @@ void load(Archive& archive, MeshRendererComponent& meshRenderer) {
 		archive(cereal::make_nvp("meshID", meshAssetID));
 		meshRenderer.mesh = AssetManager::GetAsset<MeshAsset>(meshAssetID);
 	}
-	{
-		kb::UUID materialAssetID;
-		archive(cereal::make_nvp("materialID", materialAssetID));
-		meshRenderer.material = AssetManager::GetAsset<MaterialAsset>(materialAssetID);
+	if(meshRenderer.mesh != nullptr){
+		std::unordered_map<std::string, kb::UUID> materialMap;
+		archive(cereal::make_nvp("materials", materialMap));
+		for (const auto& [name, materialId] : materialMap) {
+			for (const auto& submesh : meshRenderer.mesh->submeshes) {
+				if (submesh.name == name) {
+					meshRenderer.materials[submesh.submeshId] = AssetManager::GetAsset<MaterialAsset>(materialId);
+					break;
+				}
+			}
+		}
 	}
 }
 template <class Archive>

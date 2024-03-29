@@ -6,6 +6,7 @@ struct MeshRenderInfo{
 	GLuint vao = 0;
 	GLuint vbo = 0;
 	GLuint ebo = 0;
+	uint32 nIndicies = 0;
 
 	MeshRenderInfo() = default;
 
@@ -20,9 +21,11 @@ struct MeshRenderInfo{
 		vao = other.vao;
 		vbo = other.vbo;
 		ebo = other.ebo;
+		nIndicies = other.nIndicies;
 		other.vao = 0;
 		other.vbo = 0;
 		other.ebo = 0;
+		other.nIndicies = 0;
 	}
 
 	MeshRenderInfo(MeshRenderInfo&& other) noexcept {
@@ -48,5 +51,6 @@ private:
 			glDeleteBuffers(1, &ebo);
 			ebo = 0;
 		}
+		nIndicies = 0;
 	}
 };

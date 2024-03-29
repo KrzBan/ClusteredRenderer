@@ -27,7 +27,7 @@ public:
 private:
 	static std::expected<ShaderRenderInfo, std::string> CompileShader(const ShaderAsset& shader);
 
-	const MeshRenderInfo*	PrepareMesh(MeshAsset& mesh);
+	std::unordered_map<kb::UUID, const MeshRenderInfo*> PrepareMesh(MeshAsset& mesh);
 	const ShaderRenderInfo* PrepareShader(ShaderAsset& shader);
 	const Texture2DRenderInfo* PrepareTexture2D(Texture2DAsset& texture);
 

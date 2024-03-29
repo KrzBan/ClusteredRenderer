@@ -11,13 +11,19 @@ struct Vertex {
 	glm::vec2 texCoords;
 };
 
+struct Submesh {
+	std::string name;
+	kb::UUID submeshId;
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+};
+
 struct MeshAsset : public Asset {
 	MeshAsset() = default;
 	virtual constexpr AssetType GetType() const override { return AssetType::MESH; };
 
 	virtual void LoadAsset(const std::filesystem::path& path) override {
-		vertices.clear();
-		indices.clear();
+		submeshes.clear();
 
 		Assimp::Importer importer;
 
@@ -48,8 +54,7 @@ private:
 	void ProcessMesh(aiMesh& mesh, const aiScene& scene);
 
 public:
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
+	std::vector<Submesh> submeshes;
 };
 
 template <>
@@ -70,6 +75,9 @@ inline void MeshAsset::ProcessNode(aiNode& node, const aiScene& scene) {
 }
 
 inline void MeshAsset::ProcessMesh(aiMesh& mesh, const aiScene& scene) {
+	Submesh submesh;
+	submesh.name = mesh.mName.C_Str();
+	submesh.vertices.reserve(mesh.mNumVertices);
 	for (unsigned int i = 0; i < mesh.mNumVertices; i++) {
 		Vertex vertex{};
 		vertex.position		= { mesh.mVertices[i].x,	mesh.mVertices[i].y,	mesh.mVertices[i].z };
@@ -83,17 +91,20 @@ inline void MeshAsset::ProcessMesh(aiMesh& mesh, const aiScene& scene) {
 		else {
 			vertex.texCoords = glm::vec2(0.0f, 0.0f); 
 		}
-		vertices.push_back(vertex);
+		submesh.vertices.push_back(vertex);
 	}
-	// process indices
+	
+	submesh.vertices.reserve(mesh.mNumFaces * 3);	// Minimal space needed, potential resizes
 	for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
 		aiFace face = mesh.mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
-			indices.push_back(face.mIndices[j]);
+			submesh.indices.push_back(face.mIndices[j]);
 	}  
 
 	// process material
 	if (mesh.mMaterialIndex >= 0) {
 		
 	}
+
+	submeshes.push_back(std::move(submesh));
 }

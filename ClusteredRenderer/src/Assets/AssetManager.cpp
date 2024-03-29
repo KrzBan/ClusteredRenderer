@@ -343,8 +343,11 @@ std::optional<CommonMetaData> AssetManager::FetchFileCommonMetaData(std::filesys
 		return {};
 	
 	CommonMetaData loadedMetaData = CommonMetaData::ReadMetaFile(metaPath);
-	if (loadedMetaData.lastModified != std::filesystem::last_write_time(path)) {
+	const auto fileLastWriteTime = std::filesystem::last_write_time(path);
+	if (loadedMetaData.lastModified != fileLastWriteTime) {
 		spdlog::error("LastModified timestamp mismatch when loading existing .meta file for {}", path);
+		loadedMetaData.lastModified = fileLastWriteTime;
+		CommonMetaData::WriteMetaFile(metaPath, loadedMetaData);
 	}
 
 	return loadedMetaData;

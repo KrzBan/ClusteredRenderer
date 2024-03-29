@@ -110,8 +110,14 @@ private:
 		ImGui::InputTextMultiline("##Contents", &textAsset.text);
 	}
 	void DrawAssetMesh(MeshAsset& meshAsset) {
-		ImGui::Text(std::format("Vertices: {}", meshAsset.vertices.size()).c_str());
-		ImGui::Text(std::format("Indices: {}", meshAsset.indices.size()).c_str());
+		ImGui::Text(std::format("Submeshes: {}", meshAsset.submeshes.size()).c_str());
+
+		for (const auto& submesh : meshAsset.submeshes) {
+			ImGui::Text(std::format("Name: {}", submesh.name).c_str());
+			ImGui::Text(std::format("Vertices: {}", submesh.vertices.size()).c_str());
+			ImGui::Text(std::format("Indices: {}", submesh.indices.size()).c_str());
+		}
+		
 	}
 	void DrawAssetShaderSource(ShaderSourceAsset& shaderSourceAsset) {
 		ImGui::Text(std::format("Type: {}", magic_enum::enum_name(shaderSourceAsset.type)).c_str());
@@ -329,9 +335,19 @@ private:
 			ImGui::Text("Mesh");
 			ImGui::SameLine();
 			DynamicAssetField(component.mesh, 0);
-			ImGui::Text("Material");
-			ImGui::SameLine();
-			DynamicAssetField(component.material, 1);
+			ImGui::Text("Materials");
+
+			if (component.mesh == nullptr) {
+				return;
+			}
+
+			int i = 1;
+			for (auto& submesh : component.mesh->submeshes) {
+				ImGui::Text(submesh.name.c_str());
+				ImGui::SameLine();
+				DynamicAssetField(component.materials[submesh.submeshId], i++);
+			}
+			
 		});
 
 		DrawComponent<LightComponent>("Light", entity, [&](LightComponent& light) {
