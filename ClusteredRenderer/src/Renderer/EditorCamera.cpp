@@ -50,9 +50,8 @@ float EditorCamera::ZoomSpeed() const
 }
 
 float EditorCamera::MoveSpeed() const {
-	return 1.0f;
+	return 0.2f;
 }
-
 
 void EditorCamera::OnUpdate(Timestep ts) {
 

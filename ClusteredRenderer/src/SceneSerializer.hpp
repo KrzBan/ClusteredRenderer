@@ -108,7 +108,7 @@ void serialize(Archive& archive, NativeScriptComponent& nativeScript) {
 template <class Archive>
 void save(Archive& archive, const MeshRendererComponent& meshRenderer) {
 	archive(cereal::make_nvp("meshID", meshRenderer.mesh ? meshRenderer.mesh->assetId : kb::UUID{ 0 }));
-	std::unordered_map<std::string, kb::UUID> materialMap;
+	std::map<std::string, kb::UUID> materialMap;
 	if (meshRenderer.mesh != nullptr) {
 		for (const auto& submesh : meshRenderer.mesh->submeshes) {
 			if (not meshRenderer.materials.contains(submesh.submeshId))
@@ -130,7 +130,7 @@ void load(Archive& archive, MeshRendererComponent& meshRenderer) {
 		meshRenderer.mesh = AssetManager::GetAsset<MeshAsset>(meshAssetID);
 	}
 	if(meshRenderer.mesh != nullptr){
-		std::unordered_map<std::string, kb::UUID> materialMap;
+		std::map<std::string, kb::UUID> materialMap;
 		archive(cereal::make_nvp("materials", materialMap));
 		for (const auto& [name, materialId] : materialMap) {
 			for (const auto& submesh : meshRenderer.mesh->submeshes) {

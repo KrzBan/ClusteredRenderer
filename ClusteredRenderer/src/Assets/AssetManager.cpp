@@ -48,6 +48,11 @@ AssetType AssetManager::GetAssetType(kb::UUID id) {
 void AssetManager::Clear() {
 	s_AssetManagerData.unmanagedAssets.clear();
 }
+void AssetManager::SaveAll() {
+	for (const auto& [assetId, value] : s_AssetManagerData.assets) {
+		SaveAsset(assetId);
+	}
+}
 
 void AssetManager::InsertIdPath(const kb::UUID id, const std::filesystem::path& path) {
 	if (s_AssetManagerData.idToPath.contains(id))

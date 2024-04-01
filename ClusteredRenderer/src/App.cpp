@@ -137,6 +137,7 @@ int App::Run() {
 		AssetManager::HandleFileChanges(listener->FlushQueue());
 	}
 
+	AssetManager::SaveAll();
 	AssetManager::Clear();
 
 	return EXIT_SUCCESS;

@@ -22,6 +22,7 @@ public:
 	static std::unordered_set<std::filesystem::path>& GetUnmanagedAssets();
 
 	static void Clear();
+	static void SaveAll();
 	static bool AssetManaged(kb::UUID id);
 
 	template <typename T>

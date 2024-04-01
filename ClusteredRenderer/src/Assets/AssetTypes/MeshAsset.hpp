@@ -32,7 +32,7 @@ struct MeshAsset : public Asset {
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
 			aiProcess_SortByPType |
-			aiProcess_FlipUVs |
+				/* aiProcess_FlipUVs | */ // We Flip by default when loading texture
 			aiProcess_PreTransformVertices |
 			aiProcess_GenSmoothNormals);
 

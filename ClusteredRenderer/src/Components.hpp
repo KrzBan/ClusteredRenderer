@@ -46,7 +46,7 @@ struct TransformComponent {
 struct MeshRendererComponent {
 
 	Shared<MeshAsset> mesh;
-	std::unordered_map<kb::UUID, Shared<MaterialAsset>> materials;
+	std::map<kb::UUID, Shared<MaterialAsset>> materials;
 
 	MeshRendererComponent() = default;
 	MeshRendererComponent(const MeshRendererComponent&) = default;

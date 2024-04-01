@@ -341,8 +341,15 @@ private:
 				return;
 			}
 
+			std::vector<std::size_t> indexes(component.mesh->submeshes.size());
+			std::iota(indexes.begin(), indexes.end(), std::size_t{ 0 });
+			std::ranges::sort(indexes, std::less<>{}, 
+				[&component](std::size_t i) -> std::string& { return component.mesh->submeshes[i].name; }
+			);
+
 			int i = 1;
-			for (auto& submesh : component.mesh->submeshes) {
+			for (auto& submeshId : indexes) {
+				const auto& submesh = component.mesh->submeshes[submeshId];
 				ImGui::Text(submesh.name.c_str());
 				ImGui::SameLine();
 				DynamicAssetField(component.materials[submesh.submeshId], i++);
