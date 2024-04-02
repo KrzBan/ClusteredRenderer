@@ -6,6 +6,7 @@
 #include "SceneCamera.hpp"
 
 #include <Assets/Assets.hpp>
+#include <Scriptable.hpp>
 
 struct IDComponent {
 	kb::UUID ID;
@@ -64,16 +65,24 @@ struct CameraComponent {
 class Scriptable;
 
 struct NativeScriptComponent {
-	Scriptable* Instance = nullptr;
+	Unique<Scriptable> Instance = nullptr;
 
-	Scriptable* (*InstantiateScript)();
-	void (*DestroyScript)(NativeScriptComponent*);
+	NativeScriptComponent() = default;
+	NativeScriptComponent(const NativeScriptComponent& other) {
+		if (other.Instance) {
+			Instance = other.Instance->Clone();
+		}
+	}
+	NativeScriptComponent(NativeScriptComponent&&) = default;
+
+	NativeScriptComponent& operator=(const NativeScriptComponent&) = delete;
+	NativeScriptComponent& operator=(NativeScriptComponent&&) = default;
+	~NativeScriptComponent() = default;
 
 	template<typename T>
 	void Bind()
 	{
-		InstantiateScript = []() { return static_cast<Scriptable*>(new T()); };
-		DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+		Instance = std::make_unique<T>();
 	}
 };
 

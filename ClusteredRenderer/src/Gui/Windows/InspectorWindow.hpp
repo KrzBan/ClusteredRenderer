@@ -9,6 +9,9 @@
 #include "GuiWindow.hpp"
 #include <Gui/ControlUtils.hpp>
 
+#include <Components.hpp>
+#include <Scripts/Scripts.hpp>
+
 struct InspectorWindowOutput {
 	
 };
@@ -258,6 +261,7 @@ private:
 			AddComponentEntry<MeshRendererComponent>("MeshRenderer", entity);
 			AddComponentEntry<LightComponent>("Light", entity);
 
+			AddScriptComponentEntry<LightSpawnerScript>("Light Spawner Script", entity);
 			// DisplayAddComponentEntry<ScriptComponent>("Script");
 			// DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			// DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
@@ -367,6 +371,12 @@ private:
 			ControlUtils::DrawFloat("Range", light.range);
 		});
 
+		DrawComponent<NativeScriptComponent>("Script", entity, [&](NativeScriptComponent& nsc) {
+			if (nsc.Instance) {
+				nsc.Instance->OnGui();
+			}
+		});
+
 	}
 
 	template <typename T, typename UIFunction>
@@ -413,6 +423,15 @@ private:
 		if (not entity.HasComponent<T>()) {
 			if (ImGui::MenuItem(entryName.c_str())) {
 				entity.AddComponent<T>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+	}
+	template <typename Script>
+	void AddScriptComponentEntry(const std::string& entryName, Entity entity) {
+		if (not entity.HasComponent<NativeScriptComponent>()) {
+			if (ImGui::MenuItem(entryName.c_str())) {
+				entity.AddComponent<NativeScriptComponent>().Bind<Script>();
 				ImGui::CloseCurrentPopup();
 			}
 		}

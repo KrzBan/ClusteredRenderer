@@ -3,12 +3,13 @@
 #include <Core.hpp>
 #include <SceneSerializer.hpp>
 
+#include <Utils/AppState.hpp>
 #include "Windows/GuiWindow.hpp"
 
 class MenuBar {
 	
 public:
-	void Draw(const std::vector<GuiWindow*>& windows, Scene& scene) {
+	void Draw(const std::vector<GuiWindow*>& windows, Scene& scene, AppState& appState) {
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
 		float height = ImGui::GetFrameHeight();
 
@@ -67,9 +68,35 @@ public:
 				if (off > 0.0f)
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 
-				ImGui::Button(ICON_FA_PLAY);
-				ImGui::Button(ICON_FA_PAUSE);
-				ImGui::Button(ICON_FA_STOP);
+
+				const auto isRuntime = appState.isRuntime();
+				if (isRuntime)
+					ImGui::BeginDisabled();
+				if (ImGui::Button(ICON_FA_PLAY)) {
+					appState.Play();
+				}
+				if (isRuntime)
+					ImGui::EndDisabled();
+				
+				const auto isEditor = appState.isEditor();
+				const auto isPaused = appState.isPaused();
+
+				if (isEditor) 
+					ImGui::BeginDisabled();
+				if(ImGui::Button(isPaused ? ICON_FA_CIRCLE_PAUSE : ICON_FA_PAUSE)) {
+					appState.Pause();
+				}
+				if (isEditor)
+					ImGui::EndDisabled();
+
+				if (isEditor)
+					ImGui::BeginDisabled();
+				if(ImGui::Button(ICON_FA_STOP)) {
+					appState.Stop();
+				}
+				if (isEditor)
+					ImGui::EndDisabled();
+
 				ImGui::EndMenuBar();
 			}
 		}

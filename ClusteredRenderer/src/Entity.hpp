@@ -2,7 +2,6 @@
 
 #include <Core.hpp>
 
-#include "Components.hpp"
 #include "Scene.hpp"
 #include "UUID.hpp"
 
@@ -59,8 +58,8 @@ public:
 	operator entt::entity() const { return m_EntityHandle; }
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
-	kb::UUID GetUUID() { return GetComponent<IDComponent>().ID; }
-	const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
+	kb::UUID GetUUID();
+	const std::string& GetName();
 
 	bool operator==(const Entity& other) const
 	{

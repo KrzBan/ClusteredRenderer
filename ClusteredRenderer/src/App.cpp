@@ -14,6 +14,8 @@
 
 #include "Renderer/EditorCamera.hpp"
 
+#include <Utils/AppState.hpp>
+
 int App::Run() {
 	spdlog::set_level(spdlog::level::trace);
 	Window window(1920, 1080, config::windowTitle, config::openGLVersion);
@@ -21,6 +23,8 @@ int App::Run() {
 	Input::Init(window.glfwWindow());
 
 	Scene scene{};
+	Scene sceneRevert{};
+
 	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
 
 	AssetManager::Init(ASSETS_DIR);
@@ -45,7 +49,7 @@ int App::Run() {
 	Renderer renderer{};
 	GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
-	bool runtime = false;
+	AppState appState = AppStateEnum::EDITOR;
 	Timestep physicsAccumulator{ 0.0 };
 	std::chrono::nanoseconds renderTimeNs{};
 
@@ -56,14 +60,26 @@ int App::Run() {
 		Input::ClearKeys();
 		glfwPollEvents();
 		
-		physicsAccumulator += Time::DeltaTime();
-		while (physicsAccumulator >= Time::FixedDeltaTime()) {
-			scene.OnUpdateSimulation(Time::FixedDeltaTime());
-			physicsAccumulator -= Time::FixedDeltaTime();
+		if (appState.SwitchedToGameConsume()) {
+			sceneRevert = scene;
+			scene.OnSimulationStart();
+			scene.OnRuntimeStart();
+		}
+		if (appState.SwitchedToEditorConsume()) {
+			scene = sceneRevert;
+			sceneRevert = {};
+			scene.OnSimulationStop();
+			scene.OnRuntimeStop();
 		}
 
 		// Update Logic
-		if (runtime) {
+		if (appState.isGame()) {
+			physicsAccumulator += Time::DeltaTime();
+			while (physicsAccumulator >= Time::FixedDeltaTime()) {
+				scene.OnUpdateSimulation(Time::FixedDeltaTime());
+				physicsAccumulator -= Time::FixedDeltaTime();
+			}
+
 			scene.OnUpdateRuntime(Time::DeltaTime());
 		} else {
 			scene.OnUpdateEditor(Time::DeltaTime());
@@ -72,11 +88,16 @@ int App::Run() {
 		std::chrono::steady_clock::time_point renderTsBegin = std::chrono::steady_clock::now();
 
 		// Render
-		if (runtime) {
+		if (appState.isRuntime()) {
 			auto cameraEntity = scene.GetPrimaryCameraEntity();
-			renderer.RenderScene(scene, 
-				cameraEntity.GetComponent<CameraComponent>().Camera, 
-				cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			if (cameraEntity.has_value()) {
+				renderer.RenderScene(scene,
+					cameraEntity.value().GetComponent<CameraComponent>().Camera,
+					cameraEntity.value().GetComponent<TransformComponent>().GetTransform());
+			}
+			else {
+				renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
+			}
 		}
 		else {
 			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
@@ -93,7 +114,7 @@ int App::Run() {
 		gui.NewFrame(); 
 
 		// Draw Editor Windows
-		menuBar.Draw(pWindows, scene);
+		menuBar.Draw(pWindows, scene, appState);
 		auto contentBrowserWindowOutput = contentBrowserWindow.Draw();
 		if (contentBrowserWindowOutput.selectionChanged)
 			sceneWindow.ResetSelection();
@@ -120,13 +141,12 @@ int App::Run() {
 			renderer.hdrFbo.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			renderer.postprocessFbo.Resize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			editorCamera.SetViewportSize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
-			if (runtime) {
+			if (appState.isRuntime()) {
 				scene.OnViewportResize(viewportWindowOutput.windowWidth, viewportWindowOutput.windowHeight);
 			}
 		}
 
-		if (viewportWindowOutput.isWindowFocused && runtime == false) {
-			// Update editor camera
+		if (viewportWindowOutput.isWindowFocused && appState.isEditor()) {
 			editorCamera.OnUpdate(Time::DeltaTime());
 		}
 

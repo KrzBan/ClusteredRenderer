@@ -122,15 +122,18 @@ void Scene::DestroyEntity(Entity entity)
 
 void Scene::OnRuntimeStart()
 {
-	m_IsRunning = true;
-
 	OnPhysics2DStart();
+	
+	m_Registry.view<NativeScriptComponent>().each(
+		[=](auto entity, auto& nsc) {
+			if (nsc.Instance) {
+				nsc.Instance->OnStart();
+			}
+		});
 }
 
 void Scene::OnRuntimeStop()
 {
-	m_IsRunning = false;
-
 	OnPhysics2DStop();
 }
 
@@ -146,54 +149,43 @@ void Scene::OnSimulationStop()
 
 void Scene::OnUpdateRuntime(Timestep ts)
 {
-	if (!m_IsPaused || m_StepFrames-- > 0)
+	// Update scripts
 	{
-		// Update scripts
-		{
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-				{
-					// TODO: Move to Scene::OnScenePlay
-					if (!nsc.Instance)
-					{
-						nsc.Instance = nsc.InstantiateScript();
-						nsc.Instance->m_Entity = Entity{ entity, this };
-						nsc.Instance->OnCreate();
-					}
-
+		m_Registry.view<NativeScriptComponent>().each(
+			[=](auto entity, auto& nsc){
+				if (nsc.Instance) {
 					nsc.Instance->OnUpdate(ts);
-				});
-		}
+				}
+			});
 	}
 }
 
 void Scene::OnUpdateSimulation(Timestep ts)
 {
-	if (!m_IsPaused || m_StepFrames-- > 0)
+	// Physics
+	/*
 	{
-		// Physics
-		/*
+		const int32_t velocityIterations = 6;
+		const int32_t positionIterations = 2;
+		// m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+
+		// Retrieve transform from Box2D
+		auto view = m_Registry.view<Rigidbody2DComponent>();
+		for (auto e : view)
 		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			// m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+			Entity entity = { e, this };
+			auto& transform = entity.GetComponent<TransformComponent>();
+			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
-			// Retrieve transform from Box2D
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto e : view)
-			{
-				Entity entity = { e, this };
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-				b2Body* body = (b2Body*)rb2d.RuntimeBody;
-				const auto& position = body->GetPosition();
-				transform.Translation.x = position.x;
-				transform.Translation.y = position.y;
-				transform.Rotation.z = body->GetAngle();
-			}
+			b2Body* body = (b2Body*)rb2d.RuntimeBody;
+			const auto& position = body->GetPosition();
+			transform.Translation.x = position.x;
+			transform.Translation.y = position.y;
+			transform.Rotation.z = body->GetAngle();
 		}
-		*/
 	}
+	*/
+
 }
 
 void Scene::OnUpdateEditor(Timestep ts)
@@ -219,7 +211,7 @@ void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	}
 }
 
-Entity Scene::GetPrimaryCameraEntity()
+std::optional<Entity> Scene::GetPrimaryCameraEntity()
 {
 	auto view = m_Registry.view<CameraComponent>();
 	for (auto entity : view)
@@ -229,11 +221,6 @@ Entity Scene::GetPrimaryCameraEntity()
 			return Entity{ entity, this };
 	}
 	return {};
-}
-
-void Scene::Step(int frames)
-{
-	m_StepFrames = frames;
 }
 
 Entity Scene::DuplicateEntity(Entity entity)
@@ -330,17 +317,6 @@ void Scene::OnPhysics2DStop()
 {
 	// delete m_PhysicsWorld;
 	// m_PhysicsWorld = nullptr;
-}
-
-void Scene::RenderSceneEditor(const EditorCamera& camera) {
-	RenderScene(camera, glm::vec3{});
-}
-void Scene::RenderSceneRuntime() {
-	auto mainCameraEntity = GetPrimaryCameraEntity();
-	auto mainCameraTransform = mainCameraEntity.GetComponent<TransformComponent>();
-	auto mainCamera = mainCameraEntity.GetComponent<CameraComponent>();
-
-	RenderScene(mainCamera.Camera, mainCameraTransform.Translation);
 }
 
 void Scene::RenderScene(const Camera& camera, const glm::vec3& position) {

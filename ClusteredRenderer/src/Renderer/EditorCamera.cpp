@@ -55,7 +55,7 @@ float EditorCamera::MoveSpeed() const {
 
 void EditorCamera::OnUpdate(Timestep ts) {
 
-	const glm::vec2& delta = glm::vec2{ Input::GetMouseDeltaX(), Input::GetMouseDeltaY() } * 0.003f;
+	const glm::vec2& delta = glm::vec2{ Input::GetMouseDeltaX(), Input::GetMouseDeltaY() } * ts;
 
 	if (Input::GetKey(MOUSE_BUTTON_RIGHT)) {
 		MouseRotate(delta);
