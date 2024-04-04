@@ -58,7 +58,15 @@ public:
 				ImGui::TableNextColumn();
 				ImGui::DragFloat("##Gamma", &renderer.gamma, 0.005f, -1.0f, 10.0f);
 
+				ImGui::TableNextColumn();
+				ImGui::Text("Skybox HDR");
+				ImGui::TableNextColumn();
+				if (DynamicAssetField(renderer.hdrSkybox, 0)) {
+					renderer.HdrToCubemaps();
+				}
+
 				ImGui::EndTable();
+
 			}
 		}
 		ImGui::End();

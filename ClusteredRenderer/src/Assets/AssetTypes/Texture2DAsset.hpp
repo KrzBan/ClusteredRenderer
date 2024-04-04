@@ -22,24 +22,22 @@ struct Texture2DAsset : public Asset {
 
 		m_DataFormat = 0;
 		m_InternalFormat = 0;
+		m_DataType = GL_UNSIGNED_BYTE;
+
 		m_Data.clear();
-		//glGenTextures(1, &m_Handle);
-		//glBindTexture(GL_TEXTURE_2D, m_Handle);
-		//
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		const auto hdr = path.extension() == ".hdr";
 
 		stbi_set_flip_vertically_on_load(flipVertically);
 		int width = 0, height = 0, bpp = 0;
-		stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &bpp, 0);
+		stbi_uc* data = hdr == false ? stbi_load(path.string().c_str(), &width, &height, &bpp, 0)
+									 : reinterpret_cast<stbi_uc*>(stbi_loadf(path.string().c_str(), &width, &height, &bpp, 0));
 		if (data == nullptr) {
 			spdlog::error("[Texture2DAsset::LoadAsset] Couldn't load texture: {}", path);
 			return;
 		}
 
-		m_Data.assign(data, data + (width * height * bpp));
+		m_Data.assign(data, data + (width * height * bpp * (hdr ? sizeof(float) : sizeof(stbi_uc)) ));
 		stbi_image_free(data);
 
 		GLenum internalFormat = 0, dataFormat = 0;
@@ -63,6 +61,12 @@ struct Texture2DAsset : public Asset {
 		}
 		m_DataFormat = dataFormat;
 		m_InternalFormat = internalFormat;
+
+		if (hdr) {
+			m_DataFormat = GL_RGB;
+			m_InternalFormat = GL_RGB16F;
+			m_DataType = GL_FLOAT;
+		}
 
 		m_BPP = bpp;
 		m_Width = width;
@@ -105,6 +109,8 @@ private:
 
 	uint32 m_DataFormat = 0;
 	uint32 m_InternalFormat = 0;
+	uint32 m_DataType = GL_UNSIGNED_BYTE;
+
 	std::vector<stbi_uc> m_Data;
 
 public:

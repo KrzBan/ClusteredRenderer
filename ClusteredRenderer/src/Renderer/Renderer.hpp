@@ -33,10 +33,23 @@ private:
 
 	void BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot);
 	void DrawScreenQuad();
+	void DrawCube();
+
+	void UpdateLights(Scene& scene);
+	void RenderMeshes(Scene& scene);
+	void RenderGrid();
+	void Postprocess();
+	void RenderSkybox();
+
+public:
+	void HdrToCubemaps();
+
 
 public:
 	Framebuffer hdrFbo{ 1, 1, true };
 	Framebuffer postprocessFbo{ 1, 1, false };
+
+	Shared<Texture2DAsset> hdrSkybox;
 
 	bool renderGrid = true;
 	float exposure = 1.0f;
@@ -52,6 +65,11 @@ private:
 
 	ShaderRenderInfo gridShaderRenderInfo;
 	ShaderRenderInfo postprocessShaderRenderInfo;
+	ShaderRenderInfo hdrToCubemapsRenderInfo;
+	ShaderRenderInfo skyboxShaderRenderInfo;
 
+	uint32 skyboxFbo = 0;
+	uint32 skyboxRbo = 0;
+	uint32 cubemapId = 0;
 	Texture2DRenderInfo defaultTextureRenderInfo;
 };

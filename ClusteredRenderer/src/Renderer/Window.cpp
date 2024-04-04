@@ -101,6 +101,10 @@ void PrintVersionInfo() {
     int maxShaderStorageBlockSize = 0;
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &maxShaderStorageBlockSize);
 	spdlog::info("Max Shader Storage Block Size: {}", maxShaderStorageBlockSize);
+
+    int maxTextureImageUnits = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
+	spdlog::info("Max Texture Image Units: {}", maxTextureImageUnits);
 	// int maxEvalOrder = 0;
     //glGetIntegerv(GL_MAX_EVAL_ORDER, &maxEvalOrder);
     //spdlog::info("Max eval order: {}", maxEvalOrder);

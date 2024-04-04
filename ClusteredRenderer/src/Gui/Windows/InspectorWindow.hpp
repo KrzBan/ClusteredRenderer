@@ -47,8 +47,6 @@ public:
 	}
 
 private:
-	template <typename T>
-	void DynamicAssetField(Shared<T>& asset, int id);
 
 	void DrawAsset(const std::filesystem::path& filename) {
 		ImGui::Text(filename.string().c_str());
@@ -437,40 +435,3 @@ private:
 		}
 	}
 };
-
-template <typename T>
-void InspectorWindow::DynamicAssetField(Shared<T>& asset, int id) {
-	ImGui::PushID(id);
-
-	if (asset == nullptr) {
-		ImGui::Text("Empty");
-	}
-	else {
-		ImGui::Text(
-			AssetManager::IdToPath(asset->assetId).value_or("ERROR").filename().string().c_str()
-		);
-	}
-
-	if (ImGui::BeginPopupContextItem(std::format("Edit Asset##{}", id).c_str())) {
-		if (ImGui::MenuItem("Clear")) {
-			asset = nullptr;
-		}
-		ImGui::EndPopup();
-	}
-
-	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-		if (asset != nullptr)
-			ImGui::SetDragDropPayload("CONTENT_BROWSER_ASSET_ID", &asset->assetId, sizeof(asset->assetId));
-		ImGui::EndDragDropSource();
-	}
-	if (ImGui::BeginDragDropTarget()) {
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ASSET_ID")) {
-			IM_ASSERT(payload->DataSize == sizeof(kb::UUID));
-			kb::UUID id = *(const kb::UUID*)payload->Data;
-			asset = AssetManager::GetAsset<T>(id);
-		}
-		ImGui::EndDragDropTarget();
-	}
-
-	ImGui::PopID();
-}

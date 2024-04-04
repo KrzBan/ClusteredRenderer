@@ -9,11 +9,27 @@ struct LightSSBO {
 	LightComponent lightData;
 };
 
+struct [[nodiscard]] glEnableScoped {
+	glEnableScoped(uint32 option) : m_Option{ option } {
+		glEnable(m_Option);
+	}
+	~glEnableScoped() {
+		glDisable(m_Option);
+	}
+
+private:
+	uint32 m_Option;
+};
+
 Renderer::Renderer() {
 	glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
 	glEnable(GL_BLEND);
+	glCullFace(GL_BACK);
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Create Uniform Buffer Object for Camera Projection+View
@@ -31,41 +47,40 @@ Renderer::Renderer() {
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// Load Postprocess
-	ShaderAsset postprocessShaderAsset{};
-	postprocessShaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
-	postprocessShaderAsset.vertex->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/postprocess.vert"));
-	postprocessShaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
-	postprocessShaderAsset.fragment->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/postprocess.frag"));
-	{
-		auto compileRes = CompileShader(postprocessShaderAsset);
-		if (compileRes.has_value()) {
-			postprocessShaderRenderInfo = std::move(compileRes.value());
+	const auto LoadShader = [](ShaderRenderInfo& renderInfo, std::string vertexPath, std::string fragmentPath, std::string name) {
+		ShaderAsset shaderAsset{};
+		shaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
+		shaderAsset.vertex->LoadAsset(std::filesystem::path(vertexPath));
+		shaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
+		shaderAsset.fragment->LoadAsset(std::filesystem::path(fragmentPath));
+		{
+			auto compileRes = CompileShader(shaderAsset);
+			if (compileRes.has_value()) {
+				renderInfo = std::move(compileRes.value());
+			}
+			else {
+				spdlog::error("[Renderrer::Renderrer: Couldn't compile {} shader", name);
+				spdlog::error("{}", compileRes.error());
+			}
 		}
-		else {
-			spdlog::error("[Renderrer::Renderrer: Couldn't compile postprocess shader");
-			spdlog::error("{}", compileRes.error());
-		}
-	}
-	
+	};
+	LoadShader(postprocessShaderRenderInfo, 
+		RESOURCES_DIR "shaders/postprocess.vert", 
+		RESOURCES_DIR "shaders/postprocess.frag", 
+		"postprocess");
+	LoadShader(gridShaderRenderInfo,
+		RESOURCES_DIR "shaders/grid.vert",
+		RESOURCES_DIR "shaders/grid.frag",
+		"grid");
+	LoadShader(hdrToCubemapsRenderInfo,
+		RESOURCES_DIR "shaders/hdrToCubemaps.vert",
+		RESOURCES_DIR "shaders/hdrToCubemaps.frag",
+		"hdrToCubemaps");
+	LoadShader(skyboxShaderRenderInfo,
+		RESOURCES_DIR "shaders/skybox.vert",
+		RESOURCES_DIR "shaders/skybox.frag",
+		"skybox");
 
-	// Load Shader for Editor Grid
-	ShaderAsset gridShaderAsset{};
-	gridShaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
-	gridShaderAsset.vertex->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/grid.vert"));
-	gridShaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
-	gridShaderAsset.fragment->LoadAsset(std::filesystem::path(RESOURCES_DIR "shaders/grid.frag"));
-
-	{
-		auto compileRes = CompileShader(gridShaderAsset);
-		if (compileRes.has_value()) {
-			gridShaderRenderInfo = std::move(compileRes.value());
-		}
-		else {
-			spdlog::error("[Renderrer::Renderrer: Couldn't compile grid shader");
-			spdlog::error("{}", compileRes.error());
-		}
-	}
-	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
 	glBindTexture(GL_TEXTURE_2D, defaultTextureRenderInfo.textureId);
@@ -74,100 +89,86 @@ Renderer::Renderer() {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whiteTexData);
 }
 
-void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
-	hdrFbo.Bind();
+void Renderer::UpdateLights(Scene& scene) {
+	// Set lights
+	std::vector<LightSSBO> lights;
+	auto transLight = scene.m_Registry.group(entt::get<TransformComponent, LightComponent>);
+	for (auto entity : transLight) {
+		auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
 
-	// Clear
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// Set camera matricies
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	{
-		// Set lights
-		std::vector<LightSSBO> lights;
-		auto transLight = scene.m_Registry.group(entt::get<TransformComponent, LightComponent>);
-		for (auto entity : transLight) {
-			auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
-
-			lights.push_back({ glm::vec4(transform.Translation, 1.0f), light });
-		}
-		
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
-		if (lights.size())
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
-		else {
-			// Absolutely insane, when setting SSBO data to nothing, size = 0, the length of dynamic array is set to max
-			// As a workaround, we have to set buffer's data to something larger than 0, but smaller then sizeof(LightSSBO)
-			int invalid = 0xBADBAD;
-			glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &invalid, GL_DYNAMIC_DRAW);
-		}
-			
-		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		lights.push_back({ glm::vec4(transform.Translation, 1.0f), light });
 	}
 
-	{
-		auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
-		for (auto entity : group) {
-			auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
+	if (lights.size())
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * lights.size(), lights.data(), GL_DYNAMIC_DRAW);
+	else {
+		// Absolutely insane, when setting SSBO data to nothing, size = 0, the length of dynamic array is set to max
+		// As a workaround, we have to set buffer's data to something larger than 0, but smaller then sizeof(LightSSBO)
+		int invalid = 0xBADBAD;
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &invalid, GL_DYNAMIC_DRAW);
+	}
 
-			if (meshRenderer.mesh == nullptr)
+	// glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void Renderer::RenderMeshes(Scene& scene) {
+	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
+	for (auto entity : group) {
+		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+
+		if (meshRenderer.mesh == nullptr)
+			continue;
+
+		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
+
+		for (const auto& [id, submeshRenderInfo] : meshResult) {
+			if (not meshRenderer.materials.contains(id)) {
+				continue;
+			}
+			const auto& material = meshRenderer.materials[id];
+
+			if (material == nullptr || material->shaderAsset == nullptr)
 				continue;
 
-			const auto meshResult = PrepareMesh(*meshRenderer.mesh);
-			
-			for (const auto& [id, submeshRenderInfo] : meshResult) {
-				if (not meshRenderer.materials.contains(id)) {
-					continue;
-				}
-				const auto& material = meshRenderer.materials[id];
-
-				if (material == nullptr || material->shaderAsset == nullptr)
-					continue;
-
-				const auto shaderResult = PrepareShader(*material->shaderAsset);
-				if (shaderResult == nullptr) {
-					continue;
-				}
-
-				// Bind uniforms
-				glUseProgram(shaderResult->programId);
-				const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
-				glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
-
-				uint32 textureSlot = 0;
-				for (const auto& uniform : material->uniforms) {
-					BindUniform(shaderResult->programId, uniform, textureSlot);
-				}
-
-				// Render
-				glBindVertexArray(submeshRenderInfo->vao);
-				glDrawElements(GL_TRIANGLES, submeshRenderInfo->nIndicies, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
+			const auto shaderResult = PrepareShader(*material->shaderAsset);
+			if (shaderResult == nullptr) {
+				continue;
 			}
-			
+
+			// Bind uniforms
+			glUseProgram(shaderResult->programId);
+			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
+			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
+
+			uint32 textureSlot = 0;
+			for (const auto& uniform : material->uniforms) {
+				BindUniform(shaderResult->programId, uniform, textureSlot);
+			}
+
+			// Render
+			glBindVertexArray(submeshRenderInfo->vao);
+			glDrawElements(GL_TRIANGLES, submeshRenderInfo->nIndicies, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
 		}
 	}
-	
-	// Render Editor Grid
-	if (renderGrid) {
-		static unsigned int VAO{ 0 };
-		if (VAO == 0) {
-			glGenVertexArrays(1, &VAO);
-		}
+}
 
-		glUseProgram(gridShaderRenderInfo.programId);
-
-		glBindVertexArray(VAO);
-		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-		glUseProgram(0);
+void Renderer::RenderGrid() {
+	static unsigned int VAO{ 0 };
+	if (VAO == 0) {
+		glGenVertexArrays(1, &VAO);
 	}
-	
-	// Postprocess
+
+	glUseProgram(gridShaderRenderInfo.programId);
+
+	glBindVertexArray(VAO);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+	glUseProgram(0);
+}
+
+void Renderer::Postprocess() {
 	postprocessFbo.Bind();
 	glUseProgram(postprocessShaderRenderInfo.programId);
 	glActiveTexture(GL_TEXTURE0 + 0);
@@ -183,6 +184,108 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glEnable(GL_DEPTH_TEST);
 
 	postprocessFbo.Unbind();
+}
+
+void Renderer::RenderSkybox() {
+
+	if (cubemapId == 0)
+		return;
+
+	glUseProgram(skyboxShaderRenderInfo.programId);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+	// glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
+	DrawCube();
+
+}
+
+void Renderer::HdrToCubemaps() {
+	
+	if (skyboxFbo == 0) {
+		glGenFramebuffers(1, &skyboxFbo);
+		glGenRenderbuffers(1, &skyboxRbo);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, skyboxRbo);
+	}
+
+	if (cubemapId == 0) {
+		glGenTextures(1, &cubemapId);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+		for (unsigned int i = 0; i < 6; ++i) {
+			// note that we store each face with 16 bit floating point values
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
+				512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	
+	static glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	static glm::mat4 captureViews[] = {
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
+	};
+
+	glUseProgram(hdrToCubemapsRenderInfo.programId);
+	
+	glUniform1i(glGetUniformLocation(hdrToCubemapsRenderInfo.programId, "hdrMap"), 0);
+	glUniformMatrix4fv(
+		glGetUniformLocation(hdrToCubemapsRenderInfo.programId, "projection"), 1, GL_FALSE, glm::value_ptr(captureProjection));
+
+	auto textureResult = hdrSkybox != nullptr ? PrepareTexture2D(*hdrSkybox) : nullptr;
+	if (textureResult == nullptr)
+		textureResult = &defaultTextureRenderInfo;
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureResult->textureId);
+
+	glViewport(0, 0, 512, 512);
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	for (unsigned int i = 0; i < 6; ++i) {
+		glUniformMatrix4fv(
+			glGetUniformLocation(hdrToCubemapsRenderInfo.programId, "view"), 1, GL_FALSE, glm::value_ptr(captureViews[i]));
+		
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubemapId, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		DrawCube();
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+}
+
+void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
+	hdrFbo.Bind();
+
+	// Clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Set camera matricies
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	UpdateLights(scene);
+	RenderMeshes(scene);
+
+	RenderSkybox();
+
+	if (renderGrid) {
+		RenderGrid();
+	}
+	Postprocess();
 }
 
 void Renderer::BindUniform(GLuint shaderId, const Uniform& uniform, uint32& textureSlot) {
@@ -320,9 +423,9 @@ const Texture2DRenderInfo* Renderer::PrepareTexture2D(Texture2DAsset& texture) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+		
 		glTexImage2D(GL_TEXTURE_2D, 0, texture.m_InternalFormat, 
-			texture.GetWidth(), texture.GetHeight(), 0, texture.m_DataFormat, GL_UNSIGNED_BYTE, texture.m_Data.data());
+			texture.GetWidth(), texture.GetHeight(), 0, texture.m_DataFormat, texture.m_DataType, texture.m_Data.data());
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		m_Textures[texture.assetId] = std::move(renderInfo);
@@ -528,5 +631,76 @@ void Renderer::DrawScreenQuad() {
 	}
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+}
+
+void Renderer::DrawCube() {
+	// initialize (if necessary)
+	static uint32 cubeVAO = 0;
+	static uint32 cubeVBO = 0;
+	if (cubeVAO == 0) {
+		float vertices[] = {
+			// back face
+			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+			1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,	// top-right
+			1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,	// bottom-right
+			1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,	// top-right
+			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+			-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,	// top-left
+			// front face
+			-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
+			1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom-right
+			1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,	  // top-right
+			1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,	  // top-right
+			-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // top-left
+			-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
+			// left face
+			-1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,	// top-right
+			-1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,	// top-left
+			-1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
+			-1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
+			-1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,	// bottom-right
+			-1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,	// top-right
+																// right face
+			1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,		// top-left
+			1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,	// bottom-right
+			1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,	// top-right
+			1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,	// bottom-right
+			1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,		// top-left
+			1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,	// bottom-left
+			// bottom face
+			-1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
+			1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,	// top-left
+			1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,	// bottom-left
+			1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,	// bottom-left
+			-1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,	// bottom-right
+			-1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
+			// top face
+			-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
+			1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,	  // bottom-right
+			1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top-right
+			1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,	  // bottom-right
+			-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
+			-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f	  // bottom-left
+		};
+		glGenVertexArrays(1, &cubeVAO);
+		glGenBuffers(1, &cubeVBO);
+		// fill buffer
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		// link vertex attributes
+		glBindVertexArray(cubeVAO);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+	// render Cube
+	glBindVertexArray(cubeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 }

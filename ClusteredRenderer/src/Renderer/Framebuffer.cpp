@@ -62,9 +62,11 @@ void Framebuffer::Construct() {
 void Framebuffer::Destroy() {
 	if (m_FboID != 0) glDeleteFramebuffers(1, &m_FboID);
 	if (m_ColTexID != 0) glDeleteTextures(1, &m_ColTexID);
+	if (m_RboID != 0) glDeleteRenderbuffers(1, &m_RboID);
 
 	m_FboID = 0;
 	m_ColTexID = 0;
+	m_RboID = 0;
 }
 
 bool Framebuffer::Bind(uint32 target) const {
