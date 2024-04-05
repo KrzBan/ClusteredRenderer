@@ -32,6 +32,8 @@ Renderer::Renderer() {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);  
+
 	// Create Uniform Buffer Object for Camera Projection+View
 	glGenBuffers(1, &uboMatricies);
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
@@ -84,6 +86,14 @@ Renderer::Renderer() {
 		RESOURCES_DIR "shaders/irradiance.vert",
 		RESOURCES_DIR "shaders/irradiance.frag",
 		"irradiance");
+	LoadShader(prefilterShaderRenderInfo,
+		RESOURCES_DIR "shaders/prefilter.vert",
+		RESOURCES_DIR "shaders/prefilter.frag",
+		"prefilter");
+	LoadShader(brdfShaderRenderInfo,
+		RESOURCES_DIR "shaders/brdf.vert",
+		RESOURCES_DIR "shaders/brdf.frag",
+		"brdf");
 	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
@@ -156,6 +166,32 @@ void Renderer::RenderMeshes(Scene& scene) {
 					glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
 
 					glUniform1i(irradianceLocation, irradianceMapLocation);
+				}	
+			}
+
+			//Bind prefilterMap
+			if (prefilterMapId != 0) {
+				constexpr int prefilterMapLayout = 7;
+				int prefilterMapLocation = glGetUniformLocation(shaderResult->programId, "prefilterMap");
+
+				if (prefilterMapLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + prefilterMapLayout);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMapId);
+
+					glUniform1i(prefilterMapLocation, prefilterMapLayout);
+				}
+			}
+
+			// Bind brdfLUT
+			if (brdfLUTId != 0) {
+				constexpr int brdfLUTMapLocation = 8;
+				int brdfLUTLocation = glGetUniformLocation(shaderResult->programId, "brdfLUT");
+
+				if (brdfLUTLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + brdfLUTMapLocation);
+					glBindTexture(GL_TEXTURE_2D, brdfLUTId);
+
+					glUniform1i(brdfLUTLocation, brdfLUTMapLocation);
 				}	
 			}
 
@@ -242,7 +278,7 @@ void Renderer::HdrToCubemaps() {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 	
@@ -284,6 +320,10 @@ void Renderer::HdrToCubemaps() {
 		DrawCube();
 	}
 
+	// Generate MipMaps for cubemap
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
 	// Irradiance
 	if (irradianceId == 0) {
 		glGenTextures(1, &irradianceId);
@@ -322,6 +362,84 @@ void Renderer::HdrToCubemaps() {
 
 		DrawCube();
 	}
+
+	// Specular IBL
+	if (prefilterMapId == 0) {
+		glGenTextures(1, &prefilterMapId);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMapId);
+		for (unsigned int i = 0; i < 6; ++i) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	}
+
+	glUseProgram(prefilterShaderRenderInfo.programId);
+	glUniform1i(glGetUniformLocation(prefilterShaderRenderInfo.programId, "environmentMap"), 0);
+	glUniformMatrix4fv(
+		glGetUniformLocation(prefilterShaderRenderInfo.programId, "projection"), 1, GL_FALSE, glm::value_ptr(captureProjection));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	unsigned int maxMipLevels = 5;
+	for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
+		// reisze framebuffer according to mip-level size.
+		unsigned int mipWidth = 128 * std::pow(0.5, mip);
+		unsigned int mipHeight = 128 * std::pow(0.5, mip);
+		glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
+		glViewport(0, 0, mipWidth, mipHeight);
+
+		float roughness = (float)mip / (float)(maxMipLevels - 1);
+		glUniform1f(glGetUniformLocation(prefilterShaderRenderInfo.programId, "roughness"), roughness);
+
+		for (unsigned int i = 0; i < 6; ++i) {
+			glUniformMatrix4fv(
+				glGetUniformLocation(prefilterShaderRenderInfo.programId, "view"), 1, GL_FALSE, glm::value_ptr(captureViews[i]));
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMapId, mip);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			DrawCube();
+		}
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// BRDF
+	if (brdfLUTId == 0) {
+		glGenTextures(1, &brdfLUTId);
+
+		// pre-allocate enough memory for the LUT texture.
+		glBindTexture(GL_TEXTURE_2D, brdfLUTId);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	 
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTId, 0);
+
+	glViewport(0, 0, 512, 512);
+	glUseProgram(brdfShaderRenderInfo.programId);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);  
+	DrawScreenQuad();
+	glEnable(GL_BLEND);  
+	glEnable(GL_DEPTH_TEST);
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -654,7 +772,8 @@ std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
 		glGetProgramResourceName(shaderInfo.programId, GL_UNIFORM, attrib, nameData.size(), NULL, &nameData[0]);
 		std::string name((char*)&nameData[0], nameData.size() - 1);
 
-		if (name == "model" || name == "projection" || name == "view" || name == "irradianceMap") // implicit for all models
+		if (name == "model" || name == "projection" || name == "view" 
+			|| name == "irradianceMap" || name == "brdfLUT" || name == "prefilterMap") // implicit for all models
 			continue;
 
 		Uniform uniform;

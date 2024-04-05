@@ -69,11 +69,15 @@ private:
 	ShaderRenderInfo hdrToCubemapsRenderInfo;
 	ShaderRenderInfo skyboxShaderRenderInfo;
 	ShaderRenderInfo irradianceShaderRenderInfo;
+	ShaderRenderInfo prefilterShaderRenderInfo;
+	ShaderRenderInfo brdfShaderRenderInfo;
 
 	uint32 skyboxFbo = 0;
 	uint32 skyboxRbo = 0;
 	uint32 cubemapId = 0;
 	uint32 irradianceId = 0;
+	uint32 prefilterMapId = 0;
+	uint32 brdfLUTId = 0;
 
 	Texture2DRenderInfo defaultTextureRenderInfo;
 };
