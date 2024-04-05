@@ -52,6 +52,7 @@ public:
 	Shared<Texture2DAsset> hdrSkybox;
 
 	bool renderGrid = true;
+	bool showIrradiance = false;
 	float exposure = 1.0f;
 	float gamma = 2.2f;
 
@@ -67,9 +68,12 @@ private:
 	ShaderRenderInfo postprocessShaderRenderInfo;
 	ShaderRenderInfo hdrToCubemapsRenderInfo;
 	ShaderRenderInfo skyboxShaderRenderInfo;
+	ShaderRenderInfo irradianceShaderRenderInfo;
 
 	uint32 skyboxFbo = 0;
 	uint32 skyboxRbo = 0;
 	uint32 cubemapId = 0;
+	uint32 irradianceId = 0;
+
 	Texture2DRenderInfo defaultTextureRenderInfo;
 };

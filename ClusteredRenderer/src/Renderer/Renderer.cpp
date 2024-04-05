@@ -80,7 +80,11 @@ Renderer::Renderer() {
 		RESOURCES_DIR "shaders/skybox.vert",
 		RESOURCES_DIR "shaders/skybox.frag",
 		"skybox");
-
+	LoadShader(irradianceShaderRenderInfo,
+		RESOURCES_DIR "shaders/irradiance.vert",
+		RESOURCES_DIR "shaders/irradiance.frag",
+		"irradiance");
+	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
 	glBindTexture(GL_TEXTURE_2D, defaultTextureRenderInfo.textureId);
@@ -142,6 +146,19 @@ void Renderer::RenderMeshes(Scene& scene) {
 			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
 			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
 
+			// Bind Irradiance
+			if (irradianceId != 0) {
+				constexpr int irradianceMapLocation = 6;
+				int irradianceLocation = glGetUniformLocation(shaderResult->programId, "irradianceMap");
+
+				if (irradianceLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + irradianceMapLocation);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
+
+					glUniform1i(irradianceLocation, irradianceMapLocation);
+				}	
+			}
+
 			uint32 textureSlot = 0;
 			for (const auto& uniform : material->uniforms) {
 				BindUniform(shaderResult->programId, uniform, textureSlot);
@@ -194,8 +211,10 @@ void Renderer::RenderSkybox() {
 	glUseProgram(skyboxShaderRenderInfo.programId);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
-	// glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
+	if (not showIrradiance)
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+	else
+		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
 	DrawCube();
 
 }
@@ -250,8 +269,10 @@ void Renderer::HdrToCubemaps() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureResult->textureId);
 
-	glViewport(0, 0, 512, 512);
 	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+	glViewport(0, 0, 512, 512);
 	for (unsigned int i = 0; i < 6; ++i) {
 		glUniformMatrix4fv(
 			glGetUniformLocation(hdrToCubemapsRenderInfo.programId, "view"), 1, GL_FALSE, glm::value_ptr(captureViews[i]));
@@ -262,7 +283,46 @@ void Renderer::HdrToCubemaps() {
 
 		DrawCube();
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+
+	// Irradiance
+	if (irradianceId == 0) {
+		glGenTextures(1, &irradianceId);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
+		for (unsigned int i = 0; i < 6; ++i) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0,
+				GL_RGB, GL_FLOAT, nullptr);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	
+	glUseProgram(irradianceShaderRenderInfo.programId);
+
+	glUniform1i(glGetUniformLocation(irradianceShaderRenderInfo.programId, "environmentMap"), 0);
+	glUniformMatrix4fv(
+		glGetUniformLocation(irradianceShaderRenderInfo.programId, "projection"), 1, GL_FALSE, glm::value_ptr(captureProjection));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
+	glViewport(0, 0, 32, 32);
+	for (unsigned int i = 0; i < 6; ++i) {
+		glUniformMatrix4fv(
+			glGetUniformLocation(irradianceShaderRenderInfo.programId, "view"), 1, GL_FALSE, glm::value_ptr(captureViews[i]));
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceId, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		DrawCube();
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& transform) {
@@ -594,7 +654,7 @@ std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
 		glGetProgramResourceName(shaderInfo.programId, GL_UNIFORM, attrib, nameData.size(), NULL, &nameData[0]);
 		std::string name((char*)&nameData[0], nameData.size() - 1);
 
-		if (name == "model" || name == "projection" || name == "view") // implicit for all models
+		if (name == "model" || name == "projection" || name == "view" || name == "irradianceMap") // implicit for all models
 			continue;
 
 		Uniform uniform;

@@ -65,6 +65,12 @@ public:
 					renderer.HdrToCubemaps();
 				}
 
+				ImGui::TableNextColumn();
+				ImGui::Text("Show Irradiance");
+				ImGui::TableNextColumn();
+				ImGui::Checkbox("##ShowIrradiance", &renderer.showIrradiance);
+
+
 				ImGui::EndTable();
 
 			}
