@@ -101,6 +101,41 @@ Renderer::Renderer() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whiteTexData);
+
+	// Additional FBO for skybox IBL
+	glGenFramebuffers(1, &skyboxFbo);
+	glGenRenderbuffers(1, &skyboxRbo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, skyboxRbo);
+
+	// BRDF
+	glGenTextures(1, &brdfLUTId);
+	glBindTexture(GL_TEXTURE_2D, brdfLUTId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTId, 0);
+
+	glViewport(0, 0, 512, 512);
+	glUseProgram(brdfShaderRenderInfo.programId);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+	DrawScreenQuad();
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::UpdateLights(Scene& scene) {
@@ -257,16 +292,6 @@ void Renderer::RenderSkybox() {
 
 void Renderer::HdrToCubemaps() {
 	
-	if (skyboxFbo == 0) {
-		glGenFramebuffers(1, &skyboxFbo);
-		glGenRenderbuffers(1, &skyboxRbo);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, skyboxRbo);
-	}
-
 	if (cubemapId == 0) {
 		glGenTextures(1, &cubemapId);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);
@@ -410,36 +435,6 @@ void Renderer::HdrToCubemaps() {
 			DrawCube();
 		}
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// BRDF
-	if (brdfLUTId == 0) {
-		glGenTextures(1, &brdfLUTId);
-
-		// pre-allocate enough memory for the LUT texture.
-		glBindTexture(GL_TEXTURE_2D, brdfLUTId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	 
-	glBindFramebuffer(GL_FRAMEBUFFER, skyboxFbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, skyboxRbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTId, 0);
-
-	glViewport(0, 0, 512, 512);
-	glUseProgram(brdfShaderRenderInfo.programId);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);  
-	DrawScreenQuad();
-	glEnable(GL_BLEND);  
-	glEnable(GL_DEPTH_TEST);
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
