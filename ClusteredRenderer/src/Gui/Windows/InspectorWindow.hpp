@@ -400,8 +400,15 @@ private:
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
 			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::Separator();
+
+			if constexpr (not std::is_same_v<TransformComponent, T>) {
+				ImGui::Checkbox("##Active", &component.isActive);
+				ImGui::SameLine(0);
+			}
+
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
 			ImGui::PopStyleVar();
+			
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
 				ImGui::OpenPopup("ComponentSettings");

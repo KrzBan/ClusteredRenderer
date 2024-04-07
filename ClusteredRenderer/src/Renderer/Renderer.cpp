@@ -202,7 +202,7 @@ void Renderer::RenderMeshesWireframe(Scene& scene) {
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
 
-		if (meshRenderer.mesh == nullptr)
+		if (meshRenderer.mesh == nullptr || not meshRenderer.isActive)
 			continue;
 
 		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
@@ -235,7 +235,7 @@ void Renderer::RenderMeshesMaterial(Scene& scene) {
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
 
-		if (meshRenderer.mesh == nullptr)
+		if (meshRenderer.mesh == nullptr || not meshRenderer.isActive)
 			continue;
 
 		const auto meshResult = PrepareMesh(*meshRenderer.mesh);

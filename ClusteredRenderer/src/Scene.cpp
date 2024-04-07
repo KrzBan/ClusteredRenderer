@@ -159,7 +159,7 @@ void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		m_Registry.view<NativeScriptComponent>().each(
 			[=](auto entity, auto& nsc){
-				if (nsc.Instance) {
+				if (nsc.Instance && nsc.isActive) {
 					nsc.Instance->OnUpdate(ts);
 				}
 			});
