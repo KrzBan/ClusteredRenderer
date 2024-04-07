@@ -5,6 +5,32 @@
 
 #include "GuiWindow.hpp"
 
+// utility structure for realtime plot
+struct ScrollingBuffer {
+	int MaxSize;
+	int Offset;
+	ImVector<ImVec2> Data;
+	ScrollingBuffer(int max_size = 2000) {
+		MaxSize = max_size;
+		Offset = 0;
+		Data.reserve(MaxSize);
+	}
+	void AddPoint(float x, float y) {
+		if (Data.size() < MaxSize)
+			Data.push_back(ImVec2(x, y));
+		else {
+			Data[Offset] = ImVec2(x, y);
+			Offset = (Offset + 1) % MaxSize;
+		}
+	}
+	void Erase() {
+		if (Data.size() > 0) {
+			Data.shrink(0);
+			Offset = 0;
+		}
+	}
+};
+
 struct SettingsWindowOutput {
 
 };
@@ -23,10 +49,27 @@ public:
 		SettingsWindowOutput output{};
 		
 		using namespace std::chrono_literals;
+		
+		static ScrollingBuffer scrollingFrameData;
+		static float t = 0;
+		t += Time::DeltaTime();
+		scrollingFrameData.AddPoint(t, Time::DeltaTime() * 1000.0f);
+
+		static float history = 10.0f;
+		static ImPlotAxisFlags flags = ImPlotAxisFlags_NoTickLabels;
 
 		if (m_DrawThis == false) return output;
 
 		if (ImGui::Begin(ICON_FA_GEAR " " SETTINGS_NAME, &m_DrawThis)) {
+			if (ImPlot::BeginPlot("##Scrolling", ImVec2(-1, 150))) {
+				ImPlot::SetupAxes("Time", "Frame Time (ms)", flags, flags);
+				ImPlot::SetupAxisLimits(ImAxis_X1, t - history, t, ImGuiCond_Always);
+				ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 100);
+				ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
+				ImPlot::PlotShaded("Frame (ms)", &scrollingFrameData.Data[0].x, &scrollingFrameData.Data[0].y, scrollingFrameData.Data.size(), -INFINITY, 0, scrollingFrameData.Offset, 2 * sizeof(float));
+				ImPlot::EndPlot();
+			}
+
 			if (ImGui::BeginTable("Settings", 2)) {
 				ImGui::TableNextColumn();
 				ImGui::Text("Render Time");

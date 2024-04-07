@@ -1,4 +1,5 @@
 #include "Gui.hpp"
+#include <Gui/StyleDracula.hpp>
 
 #define FONT_TEXT_REGULAR RESOURCES_DIR "fonts/Roboto-Light.ttf"
 
@@ -7,14 +8,12 @@ static float baseFontSize = 18.0f;						 // 13.0f is the size of the default fon
 static float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
 
 void InitStyle(float scale) {
-	static float oldScale = 1.0f;
-	if (oldScale == scale)
-		return;
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style = ImGuiStyle{};
 
 	ImGui::StyleColorsDark();
+	ImGuiSetStyleDracula();
 	// ImGui::StyleColorsLight();
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -52,6 +51,7 @@ ImFontAtlas* CreateFontAtlas(float scale) {
 Gui::Gui(const Window& window) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -71,6 +71,7 @@ Gui::Gui(const Window& window) {
 Gui::~Gui() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
+	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 }
 
