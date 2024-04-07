@@ -58,12 +58,19 @@ Renderer::Renderer() {
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// Load Postprocess
-	const auto LoadShader = [](ShaderRenderInfo& renderInfo, std::string vertexPath, std::string fragmentPath, std::string name) {
+	const auto LoadShader = [](ShaderRenderInfo& renderInfo, 
+		std::string vertexPath, std::string fragmentPath, 
+		std::optional<std::string> geometryPath, 
+		std::string name) {
 		ShaderAsset shaderAsset{};
 		shaderAsset.vertex = std::make_shared<ShaderSourceAsset>();
 		shaderAsset.vertex->LoadAsset(std::filesystem::path(vertexPath));
 		shaderAsset.fragment = std::make_shared<ShaderSourceAsset>();
 		shaderAsset.fragment->LoadAsset(std::filesystem::path(fragmentPath));
+		if (geometryPath.has_value()) {
+			shaderAsset.geometry = std::make_shared<ShaderSourceAsset>();
+			shaderAsset.geometry->LoadAsset(std::filesystem::path(geometryPath.value()));
+		}
 		{
 			auto compileRes = CompileShader(shaderAsset);
 			if (compileRes.has_value()) {
@@ -77,32 +84,37 @@ Renderer::Renderer() {
 	};
 	LoadShader(postprocessShaderRenderInfo, 
 		RESOURCES_DIR "shaders/postprocess.vert", 
-		RESOURCES_DIR "shaders/postprocess.frag", 
+		RESOURCES_DIR "shaders/postprocess.frag", {},
 		"postprocess");
 	LoadShader(gridShaderRenderInfo,
 		RESOURCES_DIR "shaders/grid.vert",
-		RESOURCES_DIR "shaders/grid.frag",
+		RESOURCES_DIR "shaders/grid.frag", {},
 		"grid");
 	LoadShader(hdrToCubemapsRenderInfo,
 		RESOURCES_DIR "shaders/hdrToCubemaps.vert",
-		RESOURCES_DIR "shaders/hdrToCubemaps.frag",
+		RESOURCES_DIR "shaders/hdrToCubemaps.frag", {},
 		"hdrToCubemaps");
 	LoadShader(skyboxShaderRenderInfo,
 		RESOURCES_DIR "shaders/skybox.vert",
-		RESOURCES_DIR "shaders/skybox.frag",
+		RESOURCES_DIR "shaders/skybox.frag", {},
 		"skybox");
 	LoadShader(irradianceShaderRenderInfo,
 		RESOURCES_DIR "shaders/irradiance.vert",
-		RESOURCES_DIR "shaders/irradiance.frag",
+		RESOURCES_DIR "shaders/irradiance.frag", {},
 		"irradiance");
 	LoadShader(prefilterShaderRenderInfo,
 		RESOURCES_DIR "shaders/prefilter.vert",
-		RESOURCES_DIR "shaders/prefilter.frag",
+		RESOURCES_DIR "shaders/prefilter.frag", {},
 		"prefilter");
 	LoadShader(brdfShaderRenderInfo,
 		RESOURCES_DIR "shaders/brdf.vert",
-		RESOURCES_DIR "shaders/brdf.frag",
+		RESOURCES_DIR "shaders/brdf.frag", {},
 		"brdf");
+	LoadShader(wireframeShaderRenderInfo,
+		RESOURCES_DIR "shaders/wireframe.vert",
+		RESOURCES_DIR "shaders/wireframe.frag",
+		RESOURCES_DIR "shaders/wireframe.geom",
+		"wireframe");
 	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
@@ -177,6 +189,48 @@ void Renderer::UpdateLights(Scene& scene) {
 }
 
 void Renderer::RenderMeshes(Scene& scene) {
+	if (wireframeOverride) {
+		RenderMeshesWireframe(scene);
+	}
+	else {
+		RenderMeshesMaterial(scene);
+	}
+}
+
+void Renderer::RenderMeshesWireframe(Scene& scene) {
+	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
+	for (auto entity : group) {
+		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+
+		if (meshRenderer.mesh == nullptr)
+			continue;
+
+		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
+
+		for (const auto& [id, submeshRenderInfo] : meshResult) {
+
+			const auto* shaderResult = &wireframeShaderRenderInfo;
+
+			// Bind uniforms
+			glUseProgram(shaderResult->programId);
+			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
+			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
+
+			int wireColorLoc = glGetUniformLocation(shaderResult->programId, "u_WireColor");
+			glUniform4f(wireColorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+			int fillColorLoc = glGetUniformLocation(shaderResult->programId, "u_FillColor");
+			glUniform4f(fillColorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
+
+			// Render
+			glBindVertexArray(submeshRenderInfo->vao);
+			glDrawElements(GL_TRIANGLES, submeshRenderInfo->nIndicies, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
+	}
+}
+
+
+void Renderer::RenderMeshesMaterial(Scene& scene) {
 	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
@@ -215,10 +269,10 @@ void Renderer::RenderMeshes(Scene& scene) {
 					glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
 
 					glUniform1i(irradianceLocation, irradianceMapLocation);
-				}	
+				}
 			}
 
-			//Bind prefilterMap
+			// Bind prefilterMap
 			if (prefilterMapId != 0) {
 				constexpr int prefilterMapLayout = 7;
 				int prefilterMapLocation = glGetUniformLocation(shaderResult->programId, "prefilterMap");
@@ -241,7 +295,7 @@ void Renderer::RenderMeshes(Scene& scene) {
 					glBindTexture(GL_TEXTURE_2D, brdfLUTId);
 
 					glUniform1i(brdfLUTLocation, brdfLUTMapLocation);
-				}	
+				}
 			}
 
 			uint32 textureSlot = 0;

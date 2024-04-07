@@ -70,6 +70,10 @@ public:
 				ImGui::TableNextColumn();
 				ImGui::Checkbox("##ShowIrradiance", &renderer.showIrradiance);
 
+				ImGui::TableNextColumn();
+				ImGui::Text("Render Wireframe");
+				ImGui::TableNextColumn();
+				ImGui::Checkbox("##RenderWireframe", &renderer.wireframeOverride);
 
 				ImGui::EndTable();
 

@@ -41,7 +41,10 @@ private:
 	void Postprocess();
 	void RenderSkybox();
 
-public:
+	void RenderMeshesMaterial(Scene& scene);
+	void RenderMeshesWireframe(Scene& scene);
+
+		public:
 	void HdrToCubemaps();
 
 
@@ -53,8 +56,11 @@ public:
 
 	bool renderGrid = true;
 	bool showIrradiance = false;
+
 	float exposure = 1.0f;
 	float gamma = 2.2f;
+
+	bool wireframeOverride = false;
 
 private:
 	uint32_t uboMatricies;
@@ -71,6 +77,7 @@ private:
 	ShaderRenderInfo irradianceShaderRenderInfo;
 	ShaderRenderInfo prefilterShaderRenderInfo;
 	ShaderRenderInfo brdfShaderRenderInfo;
+	ShaderRenderInfo wireframeShaderRenderInfo;
 
 	uint32 skyboxFbo = 0;
 	uint32 skyboxRbo = 0;

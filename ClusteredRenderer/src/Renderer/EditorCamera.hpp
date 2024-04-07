@@ -52,12 +52,12 @@ private:
 
 	glm::mat4 m_ViewMatrix;
 	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_FocalPoint = { -1.0f, 1.0f, 3.0f };
 
 	glm::vec2 m_InitialMousePosition = { 0.0f, 0.0f };
 
-	float m_Distance = 10.0f;
-	float m_Pitch = 0.0f, m_Yaw = 0.0f;
+	float m_Distance = 0.0f;
+	float m_Pitch = -5.97f, m_Yaw = 6.66f;
 
 	float m_ViewportWidth = 1280, m_ViewportHeight = 720;
 };
