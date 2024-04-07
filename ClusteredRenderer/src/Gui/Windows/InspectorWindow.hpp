@@ -113,10 +113,21 @@ private:
 	void DrawAssetMesh(MeshAsset& meshAsset) {
 		ImGui::Text(std::format("Submeshes: {}", meshAsset.submeshes.size()).c_str());
 
+		const auto totalVertices = std::accumulate(meshAsset.submeshes.begin(), meshAsset.submeshes.end(), 1,
+			[](int sum, const auto& submesh) { return sum + submesh.vertices.size(); });
+		const auto totalIndices = std::accumulate(meshAsset.submeshes.begin(), meshAsset.submeshes.end(), 1,
+			[](int sum, const auto& submesh) { return sum + submesh.indices.size(); });
+		const auto totalTriangles = totalIndices / 3;
+		ImGui::Text(std::format("Total Vertices: {}", totalVertices).c_str());
+		ImGui::Text(std::format("Total Indices:	{}", totalIndices).c_str());
+		ImGui::Text(std::format("Total Triangles: {}", totalTriangles).c_str());
+
+		ImGui::SeparatorText("Sub-Meshes");
+
 		for (const auto& submesh : meshAsset.submeshes) {
 			ImGui::Text(std::format("Name: {}", submesh.name).c_str());
-			ImGui::Text(std::format("Vertices: {}", submesh.vertices.size()).c_str());
-			ImGui::Text(std::format("Indices: {}", submesh.indices.size()).c_str());
+			ImGui::Text(std::format("  Vertices: {}", submesh.vertices.size()).c_str());
+			ImGui::Text(std::format("  Indices: {}", submesh.indices.size()).c_str());
 		}
 		
 	}
