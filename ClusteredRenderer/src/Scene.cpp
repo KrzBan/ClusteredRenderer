@@ -127,6 +127,12 @@ void Scene::OnRuntimeStart()
 	m_Registry.view<NativeScriptComponent>().each(
 		[=](auto entity, auto& nsc) {
 			if (nsc.Instance) {
+				nsc.Instance->Bind(Entity{ entity, this });
+			}
+		});
+	m_Registry.view<NativeScriptComponent>().each(
+		[=](auto entity, auto& nsc) {
+			if (nsc.Instance) {
 				nsc.Instance->OnStart();
 			}
 		});

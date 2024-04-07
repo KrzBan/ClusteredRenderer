@@ -13,7 +13,15 @@ public:
 		return m_Entity.GetComponent<T>();
 	}
 
+	Entity Instantiate(const std::string& name) {
+		return m_Entity.Instantiate(name);
+	}
+
 	virtual Unique<Scriptable> Clone() const = 0;
+
+	void Bind(Entity entity) {
+		m_Entity = entity;
+	}
 
 protected:
 	virtual void OnStart() {}

@@ -12,6 +12,9 @@ public:
 	Entity(entt::entity handle, Scene* scene);
 	Entity(const Entity& other) = default;
 
+	Entity Instantiate(const std::string& name) {
+		return m_Scene->CreateEntity(name);
+	}
 	template<typename T, typename... Args>
 	T& AddComponent(Args &&...args)
 	{

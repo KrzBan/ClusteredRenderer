@@ -37,7 +37,7 @@ std::pair<float, float> EditorCamera::PanSpeed() const
 
 float EditorCamera::RotationSpeed() const
 {
-	return 0.8f;
+	return 0.4f;
 }
 
 float EditorCamera::ZoomSpeed() const
@@ -50,7 +50,7 @@ float EditorCamera::ZoomSpeed() const
 }
 
 float EditorCamera::MoveSpeed() const {
-	return 0.2f;
+	return 5.0f;
 }
 
 void EditorCamera::OnUpdate(Timestep ts) {
@@ -63,7 +63,7 @@ void EditorCamera::OnUpdate(Timestep ts) {
 		const auto horizontalMove = Input::GetKey(KB_A) * -1.0f + Input::GetKey(KB_D) * 1.0f;
 		const auto forwardMove = Input::GetKey(KB_S) * -1.0f + Input::GetKey(KB_W) * 1.0f;
 		const auto upMove = Input::GetKey(KB_Q) * -1.0f + Input::GetKey(KB_E) * 1.0f;
-		Move({ horizontalMove, forwardMove, upMove }, Input::GetKey(KB_LEFT_SHIFT));
+		Move(glm::vec3{ horizontalMove, forwardMove, upMove } * ts, Input::GetKey(KB_LEFT_SHIFT));
 	}
 	else if (Input::GetKey(KB_LEFT_ALT)) {
 		if (Input::GetKey(MOUSE_BUTTON_MIDDLE)) {

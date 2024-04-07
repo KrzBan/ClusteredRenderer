@@ -146,7 +146,7 @@ int App::Run() {
 			}
 		}
 
-		if (viewportWindowOutput.isWindowFocused && appState.isEditor()) {
+		if (viewportWindowOutput.isWindowFocused /* && appState.isEditor()*/ ) {
 			editorCamera.OnUpdate(Time::DeltaTime());
 		}
 

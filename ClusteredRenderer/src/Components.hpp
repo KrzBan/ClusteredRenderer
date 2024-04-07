@@ -8,7 +8,11 @@
 #include <Assets/Assets.hpp>
 #include <Scriptable.hpp>
 
-struct IDComponent {
+struct Component {
+	bool isActive = true;
+};
+
+struct IDComponent : public Component {
 	kb::UUID ID;
 
 	IDComponent() = default;
@@ -16,7 +20,7 @@ struct IDComponent {
 	IDComponent(const IDComponent&) = default;
 };
 
-struct TagComponent {
+struct TagComponent : public Component {
 	std::string Tag;
 
 	TagComponent() = default;
@@ -25,7 +29,7 @@ struct TagComponent {
 		: Tag(tag) {}
 };
 
-struct TransformComponent {
+struct TransformComponent : public Component {
 	glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
@@ -44,7 +48,7 @@ struct TransformComponent {
 	}
 };
 
-struct MeshRendererComponent {
+struct MeshRendererComponent : public Component {
 
 	Shared<MeshAsset> mesh;
 	std::map<kb::UUID, Shared<MaterialAsset>> materials;
@@ -53,7 +57,7 @@ struct MeshRendererComponent {
 	MeshRendererComponent(const MeshRendererComponent&) = default;
 };
 
-struct CameraComponent {
+struct CameraComponent : public Component {
 	SceneCamera Camera;
 	bool Primary = true; // TODO: think about moving to Scene
 	bool FixedAspectRatio = false;
@@ -64,7 +68,7 @@ struct CameraComponent {
 
 class Scriptable;
 
-struct NativeScriptComponent {
+struct NativeScriptComponent : public Component {
 	Unique<Scriptable> Instance = nullptr;
 
 	NativeScriptComponent() = default;
@@ -86,7 +90,7 @@ struct NativeScriptComponent {
 	}
 };
 
-struct LightComponent {
+struct LightComponent : public Component {
 	glm::vec4 ambient{ 1.0f, 1.0f, 1.0f, 1.0f };
 	glm::vec4 diffuse{1.0f, 1.0f, 1.0f, 1.0f};
 	glm::vec4 specular{ 1.0f, 1.0f, 1.0f, 1.0f };

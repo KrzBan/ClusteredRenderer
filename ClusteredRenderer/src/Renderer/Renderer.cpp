@@ -6,7 +6,16 @@
 
 struct LightSSBO {
 	glm::vec4 position;
-	LightComponent lightData;
+	
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	float ambientStrength;
+	float diffuseStrength;
+	float specularStrengthl;
+
+	float range;
 };
 
 struct [[nodiscard]] glEnableScoped {
@@ -145,7 +154,12 @@ void Renderer::UpdateLights(Scene& scene) {
 	for (auto entity : transLight) {
 		auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
 
-		lights.push_back({ glm::vec4(transform.Translation, 1.0f), light });
+		if (light.isActive)
+			lights.push_back({ glm::vec4(transform.Translation, 1.0f), 
+				light.ambient, light.diffuse, light.specular,
+				light.ambientStrength, light.diffuseStrength, light.specularStrength,
+				light.range
+				});
 	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
