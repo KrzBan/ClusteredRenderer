@@ -401,10 +401,12 @@ private:
 			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			ImGui::Separator();
 
+			ImGui::PushID(name.c_str());
 			if constexpr (not std::is_same_v<TransformComponent, T>) {
-				ImGui::Checkbox("##Active", &component.isActive);
+				ImGui::Checkbox(std::format("##Active", typeid(T).hash_code()).c_str(), &component.isActive);
 				ImGui::SameLine(0);
 			}
+			ImGui::PopID();
 
 			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
 			ImGui::PopStyleVar();
