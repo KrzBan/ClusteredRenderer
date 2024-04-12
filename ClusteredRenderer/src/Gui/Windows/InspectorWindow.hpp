@@ -141,6 +141,11 @@ private:
 	void DrawAssetShader(ShaderAsset& shaderAsset) {
 		if (ImGui::BeginTable("DrawAssetShaderTable", 2, ImGuiTableFlags_SizingStretchProp)) {
 			ImGui::TableNextColumn();
+			ImGui::Text("Transparent");
+			ImGui::TableNextColumn();
+			ImGui::Checkbox("##isTransparent", &shaderAsset.isTransparent);
+
+			ImGui::TableNextColumn();
 			ImGui::Text("Vertex");
 			ImGui::TableNextColumn();
 			DynamicAssetField(shaderAsset.vertex, 0);

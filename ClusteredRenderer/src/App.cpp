@@ -47,7 +47,6 @@ int App::Run() {
 	MenuBar menuBar;
 
 	Renderer renderer{};
-	GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
 	AppState appState = AppStateEnum::EDITOR;
 	Timestep physicsAccumulator{ 0.0 };
@@ -103,10 +102,10 @@ int App::Run() {
 			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
 		}
 
-		// while (glClientWaitSync(fence, 0, 0) != GL_ALREADY_SIGNALED) {
-		// 	// Draw call finished
-		// }
-		
+		GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		while (glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1e9) != GL_ALREADY_SIGNALED) {}
+		glDeleteSync(fence);
+
 		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
 		renderTimeNs = renderTsEnd - renderTsBegin;
 

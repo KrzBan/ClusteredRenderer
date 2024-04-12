@@ -232,6 +232,7 @@ void Renderer::RenderMeshesWireframe(Scene& scene) {
 
 void Renderer::RenderMeshesMaterial(Scene& scene) {
 	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
+	// Non Transparent
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
 
@@ -247,6 +248,91 @@ void Renderer::RenderMeshesMaterial(Scene& scene) {
 			const auto& material = meshRenderer.materials[id];
 
 			if (material == nullptr || material->shaderAsset == nullptr)
+				continue;
+
+			if (material->shaderAsset->isTransparent)
+				continue;
+
+			const auto shaderResult = PrepareShader(*material->shaderAsset);
+			if (shaderResult == nullptr) {
+				continue;
+			}
+
+			// Bind uniforms
+			glUseProgram(shaderResult->programId);
+			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
+			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
+
+			// Bind Irradiance
+			if (irradianceId != 0) {
+				constexpr int irradianceMapLocation = 6;
+				int irradianceLocation = glGetUniformLocation(shaderResult->programId, "irradianceMap");
+
+				if (irradianceLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + irradianceMapLocation);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceId);
+
+					glUniform1i(irradianceLocation, irradianceMapLocation);
+				}
+			}
+
+			// Bind prefilterMap
+			if (prefilterMapId != 0) {
+				constexpr int prefilterMapLayout = 7;
+				int prefilterMapLocation = glGetUniformLocation(shaderResult->programId, "prefilterMap");
+
+				if (prefilterMapLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + prefilterMapLayout);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMapId);
+
+					glUniform1i(prefilterMapLocation, prefilterMapLayout);
+				}
+			}
+
+			// Bind brdfLUT
+			if (brdfLUTId != 0) {
+				constexpr int brdfLUTMapLocation = 8;
+				int brdfLUTLocation = glGetUniformLocation(shaderResult->programId, "brdfLUT");
+
+				if (brdfLUTLocation != -1) {
+					glActiveTexture(GL_TEXTURE0 + brdfLUTMapLocation);
+					glBindTexture(GL_TEXTURE_2D, brdfLUTId);
+
+					glUniform1i(brdfLUTLocation, brdfLUTMapLocation);
+				}
+			}
+
+			uint32 textureSlot = 0;
+			for (const auto& uniform : material->uniforms) {
+				BindUniform(shaderResult->programId, uniform, textureSlot);
+			}
+
+			// Render
+			glBindVertexArray(submeshRenderInfo->vao);
+			glDrawElements(GL_TRIANGLES, submeshRenderInfo->nIndicies, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
+	}
+
+	// Transparent
+	for (auto entity : group) {
+		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
+
+		if (meshRenderer.mesh == nullptr || not meshRenderer.isActive)
+			continue;
+
+		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
+
+		for (const auto& [id, submeshRenderInfo] : meshResult) {
+			if (not meshRenderer.materials.contains(id)) {
+				continue;
+			}
+			const auto& material = meshRenderer.materials[id];
+
+			if (material == nullptr || material->shaderAsset == nullptr)
+				continue;
+
+			if (not material->shaderAsset->isTransparent)
 				continue;
 
 			const auto shaderResult = PrepareShader(*material->shaderAsset);
@@ -359,7 +445,23 @@ void Renderer::RenderSkybox() {
 }
 
 void Renderer::HdrToCubemaps() {
+	if (cubemapId != 0) {
+		glDeleteTextures(1, &cubemapId);
+		cubemapId = 0;
+	}
+	if (irradianceId != 0) {
+		glDeleteTextures(1, &irradianceId);
+		irradianceId = 0;
+	}
+	if (prefilterMapId != 0) {
+		glDeleteTextures(1, &prefilterMapId);
+		prefilterMapId = 0;
+	}
 	
+	if (hdrSkybox == nullptr) {
+		return;
+	}
+
 	if (cubemapId == 0) {
 		glGenTextures(1, &cubemapId);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapId);

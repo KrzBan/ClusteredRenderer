@@ -58,6 +58,8 @@ struct ShaderAsset : public Asset {
 	Shared<ShaderSourceAsset> fragment;
 	Shared<ShaderSourceAsset> compute;
 
+	bool isTransparent = false;
+
 	std::string status = "Not built";
 };
 
