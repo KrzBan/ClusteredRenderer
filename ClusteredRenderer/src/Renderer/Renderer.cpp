@@ -18,6 +18,11 @@ struct LightSSBO {
 	float range;
 };
 
+struct ClusterSSBO {
+	uint32 lightOffset;
+	uint32 pointLightCount;
+};
+
 struct [[nodiscard]] glEnableScoped {
 	glEnableScoped(uint32 option) : m_Option{ option } {
 		glEnable(m_Option);
@@ -55,7 +60,18 @@ Renderer::Renderer() {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSSBO) * 1000, nullptr, GL_DYNAMIC_DRAW);
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	// Create SSBO for Clusters
+	glGenBuffers(1, &ssboClusters);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboClusters);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboClusters);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &ssboLightIndices);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLightIndices);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssboLightIndices);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	// Load Postprocess
 	const auto LoadShader = [](ShaderRenderInfo& renderInfo, 
@@ -159,19 +175,108 @@ Renderer::Renderer() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::UpdateLights(Scene& scene) {
+// 2D Polyhedral Bounds of a Clipped, Perspective-Projected 3D Sphere. Michael Mara, Morgan McGuire. 2013
+bool ProjectSphereView(const glm::vec3& c, float r, float znear, float P00, float P11, glm::vec4& aabb) {
+	if ( c.z < (znear + r))
+		return false;
+
+	glm::vec3 cr = c * r;
+	float czr2 = c.z * c.z - r * r;
+
+	float vx = std::sqrt(c.x * c.x + czr2);
+	float minx = (vx * c.x - cr.z) / (vx * c.z + cr.x);
+	float maxx = (vx * c.x + cr.z) / (vx * c.z - cr.x);
+
+	float vy = std::sqrt(c.y * c.y + czr2);
+	float miny = (vy * c.y - cr.z) / (vy * c.z + cr.y);
+	float maxy = (vy * c.y + cr.z) / (vy * c.z - cr.y);
+
+	aabb = glm::vec4(minx * P00, miny * P11, maxx * P00, maxy * P11);
+	// clip space -> uv space
+	aabb = glm::vec4(aabb.x, aabb.w, aabb.z, aabb.y) * glm::vec4(0.5f, -0.5f, 0.5f, -0.5f) + glm::vec4(0.5f);
+
+	return true;
+}
+
+void UpdateClipRegionRoot(float nc, float lc, float lz, float Radius, float CameraScale, float& ClipMin, float& ClipMax) {
+	float nz = (Radius - nc * lc) / lz;
+	float pz = (lc * lc + lz * lz - Radius * Radius) / (lz - (nz / nc) * lc);
+	if (pz > 0.0f) {
+		float c = -nz * CameraScale / nc;
+		if (nc > 0.0f)
+			ClipMin = std::max(ClipMin, c);
+		else
+			ClipMax = std::min(ClipMax, c);
+	}
+}
+
+void UpdateClipRegion(float lc, float lz, float Radius, float CameraScale, float& ClipMin, float& ClipMax) {
+	float rSq = Radius * Radius;
+	float lcSqPluslzSq = lc * lc + lz * lz;
+	float d = rSq * lc * lc - lcSqPluslzSq * (rSq - lz * lz);
+	if (d > 0.0f) {
+		float a = Radius * lc;
+		float b = sqrt(d);
+		float nx0 = (a + b) / lcSqPluslzSq;
+		float nx1 = (a - b) / lcSqPluslzSq;
+		UpdateClipRegionRoot(nx0, lc, lz, Radius, CameraScale, ClipMin, ClipMax);
+		UpdateClipRegionRoot(nx1, lc, lz, Radius, CameraScale, ClipMin, ClipMax);
+	}
+}
+
+void ComputeClipRegion(const glm::vec3& Center, float Radius, glm::vec4& ClipRegion, float CameraNear, const glm::mat4& Projection) {
+	ClipRegion = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
+	if ((Center.z + Radius) >= CameraNear) {
+		glm::vec2 ClipMin = glm::vec2(-1.0f, -1.0f);
+		glm::vec2 ClipMax = glm::vec2(+1.0f, +1.0f);
+		UpdateClipRegion(Center.x, Center.z, Radius, Projection[0].x, ClipMin.x, ClipMax.x);
+		UpdateClipRegion(Center.y, Center.z, Radius, Projection[1].y, ClipMin.y, ClipMax.y);
+		ClipRegion = glm::vec4(ClipMin, ClipMax);
+	}
+}
+
+void ComputeBoundingBox(const glm::vec3& Center, float Radius, glm::vec4& Bounds, float CameraNear, const glm::mat4& Projection) {
+	ComputeClipRegion(Center, Radius, Bounds, CameraNear, Projection);
+	Bounds = 0.5f * glm::vec4(Bounds.x, -Bounds.w, Bounds.z, -Bounds.y) + 0.5f;
+}
+
+struct LightClusteredInfo {
+	LightComponent& lightComp;
+	glm::vec2 xExtents;
+	glm::vec2 yExtents;
+	glm::vec2 zExtents;
+};
+
+void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4& view) {
 	// Set lights
 	std::vector<LightSSBO> lights;
+	std::vector<LightClusteredInfo> lightClusteredInfos;
+
 	auto transLight = scene.m_Registry.group(entt::get<TransformComponent, LightComponent>);
 	for (auto entity : transLight) {
 		auto [transform, light] = transLight.get<TransformComponent, LightComponent>(entity);
 
-		if (light.isActive)
-			lights.push_back({ glm::vec4(transform.Translation, 1.0f), 
+		if (light.isActive) {
+			glm::vec4 aabb{};
+			auto viewSpace = view * transform.GetTransform() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+			viewSpace.z = -viewSpace.z;
+			ComputeBoundingBox(viewSpace, light.range, aabb,
+				camera.m_NearClip, camera.m_Projection);
+				
+			const auto lightClusterInfo = LightClusteredInfo{
+				light, { aabb[0], aabb[2] }, { aabb[1], aabb[3] },
+				{ viewSpace.z - light.range, viewSpace.z + light.range }
+			};
+			lightClusteredInfos.push_back(lightClusterInfo);
+			
+			spdlog::info("AABB: {}, {}, {}, {}, Z: {}", aabb.x, aabb.y, aabb.z, aabb.w, 
+				glm::to_string(lightClusterInfo.zExtents));
+
+			lights.push_back({ glm::vec4(transform.Translation, 1.0f),
 				light.ambient, light.diffuse, light.specular,
 				light.ambientStrength, light.diffuseStrength, light.specularStrength,
-				light.range
-				});
+				light.range });
+		}
 	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
@@ -185,7 +290,16 @@ void Renderer::UpdateLights(Scene& scene) {
 		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &invalid, GL_DYNAMIC_DRAW);
 	}
 
-	// glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	static std::array<uint32, 6> data = { 1, 2, 3, 4, 5, 6 };
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboClusters);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboClusters);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32) * data.size(), data.data(), GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLightIndices);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssboLightIndices);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32) * data.size(), data.data(), GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void Renderer::RenderMeshes(Scene& scene) {
@@ -620,7 +734,7 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	UpdateLights(scene);
+	UpdateLights(scene, camera, transform);
 	RenderMeshes(scene);
 
 	RenderSkybox();
@@ -861,6 +975,22 @@ std::expected<ShaderRenderInfo, std::string> Renderer::CompileShader(const Shade
 	}
 	else {
 		glShaderStorageBlockBinding(programId, lightsShaderStorageBlockIndex, 0);
+	}
+
+	GLuint clustersShaderStorageBlockIndex = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, "s_Clusters");
+	if (clustersShaderStorageBlockIndex == GL_INVALID_INDEX) {
+		spdlog::info("[Renderer::CompileShader] Shader does not contain Shader Storage Block Index: s_Clusters");
+	}
+	else {
+		glShaderStorageBlockBinding(programId, clustersShaderStorageBlockIndex, 1);
+	}
+
+	GLuint lightIndicesShaderStorageBlockIndex = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, "s_LightIndices");
+	if (lightIndicesShaderStorageBlockIndex == GL_INVALID_INDEX) {
+		spdlog::info("[Renderer::CompileShader] Shader does not contain Shader Storage Block Index: s_LightIndices");
+	}
+	else {
+		glShaderStorageBlockBinding(programId, lightIndicesShaderStorageBlockIndex, 2);
 	}
 
 	if (error == "")

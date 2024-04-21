@@ -35,7 +35,7 @@ private:
 	void DrawScreenQuad();
 	void DrawCube();
 
-	void UpdateLights(Scene& scene);
+	void UpdateLights(Scene& scene, const Camera& camera, const glm::mat4& view);
 	void RenderMeshes(Scene& scene);
 	void RenderGrid();
 	void Postprocess();
@@ -63,8 +63,15 @@ public:
 	bool wireframeOverride = false;
 
 private:
-	uint32_t uboMatricies;
-	uint32_t ssboLights;
+	uint32 uboMatricies;
+	uint32 ssboLights;
+
+	uint32 ssboClusters;
+	uint32 ssboLightIndices;
+
+	uint32 clustersX = 64;
+	uint32 clustersY = 64;
+	uint32 clustersZ = 64;
 
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;
