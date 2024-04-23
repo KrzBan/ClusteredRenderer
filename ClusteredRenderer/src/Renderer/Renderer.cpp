@@ -51,9 +51,9 @@ Renderer::Renderer() {
 	// Create Uniform Buffer Object for Camera Projection+View
 	glGenBuffers(1, &uboMatricies);
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4) + sizeof(glm::vec2), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4));
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4) + sizeof(glm::vec2));
 
 	// Create SSBO for lights
 	glGenBuffers(1, &ssboLights);
@@ -269,8 +269,8 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 			};
 			lightClusteredInfos.push_back(lightClusterInfo);
 			
-			spdlog::info("AABB: {}, {}, {}, {}, Z: {}", aabb.x, aabb.y, aabb.z, aabb.w, 
-				glm::to_string(lightClusterInfo.zExtents));
+			//spdlog::info("AABB: {}, {}, {}, {}, Z: {}", aabb.x, aabb.y, aabb.z, aabb.w, 
+			//	glm::to_string(lightClusterInfo.zExtents));
 
 			lights.push_back({ glm::vec4(transform.Translation, 1.0f),
 				light.ambient, light.diffuse, light.specular,
@@ -729,9 +729,12 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Set camera matricies
+	glm::vec2 windowSize = { hdrFbo.GetWidth(), hdrFbo.GetHeight() };
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::vec2), glm::value_ptr(windowSize));
+
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	UpdateLights(scene, camera, transform);
