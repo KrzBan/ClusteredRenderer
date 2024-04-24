@@ -51,9 +51,9 @@ Renderer::Renderer() {
 	// Create Uniform Buffer Object for Camera Projection+View
 	glGenBuffers(1, &uboMatricies);
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatricies);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4) + sizeof(glm::vec2), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4) + sizeof(glm::vec2) + 2 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4) + sizeof(glm::vec2));
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatricies, 0, 2 * sizeof(glm::mat4) + sizeof(glm::vec2) + 2 * sizeof(float));
 
 	// Create SSBO for lights
 	glGenBuffers(1, &ssboLights);
@@ -734,6 +734,8 @@ void Renderer::RenderScene(Scene& scene, const Camera& camera, const glm::mat4& 
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.GetProjection()));
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(transform));
 	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::vec2), glm::value_ptr(windowSize));
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4) + sizeof(glm::vec2), sizeof(float), &camera.m_NearClip);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4) + sizeof(glm::vec2) + sizeof(float), sizeof(float), &camera.m_FarClip);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
