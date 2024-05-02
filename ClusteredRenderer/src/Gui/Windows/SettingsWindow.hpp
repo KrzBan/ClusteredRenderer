@@ -45,7 +45,7 @@ public:
 		return SETTINGS_NAME;
 	};
 
-	SettingsWindowOutput Draw(std::chrono::nanoseconds renderTimeNs, Renderer& renderer) {
+	SettingsWindowOutput Draw(std::chrono::nanoseconds renderTimeNs, Renderer& renderer, Camera& editorCamera) {
 		SettingsWindowOutput output{};
 		
 		using namespace std::chrono_literals;
@@ -117,6 +117,34 @@ public:
 				ImGui::Text("Render Wireframe");
 				ImGui::TableNextColumn();
 				ImGui::Checkbox("##RenderWireframe", &renderer.wireframeOverride);
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Clusters");
+				ImGui::TableNextColumn();
+				uint32 minValue = 1;
+				uint32 maxValue = 512;
+				ImGui::DragScalarN("##Clusters",ImGuiDataType_U32, &renderer.numClusters, 3, 0.5f, &minValue, &maxValue);
+
+				ImGui::TableNextColumn();
+				ImGui::Separator();
+				ImGui::TableNextColumn();
+				ImGui::Separator();
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Near Clip Plane");
+				ImGui::TableNextColumn();
+				float nearClipPlane = editorCamera.GetNearClipPlane();
+				if (ImGui::DragFloat("##NearClipPlane", &nearClipPlane, 0.005f, 0.00001f, 10.0f)) {
+					editorCamera.SetNearClipPlane(nearClipPlane);
+				}
+
+				ImGui::TableNextColumn();
+				ImGui::Text("Far Clip Plane");
+				ImGui::TableNextColumn();
+				float farClipPlane = editorCamera.GetFarClipPlane();
+				if (ImGui::DragFloat("##FarClipPlane", &farClipPlane, 1.0f, 1.0f, 10000.0f)) {
+					editorCamera.SetFarClipPlane(farClipPlane);
+				}
 
 				ImGui::EndTable();
 

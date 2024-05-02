@@ -61,6 +61,7 @@ public:
 	float gamma = 2.2f;
 
 	bool wireframeOverride = false;
+	glm::uvec4 numClusters{ 16, 9, 24, 1 };
 
 private:
 	uint32 uboMatricies;
@@ -68,10 +69,6 @@ private:
 
 	uint32 ssboClusters;
 	uint32 ssboLightIndices;
-
-	uint32 clustersX = 64;
-	uint32 clustersY = 64;
-	uint32 clustersZ = 64;
 
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;

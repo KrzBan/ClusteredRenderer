@@ -25,7 +25,7 @@ int App::Run() {
 	Scene scene{};
 	Scene sceneRevert{};
 
-	EditorCamera editorCamera{45, 16/9, 0.1f, 1000.0f};
+	EditorCamera editorCamera{45, 16/9, 0.1f, 100.0f};
 
 	AssetManager::Init(ASSETS_DIR);
 
@@ -132,7 +132,7 @@ int App::Run() {
 		auto inspectorWindowOutput = inspectorWindow.Draw(selection);
 		auto viewportWindowOutput = viewportWindow.Draw(renderer.postprocessFbo.GetColorAttachmentTextureID());
 		auto assetManagerWindowOutput = assetManagerWindow.Draw();
-		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs, renderer);
+		const auto settingsWindowOutput = settingsWindow.Draw(renderTimeNs, renderer, editorCamera);
 		gui.Render(window);
 
 		// Update cameras based on viewport dimensions
