@@ -126,11 +126,6 @@ Renderer::Renderer() {
 		RESOURCES_DIR "shaders/brdf.vert",
 		RESOURCES_DIR "shaders/brdf.frag", {},
 		"brdf");
-	LoadShader(wireframeShaderRenderInfo,
-		RESOURCES_DIR "shaders/wireframe.vert",
-		RESOURCES_DIR "shaders/wireframe.frag",
-		RESOURCES_DIR "shaders/wireframe.geom",
-		"wireframe");
 	
 	const char whiteTexData[] = { 255, 255, 255, 255 };
 	glGenTextures(1, &defaultTextureRenderInfo.textureId);
@@ -303,15 +298,21 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 }
 
 void Renderer::RenderMeshes(Scene& scene) {
-	if (wireframeOverride) {
-		RenderMeshesWireframe(scene);
+	if (materialOverride) {
+		RenderMeshesOverride(scene);
 	}
 	else {
 		RenderMeshesMaterial(scene);
 	}
 }
 
-void Renderer::RenderMeshesWireframe(Scene& scene) {
+void Renderer::RenderMeshesOverride(Scene& scene) {
+	if (materialOverride->shaderAsset == nullptr) {
+		return;
+	}
+
+	const auto* shaderResult = PrepareShader(*materialOverride->shaderAsset);
+
 	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
 	for (auto entity : group) {
 		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
@@ -322,18 +323,15 @@ void Renderer::RenderMeshesWireframe(Scene& scene) {
 		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
 
 		for (const auto& [id, submeshRenderInfo] : meshResult) {
-
-			const auto* shaderResult = &wireframeShaderRenderInfo;
-
 			// Bind uniforms
 			glUseProgram(shaderResult->programId);
 			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
 			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
 
-			int wireColorLoc = glGetUniformLocation(shaderResult->programId, "u_WireColor");
-			glUniform4f(wireColorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
-			int fillColorLoc = glGetUniformLocation(shaderResult->programId, "u_FillColor");
-			glUniform4f(fillColorLoc, 1.0f, 0.0f, 1.0f, 1.0f);
+			uint32 textureSlot = 0;
+			for (const auto& uniform : materialOverride->uniforms) {
+				BindUniform(shaderResult->programId, uniform, textureSlot);
+			}
 
 			// Render
 			glBindVertexArray(submeshRenderInfo->vao);
@@ -1063,11 +1061,16 @@ std::vector<Uniform> Renderer::QueryShaderUniforms(const ShaderAsset& shader) {
 	properties.push_back(GL_NAME_LENGTH);
 	properties.push_back(GL_TYPE);
 	properties.push_back(GL_ARRAY_SIZE);
+	properties.push_back(GL_BLOCK_INDEX);
 	std::vector<GLint> values(properties.size());
 
 	for (int attrib = 0; attrib < numActiveUniforms; ++attrib) {
 		glGetProgramResourceiv(shaderInfo.programId, GL_UNIFORM, attrib, properties.size(),
 			&properties[0], values.size(), NULL, &values[0]);
+
+		// Skip any uniforms that are in a block.
+		if (values[3] != -1)
+			continue;
 
 		nameData.resize(values[0]);
 		glGetProgramResourceName(shaderInfo.programId, GL_UNIFORM, attrib, nameData.size(), NULL, &nameData[0]);

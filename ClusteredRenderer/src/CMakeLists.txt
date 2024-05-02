@@ -11,7 +11,7 @@ target_sources(ClusteredRendererLib PUBLIC
 	"Assets/CommonMetaData.hpp" "Assets/CommonMetaData.cpp"
 
 	"Assets/AssetTypes/AssetType.hpp"
-	"Assets/AssetTypes/MaterialAsset.hpp"
+	"Assets/AssetTypes/MaterialAsset.cpp" "Assets/AssetTypes/MaterialAsset.hpp"
 	"Assets/AssetTypes/TextAsset.hpp"
 
 	"cereal_optional_nvp.h"

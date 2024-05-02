@@ -114,9 +114,9 @@ public:
 				ImGui::Checkbox("##ShowIrradiance", &renderer.showIrradiance);
 
 				ImGui::TableNextColumn();
-				ImGui::Text("Render Wireframe");
+				ImGui::Text("Material Override");
 				ImGui::TableNextColumn();
-				ImGui::Checkbox("##RenderWireframe", &renderer.wireframeOverride);
+				DynamicAssetField(renderer.materialOverride, 1);
 
 				ImGui::TableNextColumn();
 				ImGui::Text("Clusters");

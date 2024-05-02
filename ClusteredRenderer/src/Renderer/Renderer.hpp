@@ -5,6 +5,7 @@
 #include <Scene.hpp>
 #include <Assets/AssetTypes/MeshAsset.hpp>
 #include <Assets/AssetTypes/ShaderAsset.hpp>
+#include <Assets/AssetTypes/MaterialAsset.hpp>
 
 #include "Framebuffer.hpp"
 #include "OpenGL/MeshRenderInfo.hpp"
@@ -42,7 +43,7 @@ private:
 	void RenderSkybox();
 
 	void RenderMeshesMaterial(Scene& scene);
-	void RenderMeshesWireframe(Scene& scene);
+	void RenderMeshesOverride(Scene& scene);
 
 		public:
 	void HdrToCubemaps();
@@ -53,6 +54,7 @@ public:
 	Framebuffer postprocessFbo{ 1, 1, false };
 
 	Shared<Texture2DAsset> hdrSkybox;
+	Shared<MaterialAsset> materialOverride;
 
 	bool renderGrid = true;
 	bool showIrradiance = false;
@@ -81,7 +83,6 @@ private:
 	ShaderRenderInfo irradianceShaderRenderInfo;
 	ShaderRenderInfo prefilterShaderRenderInfo;
 	ShaderRenderInfo brdfShaderRenderInfo;
-	ShaderRenderInfo wireframeShaderRenderInfo;
 
 	uint32 skyboxFbo = 0;
 	uint32 skyboxRbo = 0;
