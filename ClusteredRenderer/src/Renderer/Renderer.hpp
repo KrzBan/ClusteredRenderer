@@ -42,12 +42,8 @@ private:
 	void Postprocess();
 	void RenderSkybox();
 
-	void RenderMeshesMaterial(Scene& scene);
-	void RenderMeshesOverride(Scene& scene);
-
-		public:
+public:
 	void HdrToCubemaps();
-
 
 public:
 	Framebuffer hdrFbo{ 1, 1, true };

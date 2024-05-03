@@ -298,51 +298,6 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 }
 
 void Renderer::RenderMeshes(Scene& scene) {
-	if (materialOverride) {
-		RenderMeshesOverride(scene);
-	}
-	else {
-		RenderMeshesMaterial(scene);
-	}
-}
-
-void Renderer::RenderMeshesOverride(Scene& scene) {
-	if (materialOverride->shaderAsset == nullptr) {
-		return;
-	}
-
-	const auto* shaderResult = PrepareShader(*materialOverride->shaderAsset);
-
-	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
-	for (auto entity : group) {
-		auto [transform, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
-
-		if (meshRenderer.mesh == nullptr || not meshRenderer.isActive)
-			continue;
-
-		const auto meshResult = PrepareMesh(*meshRenderer.mesh);
-
-		for (const auto& [id, submeshRenderInfo] : meshResult) {
-			// Bind uniforms
-			glUseProgram(shaderResult->programId);
-			const auto modelUniformLocation = glGetUniformLocation(shaderResult->programId, "model");
-			glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(transform.GetTransform()));
-
-			uint32 textureSlot = 0;
-			for (const auto& uniform : materialOverride->uniforms) {
-				BindUniform(shaderResult->programId, uniform, textureSlot);
-			}
-
-			// Render
-			glBindVertexArray(submeshRenderInfo->vao);
-			glDrawElements(GL_TRIANGLES, submeshRenderInfo->nIndicies, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-		}
-	}
-}
-
-
-void Renderer::RenderMeshesMaterial(Scene& scene) {
 	auto group = scene.m_Registry.group(entt::get<TransformComponent, MeshRendererComponent>);
 	// Non Transparent
 	for (auto entity : group) {
@@ -357,7 +312,11 @@ void Renderer::RenderMeshesMaterial(Scene& scene) {
 			if (not meshRenderer.materials.contains(id)) {
 				continue;
 			}
-			const auto& material = meshRenderer.materials[id];
+			const auto& material = [&]() {
+				if (materialOverride == nullptr)
+					return meshRenderer.materials[id];
+				return materialOverride;
+			}();
 
 			if (material == nullptr || material->shaderAsset == nullptr)
 				continue;
@@ -439,7 +398,11 @@ void Renderer::RenderMeshesMaterial(Scene& scene) {
 			if (not meshRenderer.materials.contains(id)) {
 				continue;
 			}
-			const auto& material = meshRenderer.materials[id];
+			const auto& material = [&]() {
+				if (materialOverride == nullptr)
+					return meshRenderer.materials[id];
+				return materialOverride;
+			}();
 
 			if (material == nullptr || material->shaderAsset == nullptr)
 				continue;
