@@ -232,14 +232,24 @@ void ComputeClipRegion(const glm::vec3& Center, float Radius, glm::vec4& ClipReg
 
 void ComputeBoundingBox(const glm::vec3& Center, float Radius, glm::vec4& Bounds, float CameraNear, const glm::mat4& Projection) {
 	ComputeClipRegion(Center, Radius, Bounds, CameraNear, Projection);
-	Bounds = 0.5f * glm::vec4(Bounds.x, -Bounds.w, Bounds.z, -Bounds.y) + 0.5f;
+	Bounds = 0.5f * glm::vec4(Bounds.x, -Bounds.y, Bounds.z, -Bounds.w) + 0.5f;
+	Bounds[1] = Bounds[1] * -1.0f + 1.0f;
+	Bounds[3] = Bounds[3] * -1.0f + 1.0f;
 }
 
 struct LightClusteredInfo {
 	LightComponent& lightComp;
+
 	glm::vec2 xExtents;
 	glm::vec2 yExtents;
 	glm::vec2 zExtents;
+
+	size_t lightId;
+};
+
+struct ClusterInfo {
+	uint32 numLights;
+	uint32 offset;
 };
 
 void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4& view) {
@@ -258,21 +268,81 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 			ComputeBoundingBox(viewSpace, light.range, aabb,
 				camera.m_NearClip, camera.m_Projection);
 				
+			// (upper left, lower right) point on screen
 			const auto lightClusterInfo = LightClusteredInfo{
 				light, { aabb[0], aabb[2] }, { aabb[1], aabb[3] },
-				{ viewSpace.z - light.range, viewSpace.z + light.range }
+				{ viewSpace.z - light.range, viewSpace.z + light.range }, lights.size()
 			};
+
+			if (aabb.x >= 1.0f || aabb.z <= 0.0f ||
+				aabb.y >= 1.0f || aabb.w <= 0.0f)
+				continue;
+
 			lightClusteredInfos.push_back(lightClusterInfo);
 			
-			//spdlog::info("AABB: {}, {}, {}, {}, Z: {}", aabb.x, aabb.y, aabb.z, aabb.w, 
-			//	glm::to_string(lightClusterInfo.zExtents));
-
 			lights.push_back({ glm::vec4(transform.Translation, 1.0f),
 				light.ambient, light.diffuse, light.specular,
 				light.ambientStrength, light.diffuseStrength, light.specularStrength,
 				light.range });
 		}
 	}
+
+	const auto zFunc = [](float z, float numSlices, float nearPlane, float farPlane) -> float {
+		return nearPlane * std::powf(farPlane/nearPlane, z/numSlices);
+	};
+
+	std::vector<ClusterInfo> clusterInfos{numClusters.x * numClusters.y * numClusters.z};
+	std::vector<uint32> lightIndices;
+	std::vector<std::vector<uint32>> lightIndicesPerZ(numClusters.z);
+
+	std::vector<uint32> zIndexes(numClusters.z);
+	std::iota(zIndexes.begin(), zIndexes.end(), 0);
+
+	std::for_each(std::execution::par, zIndexes.begin(), zIndexes.end(), [&](uint32 z) {
+		glm::vec2 zExtents = { zFunc(z, numClusters.z, camera.m_NearClip, camera.m_FarClip),
+			zFunc((z + 1), numClusters.z, camera.m_NearClip, camera.m_FarClip) };
+
+		for (size_t y = 0; y < numClusters.y; ++y) {
+			glm::vec2 yExtents = { y * 1.0f / numClusters.y, (y + 1) * 1.0f / numClusters.y };
+			for (size_t x = 0; x < numClusters.x; ++x) {
+				glm::vec2 xExtents = { x * 1.0f / numClusters.x, (x + 1) * 1.0f / numClusters.x };
+
+				size_t clusterId = x + y * numClusters.x + z * numClusters.x * numClusters.y;
+
+				uint32 numLights = 0;
+				uint32 offset = lightIndicesPerZ[z].size();
+
+				for (const auto& lightClusterInfo : lightClusteredInfos) {
+
+					if (
+						(xExtents.x <= lightClusterInfo.xExtents.y && lightClusterInfo.xExtents.x <= xExtents.y) &&
+						(yExtents.x <= lightClusterInfo.yExtents.y && lightClusterInfo.yExtents.x <= yExtents.y) &&
+						(zExtents.x <= lightClusterInfo.zExtents.y && lightClusterInfo.zExtents.x <= zExtents.y)) {
+						// Light in cluster
+						lightIndicesPerZ[z].push_back(lightClusterInfo.lightId);
+						++numLights;
+					}
+				}
+
+				clusterInfos[clusterId] = { numLights, offset };
+			}
+		}
+	});
+
+	for (const auto& vec : lightIndicesPerZ) {
+		std::copy(vec.begin(), vec.end(), std::back_inserter(lightIndices));
+	}
+
+	uint32 accumulatedOffset = 0;
+	for (uint32 z = 1; z < numClusters.z; ++z) {
+		accumulatedOffset += lightIndicesPerZ[z - 1].size();
+		
+		for (uint32 id = 0; id < numClusters.x * numClusters.y; ++id) {
+			uint32 clusterId = id + z * numClusters.x * numClusters.y;
+			clusterInfos[clusterId].offset += accumulatedOffset;
+		}
+	}
+	
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLights);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboLights);
@@ -285,14 +355,23 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int), &invalid, GL_DYNAMIC_DRAW);
 	}
 
-	static std::array<uint32, 6> data = { 1, 2, 3, 4, 5, 6 };
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboClusters);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssboClusters);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32) * data.size(), data.data(), GL_DYNAMIC_DRAW);
+	if (clusterInfos.size())
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ClusterInfo) * clusterInfos.size(), clusterInfos.data(), GL_DYNAMIC_DRAW);
+	else {
+		char invalid = 0xBD;
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(char), &invalid, GL_DYNAMIC_DRAW);
+	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLightIndices);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, ssboLightIndices);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32) * data.size(), data.data(), GL_DYNAMIC_DRAW);
+	if (lightIndices.size())
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32) * lightIndices.size(), lightIndices.data(), GL_DYNAMIC_DRAW);
+	else {
+		char invalid = 0xBD;
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(char), &invalid, GL_DYNAMIC_DRAW);
+	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }

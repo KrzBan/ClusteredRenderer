@@ -84,8 +84,6 @@ int App::Run() {
 			scene.OnUpdateEditor(Time::DeltaTime());
 		}
 		
-		std::chrono::steady_clock::time_point renderTsBegin = std::chrono::steady_clock::now();
-
 		// Render
 		if (appState.isRuntime()) {
 			auto cameraEntity = scene.GetPrimaryCameraEntity();
@@ -101,6 +99,8 @@ int App::Run() {
 		else {
 			renderer.RenderScene(scene, editorCamera, editorCamera.GetViewMatrix());
 		}
+
+		std::chrono::steady_clock::time_point renderTsBegin = std::chrono::steady_clock::now();
 
 		GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 		while (glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1e9) != GL_ALREADY_SIGNALED) {}

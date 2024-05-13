@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <execution>
 #include <expected>
 #include <filesystem>
 #include <format>
