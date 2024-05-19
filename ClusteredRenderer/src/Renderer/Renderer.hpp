@@ -14,6 +14,36 @@
 
 #include "UniformTypes.hpp"
 
+class LightComponent;
+
+struct LightClusteredInfo {
+	LightComponent& lightComp;
+
+	glm::vec2 xExtents;
+	glm::vec2 yExtents;
+	glm::vec2 zExtents;
+
+	size_t lightId;
+};
+
+struct LightSSBO {
+	glm::vec4 position;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	float ambientStrength;
+	float diffuseStrength;
+	float specularStrengthl;
+
+	float range;
+};
+
+struct alignas(std::hardware_destructive_interference_size) CacheLinePerZ {
+	std::vector<uint32> vector;
+};
+
 class Renderer {
 public:
 	Renderer();
@@ -67,6 +97,10 @@ private:
 
 	uint32 ssboClusters;
 	uint32 ssboLightIndices;
+
+	std::vector<LightSSBO> lights;
+	std::vector<LightClusteredInfo> lightClusteredInfos;
+	std::vector<CacheLinePerZ> lightIndicesPerZ;
 
 	std::unordered_map<kb::UUID, MeshRenderInfo> m_Meshes;
 	std::unordered_map<kb::UUID, ShaderRenderInfo> m_Shaders;

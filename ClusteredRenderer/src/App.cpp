@@ -102,9 +102,9 @@ int App::Run() {
 
 		std::chrono::steady_clock::time_point renderTsBegin = std::chrono::steady_clock::now();
 
-		GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-		while (glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1e9) != GL_ALREADY_SIGNALED) {}
-		glDeleteSync(fence);
+		//GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		//while (glClientWaitSync(fence, GL_SYNC_FLUSH_COMMANDS_BIT, 1e9) != GL_ALREADY_SIGNALED) {}
+		//glDeleteSync(fence);
 
 		std::chrono::steady_clock::time_point renderTsEnd = std::chrono::steady_clock::now();
 		renderTimeNs = renderTsEnd - renderTsBegin;
