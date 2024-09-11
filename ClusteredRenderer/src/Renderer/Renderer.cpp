@@ -230,8 +230,6 @@ struct ClusterInfo {
 
 void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4& view) {
 	// Set lights
-	auto startLightGather = std::chrono::steady_clock::now();
-
 	lights.clear();
 	lightClusteredInfos.clear();
 
@@ -265,9 +263,6 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 		}
 	}
 
-	auto endLightGather = std::chrono::steady_clock::now();
-	spdlog::info("Light Gather: {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(endLightGather - startLightGather).count());
-
 	const auto zFunc = [](float z, float numSlices, float nearPlane, float farPlane) -> float {
 		return nearPlane * std::powf(farPlane/nearPlane, z/numSlices);
 	};
@@ -278,8 +273,6 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 
 	std::vector<uint32> zIndexes(numClusters.z);
 	std::iota(zIndexes.begin(), zIndexes.end(), 0);
-
-	auto startClusterAssignment = std::chrono::steady_clock::now();
 
 	std::for_each(std::execution::par_unseq, zIndexes.begin(), zIndexes.end(), [&](uint32 z) {
 		glm::vec2 zExtents = { zFunc(z, numClusters.z, camera.m_NearClip, camera.m_FarClip),
@@ -313,9 +306,6 @@ void Renderer::UpdateLights(Scene& scene, const Camera& camera, const glm::mat4&
 			}
 		}
 	});
-
-	auto endClusterAssignment = std::chrono::steady_clock::now();
-	spdlog::info("Cluser Assignment: {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(endClusterAssignment - startClusterAssignment).count());
 
 	std::vector<uint32> lightIndices( std::accumulate(lightIndicesPerZ.begin(), lightIndicesPerZ.end(), size_t{ 0 }, [](size_t lhs, auto vec) { return lhs + vec.vector.size(); }) );
 	size_t offset = 0;

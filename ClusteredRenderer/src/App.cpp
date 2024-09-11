@@ -27,6 +27,13 @@ int App::Run() {
 
 	EditorCamera editorCamera{45, 16/9, 0.1f, 100.0f};
 
+	{	// Create default ClusteredRendererWorkspace
+		const auto assetDirPath = std::filesystem::path(config::assetDirectory);
+		if (not std::filesystem::exists(assetDirPath)) {
+			std::filesystem::create_directory(assetDirPath);
+		}
+	}
+
 	AssetManager::Init(ASSETS_DIR);
 
 	// File Watcher
@@ -34,7 +41,7 @@ int App::Run() {
 	efsw::FileWatcher* fileWatcher = new efsw::FileWatcher();
 	efsw::WatchID watchID = fileWatcher->addWatch(ASSETS_DIR, listener.get(), true);
 	fileWatcher->watch();
-
+	
 	Gui gui(window);
 	AssetManagerWindow assetManagerWindow{};
 	ContentBrowserWindow contentBrowserWindow{};
@@ -154,6 +161,8 @@ int App::Run() {
 
 		// Update asset changes
 		AssetManager::HandleFileChanges(listener->FlushQueue());
+
+		spdlog::info("Frame time: {}", Time::DeltaTime());
 	}
 
 	AssetManager::SaveAll();

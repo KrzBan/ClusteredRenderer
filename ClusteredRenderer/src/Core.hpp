@@ -9,8 +9,8 @@ struct OpenGLVersion {
 	int minor = 0;
 };
 
-#define ASSETS_DIR "F:/dev/ClusteredRendererWorkspace"
-#define ASSETS_DIR_L "F:\\dev\\ClusteredRendererWorkspace"
+#define ASSETS_DIR "ClusteredRendererWorkspace"
+#define ASSETS_DIR_L "ClusteredRendererWorkspace"
 #define RESOURCES_DIR "./resources/"
 
 namespace config {
